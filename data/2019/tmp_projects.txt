@@ -1,0 +1,117 @@
+1;;3;5;alle studier, dog ikke farmaci
+2;;3;5;alle studier, dog ikke farmaci
+3;;3;6;kun farmaci
+4;a;3;4;kun farmaci
+4;b;3;4;kun farmaci
+5;;3;6;kun farmaci
+6;;3;5;alle studier, dog ikke farmaci
+7;a;3;5;alle studier, dog ikke farmaci
+7;b;3;5;alle studier, dog ikke farmaci
+8;;3;5;alle studier, dog ikke farmaci
+9;;3;4;alle studier, dog ikke farmaci
+10;;3;3;alle studier, dog ikke farmaci
+11;;3;4;alle studier, dog ikke farmaci
+12;;3;5;kun farmaci
+14;;3;5;alle
+15;;3;4;alle studier, dog ikke farmaci
+16;;3;5;alle
+17;;3;5;alle studier, dog ikke farmaci
+18;;3;5;alle studier, dog ikke farmaci
+19;;3;5;kun farmaci
+20;;3;5;alle
+21;a;3;5;alle
+21;b;3;5;alle
+22;a;3;5;alle
+22;b;3;5;alle
+22;c;3;5;alle
+23;;3;6;kun farmaci
+24;a;3;4;kun farmaci
+24;b;3;4;kun farmaci
+25;;3;5;alle studier, dog ikke farmaci
+26;;3;5;alle
+27;;3;5;alle studier, dog ikke farmaci
+28;a;3;5;alle
+28;b;3;5;alle
+29;;3;5;alle studier, dog ikke farmaci
+30;;3;6;alle studier, dog ikke farmaci
+31;a;3;5;alle
+31;b;3;5;alle
+32;;3;5;kun farmaci
+33;a;3;5;alle
+33;b;3;5;alle
+34;;3;5;alle studier, dog ikke farmaci
+35;;3;4;kun farmaci
+36;a;3;5;alle
+36;b;3;5;alle
+37;;3;5;alle studier, dog ikke farmaci
+38;;3;3;alle studier, dog ikke farmaci
+39;a;3;5;kun farmaci
+39;b;3;5;kun farmaci
+40;a;3;5;alle
+40;b;3;5;alle
+40;c;3;5;alle
+40;d;3;5;alle
+40;e;3;5;alle
+40;f;3;5;alle
+40;g;3;5;alle
+41;;3;5;alle studier, dog ikke farmaci
+42;;3;5;alle
+43;;3;5;alle studier, dog ikke farmaci
+44;;3;4;alle studier, dog ikke farmaci
+45;;3;5;alle studier, dog ikke farmaci
+46;;3;5;alle
+47;;3;4;alle studier, dog ikke farmaci
+48;;3;4;alle
+49;;3;5;alle studier, dog ikke farmaci
+50;;3;3;alle studier, dog ikke farmaci
+51;;3;5;alle studier, dog ikke farmaci
+52;;3;4;alle studier, dog ikke farmaci
+53;;3;4;alle
+54;a;3;5;alle studier, dog ikke farmaci
+54;b;3;5;alle studier, dog ikke farmaci
+54;c;3;5;alle studier, dog ikke farmaci
+55;;3;5;alle
+56;a;3;5;alle
+56;b;3;5;alle
+57;a;3;4;kun farmaci
+57;b;3;4;kun farmaci
+58;;3;5;alle studier, dog ikke farmaci
+59;a;3;5;alle studier, dog ikke farmaci
+59;b;3;5;alle studier, dog ikke farmaci
+60;;3;4;alle
+61;a;3;5;alle
+61;b;3;5;alle
+62;;3;5;alle studier, dog ikke farmaci
+63;a;3;5;alle studier, dog ikke farmaci
+63;b;3;5;alle studier, dog ikke farmaci
+64;;3;6;kun farmaci
+65;;3;4;alle studier, dog ikke farmaci
+66;;3;4;alle studier, dog ikke farmaci
+67;;3;4;alle studier, dog ikke farmaci
+68;;3;5;alle studier, dog ikke farmaci
+69;;3;4;alle studier, dog ikke farmaci
+70;a;3;5;alle studier, dog ikke farmaci
+70;b;3;5;alle studier, dog ikke farmaci
+71;a;3;6;alle studier, dog ikke farmaci
+71;b;3;6;alle studier, dog ikke farmaci
+72;;3;6;kun farmaci
+73;a;3;5;alle studier, dog ikke farmaci
+73;b;3;5;alle studier, dog ikke farmaci
+73;c;3;5;alle studier, dog ikke farmaci
+74;a;3;5;alle
+74;b;3;5;alle
+75;;3;5;alle studier, dog ikke farmaci
+76;;3;5;alle studier, dog ikke farmaci
+77;;3;5;alle
+78;;3;4;alle
+79;a;3;5;kun farmaci
+79;b;3;5;kun farmaci
+80;;3;5;alle studier, dog ikke farmaci
+81;;3;4;alle
+82;;3;6;kun farmaci
+83;;3;5;alle studier, dog ikke farmaci
+84;;3;5;kun farmaci
+85;;3;5;kun farmaci
+86;;3;4;alle studier, dog ikke farmaci
+87;a;3;4;alle studier, dog ikke farmaci
+87;b;3;4;alle studier, dog ikke farmaci

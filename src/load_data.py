@@ -8,7 +8,7 @@ import csv
 
 
 def minimax_sol(dirname):
-    d = {'2016': 5}
+    d = {'2016': 5, '2019': 7}
 
     return d[dirname.split('/')[-1]]
 
