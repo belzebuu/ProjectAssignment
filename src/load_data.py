@@ -44,6 +44,10 @@ class Problem:
         # ID;team;title;min_cap;max_cap;type;prj_id;instit;institute;mini;wl
         # OLD: ProjektNr; Underprojek; Projekttitel; Min; Max;Projekttype; ProjektNr  i BB; Institut forkortelse; Obligatorisk minikursus; Gruppeplacering
         project_table = pd.read_csv(dirname+"/projects.csv", sep=";")
+        project_table.team = project_table.team.fillna('')
+        project_table.instit = project_table.instit.fillna('')
+        project_table.prj_id = project_table.prj_id.astype(str)
+        project_table.ID = project_table.ID.astype(int)
         project_table.index = project_table["prj_id"]
         project_details = project_table.to_dict("index", into=OrderedDict)
         # topics = {x: list(map(lambda p: p["team"], project_details[x])) for x in project_details}
@@ -71,14 +75,13 @@ class Problem:
                   indent=4, separators=(',', ': '),  ensure_ascii=False)
 
         projects = defaultdict(list)
-
         Team = namedtuple("Team", ("min", "max", "type"))
         for topic in topics:
             for t in topics[topic]:
-                id = str(topic)+t
-                projects[topic].append(Team(project_details[id]["min_cap"],
-                                            project_details[id]["max_cap"],
-                                            project_details[id]["type"]
+                _id = str(topic)+t                
+                projects[topic].append(Team(project_details[_id]["min_cap"],
+                                            project_details[_id]["max_cap"],
+                                            project_details[_id]["type"]
                                             )
                                        )
         return (project_details, topics, projects)
@@ -192,7 +195,7 @@ class Problem:
             std_values[u] = values
             std_ranks[u] = ranks
 
-        # print(std_ranks)
+        #print(std_ranks)
         return std_values, std_ranks
 
     def read_restrictions(self, dirname):

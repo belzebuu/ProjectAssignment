@@ -66,16 +66,16 @@ def model_ip(prob, config):
         peek = prob.std_type[prob.groups[g][0]]
         valid_prjs = [x for x in cal_P if prob.projects[x][0].type in prob.valid_prjtype[peek]]
         #valid_prjs=filter(lambda x: prob.projects[x][0][2]==peek or prob.projects[x][0][2]=='alle', prob.projects.keys())
-
+        print(valid_prjs)
         working = [x[g, p, t] for p in valid_prjs for t in range(len(prob.projects[p]))]
         m.addConstr(quicksum(working) == 1, 'grp_%s' % g)
         for p in cal_P:
             if not p in valid_prjs:
                 for t in range(len(prob.projects[p])):
-                    m.addConstr(x[g, p, t] == 0, 'ngrp_%s' % g)
+                    m.addConstr(x[g, p, t] == 0, 'not_valid_%s' % g)
             if not p in prob.std_ranks[prob.groups[g][0]]:
                 for t in range(len(prob.projects[p])):
-                    m.addConstr(x[g, p, t] == 0, 'ngrp_%s' % g)
+                    m.addConstr(x[g, p, t] == 0, 'not_ranked_%s' % g)
 
     # Capacity constraints
     for p in cal_P:
@@ -110,7 +110,7 @@ def model_ip(prob, config):
     # Compute optimal solution
     m.setObjective(v, GRB.MINIMIZE)
 
-    # m.write("model_ip.lp")
+    m.write("model_ip.lp")
     m.optimize()
 
     # Print solution

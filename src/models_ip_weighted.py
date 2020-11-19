@@ -21,6 +21,7 @@ def calculate_weights(weight_method, max_rank):
     elif weight_method == "powers":
         weights[1:] = [-2 ** max(8 - x, 0) for x in range(1, max_rank + 1)]
         weights[0] = -1
+    print(weights)
     return weights
 
 def model_ip_weighted(prob, config, minimax):
