@@ -3,13 +3,13 @@ from load_data import *
 from time import *
 from gurobipy import *
 from owa import *
+import numpy as np
 
 
-def calculate_weights(weight_method, max_rank):
-    weights = [0] * (max_rank + 1)
+def calculate_weights(weight_method, max_rank):    
     if weight_method == "identity":
-        weights = list(range(max_rank + 1))
-        weights[0] = max_rank + 1
+        weights = np.arange(max_rank + 1, dtype="float")
+        weights[0] = np.nan # max_rank + 1
     elif weight_method == "owa":
         weights = owa_weights(max_rank)
         # beta=1-0.001 #1.0/max_rank - 0.001
@@ -18,10 +18,10 @@ def calculate_weights(weight_method, max_rank):
         # weights[1] = rescale*f_i[0]*beta**(max_rank-1)/(1+beta)**(max_rank-1)
         # weights[2:] = map(lambda x: rescale*f_i[x-1]*beta**(max_rank-x)/(1+beta)**(max_rank+1-x), range(2,max_rank+1))
         # weights[0] = max(weights[1:])+1
-    elif weight_method == "powers":
-        weights[1:] = [-2 ** max(8 - x, 0) for x in range(1, max_rank + 1)]
-        weights[0] = -1
+    elif weight_method == "powers":        
+        weights = np.array([np.nan]+[-2 ** max(8 - x, 0) for x in range(1, max_rank + 1)],dtype="float")        
     print(weights)
+    #raise SystemExit
     return weights
 
 def model_ip_weighted(prob, config, minimax):
@@ -73,8 +73,9 @@ def model_ip_weighted(prob, config, minimax):
                                    obj=0.0,
                                    name='slack_%s_%s' % (p, t))
 
-    v = m.addVar(lb=-2 ** 8 * len(list(prob.std_type.keys())),
-                 ub=len(list(prob.std_type.keys())) * max_rank, vtype=GRB.CONTINUOUS, obj=1.0, name='v')
+    v = m.addVar(lb=-GRB.INFINITY, #-2 ** 8 * len(list(prob.std_type.keys())),
+                 ub=GRB.INFINITY, #len(list(prob.std_type.keys())) * max_rank, 
+                 vtype=GRB.CONTINUOUS, obj=1.0, name='v')
 
     ############################################################
     if config.instability == True:
@@ -132,10 +133,10 @@ def model_ip_weighted(prob, config, minimax):
         for p in cal_P:
             if not p in valid_prjs:
                 for t in range(len(prob.projects[p])):
-                    m.addConstr(x[g, p, t] == 0, 'ngrp_%s' % g)
+                    m.addConstr(x[g, p, t] == 0, 'not_valid_%s' % g)
             if not p in prob.std_ranks[prob.groups[g][0]]:
                 for t in range(len(prob.projects[p])):
-                    m.addConstr(x[g, p, t] == 0, 'ngrp_%s' % g)
+                    m.addConstr(x[g, p, t] == 0, 'not_ranked_%s' % g)
 
     # Capacity constraints
     for p in cal_P:
@@ -163,7 +164,7 @@ def model_ip_weighted(prob, config, minimax):
     ############################################################
     # weighted
     m.addConstr(v >= quicksum(weights[grp_ranks[g][p]] * a[g] * x[g, p, t] for g in list(
-        prob.groups.keys()) for p in list(grp_ranks[g].keys()) for t in range(len(prob.projects[p]))), 'v')
+        prob.groups.keys()) for p in list(grp_ranks[g].keys()) for t in range(len(prob.projects[p]))), 'weight_v')
 
     ############################################################
     # instability
@@ -198,8 +199,8 @@ def model_ip_weighted(prob, config, minimax):
                         quicksum(grp_ranks[g][p] * x[g, p, t] for p in list(grp_ranks[g].keys())
                                  for t in range(len(prob.projects[p]))),
                         'u_%s' % (g))
-            m.addConstr(f >= u[g], 'v_%s' % g)
-        m.addConstr(f <= minimax, 'minimax_%s' % minimax)
+            m.addConstr(f >= u[g], 'minimax_%s' % g)
+        m.addConstr(f <= minimax, 'minimax')
         # W_f = 1.0 #max_rank*len(prob.std_type.keys())*len(prob.std_type.keys())*1000
     ############################################################
     # Compute optimal solution

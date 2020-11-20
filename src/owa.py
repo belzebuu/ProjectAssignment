@@ -11,13 +11,13 @@ def owa_weights_values(number_of_values, beta):
     Returns:
          Weights for values [1, ... ,]. The first element (weights[0] is the largest weight)
     """
-    weights = [0]*(number_of_values+1)
+    weights = np.zezros(number_of_values+1, dtype="float")
     rescale = 10000
     weights[1] = rescale*beta**(number_of_values-1) / \
         (1+beta)**(number_of_values-1)
     weights[2:] = [rescale*beta**(number_of_values-x)/(1+beta) **
                    (number_of_values+1-x) for x in range(2, number_of_values+1)]
-    weights[0] = max(weights[1:])+1
+    weights[0] = np.nan # max(weights[1:])+1
 
     # print(["%0.5f" % x for x in weights[1:]])
     return weights

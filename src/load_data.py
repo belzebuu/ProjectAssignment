@@ -103,7 +103,7 @@ class Problem:
 
         # grp_id;group;username;type;priority_list;student_id;full_name;email;timestamp
         student_table = pd.read_csv(dirname+"/students.csv", sep=";")
-        student_table["username"].apply(lambda x: x.lower())
+        student_table["username"] = student_table["username"].apply(str.lower)
         student_table.index = student_table["username"]
         student_details = student_table.to_dict("index", into=OrderedDict)
 
@@ -220,5 +220,5 @@ class Problem:
         except csv.Error as e:
             sys.exit('file %s, line %d: %s' % (filename, reader.line_num, e))
             # return {'biologi': ["alle", "natbidat"],"farmaci": ["alle","farmaci"],"natbidat": ["alle","natbidat"]}
-        print(valid_prjtypes)
+        #print(valid_prjtypes)
         return valid_prjtypes

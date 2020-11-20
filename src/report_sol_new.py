@@ -14,13 +14,6 @@ from collections import OrderedDict
 from load_data import Problem
 
 
-output1 = os.path.join("out", "output1")
-output2 = "out/output2.txt"
-output3 = "out/output3.csv"
-output4 = "out/output4.csv"
-output5 = "out/output5.txt"
-
-
 def read_solution(solfile):
     ass_std2team = {}
     ass_team2std = defaultdict(set)
@@ -32,6 +25,7 @@ def read_solution(solfile):
         ass_std2team[parts[0]] = (int(parts[1]), parts[2])
         ass_team2std[parts[1]+parts[2]].add(parts[0])
 
+    print(ass_std2team, ass_team2std)
     return ass_std2team, ass_team2std
 
 
@@ -64,8 +58,9 @@ def project_table(ass_std2team, ass_team2std, popularity, max_p, prob):
 
     # Print per project in std
     # and collect student assigned for later output
-
-    f2 = open(output2, "w")
+    output1=os.path.join("out","projects")
+    
+    filehandle = open(output1+".txt", "w")
     studentassignments = []
     project_details = OrderedDict()
     for i in sorted(prob.topics.keys()):
@@ -88,20 +83,20 @@ def project_table(ass_std2team, ass_team2std, popularity, max_p, prob):
 
             project_details[pID]["assigned"] = []
             if (std_assigned > 0):
-                f2.write("%s: %s\n" %
+                filehandle.write("%s: %s\n" %
                          (pID,
                           project_details[pID]["title"])
                          )
                 for sID in sorted(ass_team2std[pID]):
                     project_details[pID]["assigned"].append(sID)
-                    f2.write("%s, %s, %s\n" %
+                    filehandle.write("%s, %s, %s\n" %
                              (prob.student_details[sID]["email"],
                               # prob.student_details[sID]["Efternavn"],
                               prob.student_details[sID]["full_name"],
                               prob.student_details[sID]["priority_list"]))
-                f2.write("\n")
+                filehandle.write("\n")
 
-    f2.close()
+    filehandle.close()
 
     with codecs.open(output1+".json",  "w", "utf-8") as filehandle:
         json.dump(project_details, fp=filehandle, sort_keys=True,
@@ -111,78 +106,28 @@ def project_table(ass_std2team, ass_team2std, popularity, max_p, prob):
     table.to_csv(output1+".csv")
 
 
-def student_table(prob):
+def student_table(ass_std2team, ass_team2std, prob):
     # Now output to a file the info per student
-    #
-    # Info is:
-    #   StudentID, StudentType, ProjectID, ProjectTitle, ProjectType,
-    #   isProjectUnderfull?, wishlistOfStudent
-
-    # put into sID order (as sID is first element of list for each student):
-    studentassignments.sort()
-
     # output:
-    f = open(output3, "w")
-    #        for [sID,sType,pID,ptitle,ptype,underfull,wishlist] in studentassignments:
-    #                wlist = ",".join(wishlist)
-    #                f.write("%s;%s;%s;%s;%s;%s;%s\n" %
-    #                                (sID,sType,pID,ptitle,ptype,underfull,wlist))
-    #        f.close()
+    outfile = os.path.join("out", "students")
+  
+    student_details=OrderedDict()
+    for g in prob.groups.keys():
+        for s in prob.groups[g]:
+            student_details[s]=(prob.student_details[s]).copy()
+            student_details[s]["team_assigned"]="".join(map(str, ass_std2team[s]) )
+            student_details[s]["topic_assigned"]=ass_std2team[s][0]
+            student_details[s]["priority_assigned"]=prob.std_ranks[s][ass_std2team[s][0]]
+  
+    with codecs.open(outfile+".json",  "w", "utf-8") as filehandle:
+        json.dump(student_details, fp=filehandle, sort_keys=True,
+                  indent=4, separators=(',', ': '),  ensure_ascii=False)
+  
+    table = pd.DataFrame.from_dict(student_details, orient='index')
+    table.to_csv(outfile+".csv", sep=";",index=False,columns=["username","type","grp_id","topic_assigned","team_assigned","priority_assigned"])
 
-    for s in students:  # problem.groups.keys():
-        prob.student_details[s]["DerfraIkkeTilladt"] = []
-        peek = prob.student_details[s]["type"]
-        # d={'biologi': ["alle", "natbidat"],"farmaci": ["alle","farmaci"],"natbidat": ["alle","natbidat"]} # which projects for students
-        valid_prjs = [x for x in sorted(prob.topics.keys()) if prob.project_details[str(
-            x)+prob.topics[x][0]]["type"] in prob.valid_prjtype[peek]]
-        # valid_prjs=filter(lambda x: prob.project_details[str(x)+prob.topics[x][0]]["MinProjektType"]==peek or prob.project_details[str(x)+prob.topics[x][0]]["ProjektType"]=='alle', sorted(prob.topics.keys()))
-        # print set(prob.student_details[s]["prob.prioritiesiteringsliste"])
-        diff = set(prob.student_details[s]["PrioriteringsListe"]) - set(valid_prjs)
-        if len(diff) > 0:
-            tmp = []
-            for p in diff:
-                tmp.append(p)
-            prob.student_details[s]["DerfraIkkeTilladt"] = tmp
-
-    f.write("Brugernavn;StudType;ProjektNr;Undergruppe;ProjektTitel;ProjektType;ProjektStatus;TildeltPrio;PrioriteringsListe;DerfraIkkeTilladt;Min;Max;")
-    f.write("LedigePladser;Navn;Email;GruppeID;Tilmeldingstidspunkt;Institutforkortelse;")
-    f.write("Institut;Minikursus obligatorisk;Gruppeplacering\n")
-    students.sort()
-    for s in students:
-        pID = str(int(ass_std2team[s][0]))+ass_std2team[s][1]
-        # print pID;
-        priolist = prob.student_details[s]["priority_list"]
-        valgt = [x for x in range(1, len(priolist)+1) if int(priolist[x-1])
-                 == int(prob.project_details[pID]["ProjektNr"])]
-        gottenprio = '%s' % ', '.join(map(str, valgt))
-        f.write("%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s\n" %
-                (
-                    prob.student_details[s]["Brugernavn"],
-                    prob.student_details[s]["StudType"],
-                    prob.project_details[pID]["ProjektNr"],
-                    prob.project_details[pID]["Undergruppe"],
-                    prob.project_details[pID]["ProjektTitle"],
-                    prob.project_details[pID]["ProjektType"],
-                    prob.project_details[pID]["ProjektStatus"],
-                    gottenprio,
-                    str(prob.student_details[s]["PrioriteringsListe"]),
-                    prob.student_details[s]["DerfraIkkeTilladt"],
-                    prob.project_details[pID]["Min"],
-                    prob.project_details[pID]["Max"],
-                    prob.project_details[pID]["LedigePladser"],
-                    # prob.project_details[pID]["ProjektNrBB"],
-                    # prob.student_details[s]["CprNr"],
-                    # prob.student_details[s]["Fornavne"],
-                    prob.student_details[s]["Navn"],
-                    prob.student_details[s]["Email"],
-                    prob.student_details[s]["GruppeID"],
-                    prob.student_details[s]["Tilmeldingstidspunkt"],
-                    prob.project_details[pID]["InstitutForkortelse"],
-                    # prob.project_details[pID]["Institut"],
-                    prob.project_details[pID]["Minikursus_obl"],
-                    # # prob.project_details[pID]["Minikursus_anb"],
-                    prob.project_details[pID]["Gruppeplacering"]))
-    f.close()
+    #filehandle = open(outfile+".csv", "w")
+    #filehandle.close()
 
 
 def summarize(ass_std2team, ass_team2std, max_p, prob):
@@ -206,7 +151,7 @@ def summarize(ass_std2team, ass_team2std, max_p, prob):
                 count_teams += 1
                 prj = 1
         count_prj += prj
-        wload_topic[i] = (std_topic, teams)
+        wload_topic[i] = (teams, std_topic)
 
     counter = [0]*max_p
     unprioritized = 0
@@ -232,6 +177,7 @@ def summarize(ass_std2team, ass_team2std, max_p, prob):
         s = s+out+"\n"
 
     print(s)
+    print("{Topic: (n_teams, n_stds)}")
     print(wload_topic)
     #f = open(output1, "a")
     # f.write(s)
@@ -239,7 +185,8 @@ def summarize(ass_std2team, ass_team2std, max_p, prob):
 
 
 def count_popularity(prob):
-    f = open(output4, "w")
+    outfile = os.path.join("out", "popularity")
+    
     popularity = {}
     max_p = 0
     students = list(prob.student_details.keys())
@@ -247,23 +194,27 @@ def count_popularity(prob):
         if (len(prob.priorities[s]) > max_p):
             max_p = len(prob.priorities[s])
     for i in sorted(prob.topics.keys()):
-        popularity[i] = [0]*(max_p+1)
+        popularity[i] = [0]*(max_p)
     for s in students:
         for i in range(len(prob.priorities[s])):
             pId = prob.priorities[s][i]
             if pId not in prob.topics:
-                continue  # pId = int(prob.priorities[s][i])
-            popularity[pId][0] += 1
-            popularity[pId][i+1] += 1
-    for i in sorted(prob.topics.keys()):
-        pID = str(int(i))+prob.topics[i][0]
-        f.write(str(i)+";\""+prob.project_details[pID]["title"]+"\";")
-        f.write(prob.project_details[pID]["type"]+";" +
-                prob.project_details[pID]["instit"]+";")
-        for j in range(0, (max_p+1)):
-            f.write(str(popularity[i][j])+";")
-        f.write("\n")
-    f.close()
+                continue  # pId = int(prob.priorities[s][i])            
+            popularity[pId][i] += 1
+    
+    topic_popularity=OrderedDict()
+    for item in sorted(popularity.items(), key = lambda x: x[1][0], reverse=True ):
+        i = item[0]
+        pID = str(i)+prob.topics[i][0]
+        topic_popularity[i] = (prob.project_details[pID]).copy()
+        for j in range(max_p):
+            topic_popularity[i][str(j+1)+". prio."]=popularity[i][j]
+        topic_popularity[i]["tot_popularity"]=sum(popularity[i])
+
+    table = pd.DataFrame.from_dict(topic_popularity, orient='index')
+    columns = ["title","type","instit","tot_popularity"]+[str(j+1)+". prio." for j in range(max_p)]
+    table.to_csv(outfile+".csv", sep=";",index=False,columns=columns)
+
     return popularity, max_p
 
 
@@ -301,7 +252,7 @@ def main(argv):
         sys.exit("Solution infeasible")
     project_table(ass_std2team, ass_team2std, popularity, max_p, problem)
     # institute_wise()
-    # student_table(problem)
+    student_table(ass_std2team, ass_team2std, problem)
     summarize(ass_std2team, ass_team2std, max_p, problem)
 
 
