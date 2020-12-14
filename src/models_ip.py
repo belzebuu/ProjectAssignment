@@ -66,7 +66,7 @@ def model_ip(prob, config):
         peek = prob.std_type[prob.groups[g][0]]
         valid_prjs = [x for x in cal_P if prob.projects[x][0].type in prob.valid_prjtype[peek]]
         #valid_prjs=filter(lambda x: prob.projects[x][0][2]==peek or prob.projects[x][0][2]=='alle', prob.projects.keys())
-        print(valid_prjs)
+        #print(valid_prjs)
         working = [x[g, p, t] for p in valid_prjs for t in range(len(prob.projects[p]))]
         m.addConstr(quicksum(working) == 1, 'grp_%s' % g)
         for p in cal_P:
@@ -96,9 +96,9 @@ def model_ip(prob, config):
         m.addConstr(v >= u[g], 'v_%s' % g)
 
     # enforce restrictions on number of teams open across different topics:
-    for rest in prob.restrictions:
+    for rest in prob.restrictions['nteams']:
         m.addConstr(quicksum(y[p, t] for p in rest["topics"] for t in range(
-            len(prob.projects[p]))) <= rest["cum"], "rest_%s" % "-".join(map(str, rest["topics"])))
+            len(prob.projects[p]))) <= rest["groups_max"], "rest_%s" % rest["username"])
 
     # Symmetry breaking on the teams
     for p in cal_P:

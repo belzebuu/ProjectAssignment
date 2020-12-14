@@ -10,7 +10,9 @@ import pandas as pd
 from collections import defaultdict
 from collections import OrderedDict
 from collections import namedtuple
+import random
 
+random.seed(3)
 
 class Problem:
     def __init__(self, dirname):
@@ -19,7 +21,7 @@ class Problem:
         self.student_details, self.priorities, self.groups, self.std_type = self.read_students(
             dirname)
         self.check_tot_capacity()
-        self.std_values, self.std_ranks = self.calculate_ranks_values()
+        self.std_values, self.std_ranks_av, self.std_ranks_min = self.calculate_ranks_values()
 
         # self.minimax_sol = self.minimax_sol(dirname),
         self.valid_prjtype = self.type_compliance(dirname)
@@ -107,37 +109,47 @@ class Problem:
         student_table.index = student_table["username"]
         student_details = student_table.to_dict("index", into=OrderedDict)
 
+        #for s in student_details:
+        #    student_details[s]["priority_list"] = [
+        #        int(x.strip()) for x in student_details[s]["priority_list"].split(",")]
+        def handle_tie(part):
+            ties = [int(x.strip()) for x in part.split(",")]
+            #random.shuffle(ties)
+            return [ties]
+
+        def process_string(instring):
+            instring=instring.strip(",")
+            #print(instring)
+            if len(instring)==0:
+                return []
+            pos_s = instring.find("(")
+            if pos_s == -1:
+                return [[int(x.strip())] for x in instring.split(",")]
+            else:
+                pos_e = instring.find(")")
+                return process_string(instring[0:pos_s]) + handle_tie(instring[pos_s+1:pos_e]) + process_string(instring[pos_e+1:]) 
+
+        ## Note: we assume a well formed string
         for s in student_details:
-            student_details[s]["priority_list"] = [
-                int(x.strip()) for x in student_details[s]["priority_list"].split(",")]
+            student_details[s]["priority_list_wties"]=student_details[s]["priority_list"]
+            student_details[s]["priority_list"]=process_string(student_details[s]["priority_list"].strip())
 
-        #reader = csv.reader(open(students_file, "r", encoding="utf8"), delimiter=";")
+            for t in student_details[s]["priority_list"]:
+                for p in t:
+                    if p not in self.topics:
+                        print("WARNING:" + u + " expressed a preference for a project " + str(p)+" which is not available")
+                        answer = input("Continue? (y/n)\n")
+                        if answer not in ['', 'Y', 'y']:
+                            sys.exit("You decided to stop")
 
-        # student_details = {}
-        # # GruppeId; Brugernavn; StudType; Prioteringsliste; Studentnavn;  Email; Tilmeldingstidspunkt
-        # for line in reader:
-        #     if line[0][0] == "#":
-        #         continue
-        #     username = line[1].lower()
-        #     student_details[username] = dict(
-        #         GruppeID=line[0],
-        #         Brugernavn=username,
-        #         StudType=line[2].lower(),
-        #         # Studieretning=line[3].lower(),
-        #         PrioriteringsListe=[int(x) for x in line[3].split(",")],
-        #         # CprNr=(len(line)>4 and line[4] or ""),
-        #         # Fornavne=(len(parts)>4 and parts[5] or ""),
-        #         # Efternavn=(len(parts)>4 and parts[6] or ""),
-        #         Navn=(len(line) > 4 and line[4] or ""),
-        #         Email=(len(line) > 4 and line[5] or ""),
-        #         Tilmeldingstidspunkt=(len(line) > 4 and line[6] or "")
-        #     )
+        #print(json.dumps(student_details,indent=4))
 
         filehandle = codecs.open(os.path.join("log", "students.json"),  "w", "utf-8")
         json.dump(student_details, fp=filehandle, sort_keys=True,
                   indent=4, separators=(',', ': '),  ensure_ascii=False)
 
         priorities = {u: student_details[u]["priority_list"] for u in student_details}
+        
         tmp = {u: (student_details[u]["grp_id"], student_details[u]["type"])
                for u in student_details}
         group_ids = {student_details[u]["grp_id"] for u in student_details}
@@ -152,35 +164,28 @@ class Problem:
 
     def calculate_ranks_values(self, prioritize_all=False):
         std_values = {}
-        std_ranks = {}
+        std_ranks_av = {}
+        std_ranks_min = {}
         for u in self.student_details:
             priorities = self.student_details[u]["priority_list"]
 
-            n = len(priorities)
             i = 7
             j = 1
 
             values = {}
-            ranks = {}
-            # print priorities;
+            ranks_av = {}
+            ranks_min = {}
+            #print(priorities)
             for p in priorities:
-                if p not in self.topics:
-                    print("WARNING:" + u + " expressed a preference for a project " +
-                          str(p)+" which is not available")
-                    answer = input(
-                        "Continue? (y/n)\n")
-                    if answer not in ['', 'Y', 'y']:
-                        sys.exit("You decided to stop")
-                    else:  # we increse the priorities anyway.
-                        j += 1
-                        if i > 0:
-                            i = i-1
-                        continue
-                values[p] = 2**i
-                ranks[p] = j
-                j += 1
-                if i > 0:
-                    i = i-1
+                r = len(p)
+                av_exp = sum(range(i-r+1,i+1))/r
+                av_rank = sum(range(j,j+r))/r
+                for t in p:
+                    values[t] = 2**av_exp
+                    ranks_av[t] = av_rank
+                    ranks_min[t] = j
+                j=j+r
+                i=max(0,i-r)
 
             # if we need to ensure feasibility we can insert a low priority for all other projects
             if prioritize_all:
@@ -189,17 +194,25 @@ class Problem:
                 prj_list = random.sample(prj_set, k=len(prj_set))
                 for p in prj_list:
                     values[p] = 2**i
-                    ranks[p] = j
+                    ranks_av[p] = j
+                    ranks_min[p] = j
                     j += 1
 
             std_values[u] = values
-            std_ranks[u] = ranks
+            std_ranks_av[u] = ranks_av
+            std_ranks_min[u] = ranks_min
 
-        #print(std_ranks)
-        return std_values, std_ranks
-
+        #print(std_ranks,std_values)
+        return std_values, std_ranks_av, std_ranks_min
+    
     def read_restrictions(self, dirname):
-        """ reads types """
+        """ reads restrictions """
+        with open(dirname+"/restrictions.json", "r") as jsonfile:
+            restrictions=json.load(jsonfile)
+        return restrictions
+
+    def read_restrictions_csv(self, dirname):
+        """ reads restrictions """
         reader = csv.reader(open(dirname+"/restrictions.csv", "r"), delimiter=";")
         restrictions = []
         try:

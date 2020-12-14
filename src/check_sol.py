@@ -22,8 +22,8 @@ def check_sol(solutions, problem, soldirname=""):
         for s in problem.std_type:
             if s not in sol.topics:
                 unass_students += 1
-            elif sol.topics[s] not in list(problem.std_ranks[s].keys()):
-                print(sol.topics[s], list(problem.std_ranks[s].keys()))
+            elif sol.topics[s] not in list(problem.std_ranks_min[s].keys()):
+                print(sol.topics[s], list(problem.std_ranks_min[s].keys()))
                 sys.exit("%s student assigned to a project not ranked" % s)
 
         # group members are assigned to the same teams
@@ -57,9 +57,9 @@ def check_sol(solutions, problem, soldirname=""):
         for g in problem.groups:
             s = problem.groups[g][0]
             if s in sol.topics:
-                rank = problem.std_ranks[s][sol.topics[s]]
-                for p in list(problem.std_ranks[s].keys()):
-                    if (problem.std_ranks[s][p] < rank):
+                rank = problem.std_ranks_min[s][sol.topics[s]]
+                for p in list(problem.std_ranks_min[s].keys()):
+                    if (problem.std_ranks_min[s][p] < rank):
                         for t in range(len(problem.projects[p])):
                             if len(members[p][t]) > 0:
                                 if len(members[p][t])+len(problem.groups[g]) <= problem.projects[p][t][1]:
@@ -72,7 +72,7 @@ def check_sol(solutions, problem, soldirname=""):
         tot_util = 0
         for s in problem.std_type:
             if s in sol.topics:
-                tot_util += problem.std_ranks[s][sol.topics[s]]
+                tot_util += problem.std_ranks_min[s][sol.topics[s]]
         ############################################################
         # count envy
         tot_envy = 0
@@ -80,24 +80,24 @@ def check_sol(solutions, problem, soldirname=""):
             max_envy = 0
             for s1 in problem.std_type:
                 if s1 != s and s in sol.topics and s1 in sol.topics:
-                    if sol.topics[s1] in problem.std_ranks[s]:
-                        envy = max(0, problem.std_ranks[s][sol.topics[s]] -
-                                   problem.std_ranks[s][sol.topics[s1]])
+                    if sol.topics[s1] in problem.std_ranks_min[s]:
+                        envy = max(0, problem.std_ranks_min[s][sol.topics[s]] -
+                                   problem.std_ranks_min[s][sol.topics[s1]])
                         if (envy > max_envy):
                             max_envy = envy
             tot_envy += max_envy
 
         max_rank = 0
-        for s in list(problem.std_ranks.keys()):
-            if len(problem.std_ranks[s])+1 > max_rank:
-                max_rank = len(problem.std_ranks[s])+1
+        for s in list(problem.std_ranks_min.keys()):
+            if len(problem.std_ranks_min[s])+1 > max_rank:
+                max_rank = len(problem.std_ranks_min[s])+1
 
 # 		max_rank=0
 # 		array_ranks={}
 # 		grp_ranks={}
 # 		for g in problem.groups.keys():
 # 			s=problem.groups[g][0] # we consider only first student, the other must have equal prefs
-# 			grp_ranks[g]=problem.std_ranks[s]
+# 			grp_ranks[g]=problem.std_ranks_min[s]
 # 			if len(grp_ranks[g])+1 > max_rank:
 # 				max_rank=len(grp_ranks[g])+1
 #
@@ -106,7 +106,7 @@ def check_sol(solutions, problem, soldirname=""):
 # 			array_ranks[g]=dict(zip(problem.projects.keys(),values))
 #
 # 		tot_envy1=0
-# 		values = map(lambda x: problem.std_ranks[problem.groups[x][0]], problem.groups.keys())
+# 		values = map(lambda x: problem.std_ranks_min[problem.groups[x][0]], problem.groups.keys())
 # 		grp_rank = dict(zip(problem.groups.keys(), values))
 # 		values = map(lambda x: sol.topics[problem.groups[x][0]], problem.groups.keys())
 # 		grp_sln = dict(zip(problem.groups.keys(), values))
@@ -151,7 +151,7 @@ def check_sol(solutions, problem, soldirname=""):
 
         for s in problem.std_values:
             if s in sol.topics:  # used in the paper:  and len(problem.groups[std_group[s]])==3:
-                rank = problem.std_ranks[s][sol.topics[s]]
+                rank = problem.std_ranks_min[s][sol.topics[s]]
                 counter[rank] += 1
 
         s = "\n"
