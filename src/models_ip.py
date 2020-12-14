@@ -73,7 +73,7 @@ def model_ip(prob, config):
             if not p in valid_prjs:
                 for t in range(len(prob.projects[p])):
                     m.addConstr(x[g, p, t] == 0, 'not_valid_%s' % g)
-            if not p in prob.std_ranks[prob.groups[g][0]]:
+            if not p in prob.std_ranks_min[prob.groups[g][0]]:
                 for t in range(len(prob.projects[p])):
                     m.addConstr(x[g, p, t] == 0, 'not_ranked_%s' % g)
 
@@ -183,7 +183,7 @@ def model_lex(prob, v, h, z, minimax, instability, direction):
     grp_x_ranks = {}
     for g in list(prob.groups.keys()):
         s = prob.groups[g][0]  # we consider only first student, the other must have equal prefs
-        grp_ranks[g] = prob.std_ranks[s]
+        grp_ranks[g] = prob.std_ranks_min[s]
         if len(grp_ranks[g]) > max_rank:
             max_rank = len(grp_ranks[g])
         for p in grp_ranks[g]:
@@ -281,7 +281,7 @@ def model_lex(prob, v, h, z, minimax, instability, direction):
             if not p in valid_prjs:
                 for t in range(len(prob.projects[p])):
                     m.addConstr(x[g, p, t] == 0, 'ngrp_%s' % g)
-            if not p in prob.std_ranks[prob.groups[g][0]]:
+            if not p in prob.std_ranks_min[prob.groups[g][0]]:
                 for t in range(len(prob.projects[p])):
                     m.addConstr(x[g, p, t] == 0, 'ngrp_%s' % g)
 
