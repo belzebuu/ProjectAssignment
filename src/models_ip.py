@@ -15,7 +15,7 @@ def model_ip(prob, config):
     cal_P = list(prob.projects.keys())
     for g in cal_G:
         s = prob.groups[g][0]  # we consider only first student, the other must have equal prefs
-        grp_ranks[g] = prob.std_ranks[s]
+        grp_ranks[g] = prob.std_ranks_min[s]
         if len(grp_ranks[g]) > max_rank:
             max_rank = len(grp_ranks[g])
 
