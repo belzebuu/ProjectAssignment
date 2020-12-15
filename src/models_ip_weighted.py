@@ -29,7 +29,7 @@ def calculate_weight(weight_method, max_rank, rank):
     if weight_method == "identity":
         weight = rank #np.arange(max_rank + 1, dtype="float")
     elif weight_method == "owa":
-        weights = owa_single_weight(rank, max_rank)
+        weight = owa_single_weight(rank, max_rank)
         # beta=1-0.001 #1.0/max_rank - 0.001
         # f_i = [1 for x in range(1,max_rank+1)] #[1./max_rank*x for x in range(1,max_rank+1)]
         # rescale=1000
