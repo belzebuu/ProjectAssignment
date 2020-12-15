@@ -24,6 +24,23 @@ def calculate_weights(weight_method, max_rank):
     #raise SystemExit
     return weights
 
+
+def calculate_weight(weight_method, max_rank, rank):    
+    if weight_method == "identity":
+        weight = rank #np.arange(max_rank + 1, dtype="float")
+    elif weight_method == "owa":
+        weights = owa_single_weight(rank, max_rank)
+        # beta=1-0.001 #1.0/max_rank - 0.001
+        # f_i = [1 for x in range(1,max_rank+1)] #[1./max_rank*x for x in range(1,max_rank+1)]
+        # rescale=1000
+        # weights[1] = rescale*f_i[0]*beta**(max_rank-1)/(1+beta)**(max_rank-1)
+        # weights[2:] = map(lambda x: rescale*f_i[x-1]*beta**(max_rank-x)/(1+beta)**(max_rank+1-x), range(2,max_rank+1))
+        # weights[0] = max(weights[1:])+1
+    elif weight_method == "powers":        
+        weight = -2 ** max(8 - rank, 0) 
+    return weight
+
+
 def model_ip_weighted(prob, config, minimax):
     start = clock()
     m = Model('weighted')
@@ -37,7 +54,7 @@ def model_ip_weighted(prob, config, minimax):
     max_rank = 0
     for g in cal_G:
         s = prob.groups[g][0]  # we consider only first student, the other must have equal prefs
-        grp_ranks[g] = prob.std_ranks[s]
+        grp_ranks[g] = prob.std_ranks_av[s]
         if len(grp_ranks[g]) > max_rank:
             max_rank = len(grp_ranks[g])
 
@@ -134,7 +151,7 @@ def model_ip_weighted(prob, config, minimax):
             if not p in valid_prjs:
                 for t in range(len(prob.projects[p])):
                     m.addConstr(x[g, p, t] == 0, 'not_valid_%s' % g)
-            if not p in prob.std_ranks[prob.groups[g][0]]:
+            if not p in prob.std_ranks_av[prob.groups[g][0]]:
                 for t in range(len(prob.projects[p])):
                     m.addConstr(x[g, p, t] == 0, 'not_ranked_%s' % g)
 
@@ -162,7 +179,7 @@ def model_ip_weighted(prob, config, minimax):
 
     ############################################################
     # weighted
-    m.addConstr(v >= quicksum(weights[grp_ranks[g][p]] * a[g] * x[g, p, t] for g in list(
+    m.addConstr(v >= quicksum(calculate_weight([grp_ranks[g][p]]) * a[g] * x[g, p, t] for g in list(
         prob.groups.keys()) for p in list(grp_ranks[g].keys()) for t in range(len(prob.projects[p]))), 'weight_v')
 
     ############################################################

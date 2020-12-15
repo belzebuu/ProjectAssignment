@@ -59,9 +59,44 @@ def owa_weights_distribution(max_rank):
     # print(["%0.5f" % x for x in weights[1:]])
     return weights
 
+def owa_single_weight(rank, max_rank):
+    """Calculates the OWA weights with the distribution approach
+    More specifically, the function returns the product of w_h and \bar{f}_h
+    used in the last equation of page 54 of the article.
+    With respect to the function above the function includes the calculation of beta and the values \bar{f}_h.
+    These are application specific and must be reconsidered in a different application
+
+    Parameters:
+         max_rank: max rank expressed by the students
+
+    Returns:
+         Weights for rank values [0, 1, ... ,\Delta]. The first element (weights[0] is the largest value in weights)
+    """
+    number_of_values = max_rank  # the default, not used for numerical reasons and because in our instances it is never necessary to have m>8
+    number_of_values = 8  # max number for which to use Yager formula, hardcoded to 8
+    # preparing weights element 0 will become the m-th element
+    weights = [0]*(number_of_values+1)
+    # beta: smaller than the smallest perceived difference among values which is 1 and 1/Delta after normalization
+    beta = 1.0/max_rank - 0.001
+    # beta=1-0.001 # without normalization
+    # f_i = [1]*(number_of_values+1)  # used in most of the calculations
+    f_i = rank*1./number_of_values # for x in range(number_of_values+1)] # described in the paper
+    rescale = 10000
+        
+    if max_rank > number_of_values:
+        weight = rescale * f_i * beta**(number_of_values-1)/(1+beta)**(number_of_values+1-1)
+    else:
+        weight = rescale * f_i * beta**(number_of_values-rank)/(1+beta)**(number_of_values+1-rank)  # 2,3,...,number_of_values
+
+    # print(["%0.5f" % x for x in weights[1:]])
+    return weight
 
 
 owa_weights = owa_weights_distribution
+
+
+
+
 
 
 if __name__ == "__main__":
