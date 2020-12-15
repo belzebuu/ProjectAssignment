@@ -12,7 +12,7 @@ import pandas as pd
 from collections import defaultdict
 from collections import OrderedDict
 from load_data import Problem
-
+import functools
 
 def read_solution(solfile):
     ass_std2team = {}
@@ -35,7 +35,7 @@ def check_sol(ass_std2team, ass_team2std, prob, max_p):  # tablefile=''):
         if s not in ass_std2team:
             isok = False
             print(s+" not assigned!")
-        elif (ass_std2team[s][0] not in prob.priorities[s]):
+        elif (ass_std2team[s][0] not in functools.reduce(lambda x,y: x+y, prob.priorities[s])):
             isok = False
             print(s+" assigned to smth not in his priorities!")
 
@@ -117,7 +117,7 @@ def student_table(ass_std2team, ass_team2std, prob):
             student_details[s]=(prob.student_details[s]).copy()
             student_details[s]["team_assigned"]="".join(map(str, ass_std2team[s]) )
             student_details[s]["topic_assigned"]=ass_std2team[s][0]
-            student_details[s]["priority_assigned"]=prob.std_ranks[s][ass_std2team[s][0]]
+            student_details[s]["priority_assigned"]=prob.std_ranks_min[s][ass_std2team[s][0]]
   
     with codecs.open(outfile+".json",  "w", "utf-8") as filehandle:
         json.dump(student_details, fp=filehandle, sort_keys=True,
@@ -161,8 +161,11 @@ def summarize(ass_std2team, ass_team2std, max_p, prob):
         if s not in ass_std2team:
             unassigned = unassigned+1
             continue
-        if (ass_std2team[s][0] in prob.priorities[s]):
-            counter[prob.priorities[s].index(ass_std2team[s][0])] += 1
+        if (ass_std2team[s][0] in functools.reduce(lambda x,y: x+y, prob.priorities[s])):
+            for i in range(len(prob.priorities[s])):
+                if ass_std2team[s][0] in prob.priorities[s][i]:
+                    counter[i] += 1
+                    break
         else:
             unprioritized += 1
 
@@ -197,10 +200,10 @@ def count_popularity(prob):
         popularity[i] = [0]*(max_p)
     for s in students:
         for i in range(len(prob.priorities[s])):
-            pId = prob.priorities[s][i]
-            if pId not in prob.topics:
-                continue  # pId = int(prob.priorities[s][i])            
-            popularity[pId][i] += 1
+            for pId in prob.priorities[s][i]:
+                if pId not in prob.topics:
+                    continue  # pId = int(prob.priorities[s][i])            
+                popularity[pId][i] += 1
     
     topic_popularity=OrderedDict()
     for item in sorted(popularity.items(), key = lambda x: x[1][0], reverse=True ):

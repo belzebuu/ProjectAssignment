@@ -166,12 +166,11 @@ def model_ip_weighted(prob, config, minimax):
                 m.addConstr(quicksum(x[g, p, t] for g in cal_G) <= 1, 'max_one_grp_%s%s' % (p, t))
 
     # enforce restrictions on number of teams open across different topics:
-    #for rest in prob.restrictions['nteams']:
-    #    m.addConstr(quicksum(y[p, t] for p in rest["topics"] for t in range(len(prob.projects[p]))) <= rest["groups_max"], "rest_%s" % rest["username"])
+    for rest in prob.restrictions['nteams']:
+        m.addConstr(quicksum(y[p, t] for p in rest["topics"] for t in range(len(prob.projects[p]))) <= rest["groups_max"], "rest_%s" % rest["username"])
 
     ############################################################
     # Symmetry breaking on the teams
-
     for p in cal_P:
         for t in range(len(prob.projects[p]) - 1):
             m.addConstr(quicksum(x[g, p, t] for g in list(prob.groups.keys())) >= quicksum(
@@ -184,7 +183,7 @@ def model_ip_weighted(prob, config, minimax):
 
     ############################################################
     # instability
-    if config.instability == True:
+    if config.instability == False:
         for p in cal_P:
             for t in range(len(prob.projects[p])):
                 for g in list(prob.groups.keys()):
