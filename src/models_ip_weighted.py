@@ -220,7 +220,7 @@ def model_ip_weighted(prob, config, minimax):
         # W_f = 1.0 #max_rank*len(prob.std_type.keys())*len(prob.std_type.keys())*1000
     ############################################################
     # Compute optimal solution
-    W_v = 1.0
+    W_v = 0.0 #1.0
     # m.setObjective(W_v*v + W_instability * instability + W_f * f, GRB.MINIMIZE)
     # m.setObjective(W_v*v + W_f * f, GRB.MINIMIZE)
     m.setObjective(W_v * v, GRB.MINIMIZE)
