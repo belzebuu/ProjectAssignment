@@ -178,8 +178,8 @@ def model_ip_weighted(prob, config, minimax):
                 x[g, p, t + 1] for g in list(prob.groups.keys())), "symbreak_%s" % (p))
 
     ############################################################
-    # weighted
-    m.addConstr(v >= quicksum(calculate_weight([grp_ranks[g][p]]) * a[g] * x[g, p, t] for g in list(
+    # weighted # weights[grp_ranks[g][p]]
+    m.addConstr(v >= quicksum(calculate_weight(config.Wmethod, max_rank, grp_ranks[g][p]) * a[g] * x[g, p, t] for g in list(
         prob.groups.keys()) for p in list(grp_ranks[g].keys()) for t in range(len(prob.projects[p]))), 'weight_v')
 
     ############################################################
