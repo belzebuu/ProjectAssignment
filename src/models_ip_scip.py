@@ -1,6 +1,6 @@
 from utils import *
 from load_data import *
-from time import *
+from time import perf_counter
 
 from pyscipopt import *
 
@@ -9,7 +9,7 @@ from functools import reduce
 
 
 def model_ip_scip(prob):
-    start = clock()
+    start = perf_counter()
     m = Model('leximin')
 
     grp_ranks = {}
@@ -125,7 +125,7 @@ def model_ip_scip(prob):
                         for s in prob.groups[g]:
                             teams[s] = t
                             topics[s] = p
-    elapsed = (clock() - start)
+    elapsed = (perf_counter() - start)
     solution = []
     solution.append(Solution(topics=topics, teams=teams, solved=[elapsed]))
     return m.getVal(v), solution

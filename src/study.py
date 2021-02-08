@@ -4,7 +4,7 @@ import getopt
 #from matrix import *
 #from dfs_example import dfs
 import os
-from time import *
+from time import perf_counter
 import sys
 from load_data import *
 from utils import *
@@ -92,7 +92,7 @@ def main(argv):
 			print("set Tau")
 			usage()
 
-	start = clock()
+	start = perf_counter()
 	if model==1:
 		solutions=model1(problem)
 	elif model==2:
@@ -158,7 +158,7 @@ def main(argv):
 		cp_model=cp_model_set
 		transform_sol=transform_sol_grp
 		solutions=lex_cp_procedure(problem, cp_model, transform_sol)
-	elapsed = (clock() - start)
+	elapsed = (perf_counter() - start)
 
 	stat = check_sol(solutions,problem,soldirname="sln")
 	for st in stat:

@@ -1,6 +1,6 @@
 from utils import *
 from load_data import *
-from time import *
+from time import perf_counter
 from gurobipy import *
 from owa import *
 import numpy as np
@@ -42,7 +42,7 @@ def calculate_weight(weight_method, max_rank, rank):
 
 
 def model_ip_weighted(prob, config, minimax):
-    start = clock()
+    start = perf_counter()
     m = Model('weighted')
 
     # weight_method, instability, minimax, allsol
@@ -264,7 +264,7 @@ def model_ip_weighted(prob, config, minimax):
                     else:
                         expr += x[g, p, t]
         print("solution " + str(i) + " found\n")
-        elapsed = (clock() - start)
+        elapsed = (perf_counter() - start)
         solutions.append(Solution(topics=topics, teams=teams, solved=[elapsed]))
         if m.status != GRB.status.OPTIMAL or not config.allsol or elapsed >= 3600:
             break

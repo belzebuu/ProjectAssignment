@@ -1,0 +1,88 @@
+{
+    "nteams": [
+        {
+            "username": "a",
+            "groups_max": 2,
+            "topics": [
+                1
+            ]
+        },
+        {
+            "username": "b",
+            "groups_max": 2,
+            "topics": [
+                2
+            ]
+        },
+        {
+            "username": "c",
+            "groups_max": 2,
+            "topics": [
+                3
+            ]
+        },
+        {
+            "username": "d",
+            "groups_max": 2,
+            "topics": [
+                4
+            ]
+        },
+        {
+            "username": "e",
+            "groups_max": 2,
+            "topics": [
+                5
+            ]
+        },
+        {
+            "username": "f",
+            "groups_max": 2,
+            "topics": [
+                6
+            ]
+        },
+        {
+            "username": "g",
+            "groups_max": 2,
+            "topics": [
+                7
+            ]
+        },
+        {
+            "username": "h",
+            "groups_max": 2,
+            "topics": [
+                8
+            ]
+        },
+        {
+            "username": "i",
+            "groups_max": 2,
+            "topics": [
+                9
+            ]
+        },
+        {
+            "username": "l",
+            "groups_max": 2,
+            "topics": [
+                10
+            ]
+        },
+        {
+            "username": "m",
+            "groups_max": 2,
+            "topics": [
+                11
+            ]
+        },
+        {
+            "username": "n",
+            "groups_max": 2,
+            "topics": [
+                12
+            ]
+        }
+    ]
+}

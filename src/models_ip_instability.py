@@ -1,9 +1,9 @@
 from utils import *
-from time import *
+from time import perf_counter
 from gurobipy import *
 
 def model_ip_instability(prob):
-	start = clock()
+	start = perf_counter()
 	m = Model('instability')
 
 	allsolutions=False
@@ -170,7 +170,7 @@ def model_ip_instability(prob):
 					else:
 						expr += x[g,p,t]
 		print("solution "+str(i)+" found\n");
-		elapsed = (clock() - start)
+		elapsed = (perf_counter() - start)
 		solutions.append(Solution(topics=topics,teams = teams, solved=[elapsed]))
 		if m.status != GRB.status.OPTIMAL or not allsolutions:
 			break;

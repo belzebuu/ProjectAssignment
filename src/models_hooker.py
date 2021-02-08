@@ -1,11 +1,11 @@
 from utils import *
 from load_data import *
-from time import *
+from time import perf_counter
 from gurobipy import *
 
 
 def model_hooker(prob,Tau, instability):
-	start = clock()
+	start = perf_counter()
 	m = Model('hooker')
 
 	cal_P = list(prob.projects.keys())
@@ -234,7 +234,7 @@ def model_hooker(prob,Tau, instability):
 						for s in prob.groups[g]:
 							teams[s]=t
 							topics[s]=p
-	elapsed = (clock() - start)
+	elapsed = (perf_counter() - start)
 	solution = []
 	solution.append(Solution(topics=topics,teams = teams, solved=[elapsed]))
 	return solution

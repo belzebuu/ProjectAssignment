@@ -4,12 +4,12 @@ from optparse import OptionParser
 #from matrix import *
 #from dfs_example import dfs
 import os
-from time import *
+from time import perf_counter
 import sys
 from load_data import *
 from utils import *
 from models_ip import *
-from models_ip_scip import *
+#from models_ip_scip import *
 from models_ip_weighted import *
 from check_sol import *
 
@@ -55,12 +55,12 @@ def main():
     if options.Wmethod not in ["identity", "owa", "powers"]:
         sys.exit("Wmethod not recognized")
 
-    start = clock()
+    start = perf_counter()
     model = "minimax_instab_weighted"
     model = model+"-"+options.Wmethod
     value, solutions = model_ip_weighted(problem, options, minimax)
 
-    elapsed = (clock() - start)
+    elapsed = (perf_counter() - start)
 
     stat = check_sol(solutions, problem, soldirname="sln")
     for st in stat:

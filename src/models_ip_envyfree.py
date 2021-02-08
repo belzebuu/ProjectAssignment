@@ -1,13 +1,13 @@
 from utils import *
 from load_data import *
-from time import *
+from time import perf_counter
 from gurobipy import *
 
 
 
 
 def model_ip_envy(prob):
-	start = clock()
+	start = perf_counter()
 
 	grp_ranks={}
 	array_ranks={}
@@ -113,7 +113,7 @@ def model_ip_envy(prob):
 							teams[s]  = t
 							topics[s] = p
 
-	elapsed = (clock() - start)
+	elapsed = (perf_counter() - start)
 	solution = []
 	solution.append(Solution(topics=topics, teams=teams, solved=[elapsed]))
 	return m.getAttr("ObjVal"), solution

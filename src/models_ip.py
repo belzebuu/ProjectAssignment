@@ -1,12 +1,12 @@
 from utils import *
 from load_data import *
-from time import *
+import time
 from gurobipy import *
 from functools import reduce
 
 
 def model_ip(prob, config):
-    start = clock()
+    start = time.perf_counter()
     m = Model('leximin')
 
     grp_ranks = {}
@@ -124,7 +124,7 @@ def model_ip(prob, config):
                         for s in prob.groups[g]:
                             teams[s] = t
                             topics[s] = p
-    elapsed = (clock() - start)
+    elapsed = (time.perf_counter() - start)
     solution = []
     solution.append(Solution(topics=topics, teams=teams, solved=[elapsed]))
     return v.x, solution
@@ -139,9 +139,9 @@ def lex_ip_procedure(prob, instability):
     z = []
     solved = [0]*(MR+1)
     while h > 0:
-        start = clock()
+        start = time.perf_counter()
         (z, sol) = model_lex(prob, int(v), h, z, False, instability, "bottomup")
-        elapsed = (clock() - start)
+        elapsed = (time.perf_counter() - start)
         solved[h] = elapsed
         h -= 1
         print(z)
@@ -160,9 +160,9 @@ def greedy_maximum_matching_ip_procedure(prob, minimax, instability):
     z = []
     solved = [0]*(MR+1)
     while h < int(v):
-        start = clock()
+        start = time.perf_counter()
         (z, sol) = model_lex(prob, int(v), h, z, minimax, instability, "topdown")
-        elapsed = (clock() - start)
+        elapsed = (time.perf_counter() - start)
         solved[h] = elapsed
         h += 1
         print(reduce((lambda x, y: x + y), z))
@@ -172,7 +172,7 @@ def greedy_maximum_matching_ip_procedure(prob, minimax, instability):
 
 
 def model_lex(prob, v, h, z, minimax, instability, direction):
-    start = clock()
+    start = time.perf_counter()
     m = Model('leximin')
 
     cal_P = list(prob.projects.keys())
