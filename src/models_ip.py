@@ -96,9 +96,10 @@ def model_ip(prob, config):
         m.addConstr(v >= u[g], 'v_%s' % g)
 
     # enforce restrictions on number of teams open across different topics:
-    for rest in prob.restrictions['nteams']:
-        m.addConstr(quicksum(y[p, t] for p in rest["topics"] for t in range(
-            len(prob.projects[p]))) <= rest["groups_max"], "rest_%s" % rest["username"])
+    if 'nteams' in prob.restrictions:
+        for rest in prob.restrictions['nteams']:
+            m.addConstr(quicksum(y[p, t] for p in rest["topics"] for t in range(
+                len(prob.projects[p]))) <= rest["groups_max"], "rest_%s" % rest["username"])
 
     # Symmetry breaking on the teams
     for p in cal_P:

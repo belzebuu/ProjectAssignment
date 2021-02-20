@@ -43,14 +43,14 @@ class Problem:
 
         topics = defaultdict(list)
         # We assume header to be:
-        # ID;team;title;min_cap;max_cap;type;prj_id;instit;institute;mini;wl
+        # ID;team;title;min_cap;max_cap;type;prj_id;instit;institute;mini;wl;teachers;email
         # OLD: ProjektNr; Underprojek; Projekttitel; Min; Max;Projekttype; ProjektNr  i BB; Institut forkortelse; Obligatorisk minikursus; Gruppeplacering
         project_table = pd.read_csv(dirname+"/projects.csv", sep=";")
         project_table.team = project_table.team.fillna('')
         project_table.instit = project_table.instit.fillna('')
         project_table.prj_id = project_table.prj_id.astype(str)
         project_table.ID = project_table.ID.astype(int)
-        project_table.index = project_table["prj_id"]
+        project_table.index = project_table["ID"].astype(str)+project_table["team"].astype(str) # project_table["prj_id"]
         project_details = project_table.to_dict("index", into=OrderedDict)
         # topics = {x: list(map(lambda p: p["team"], project_details[x])) for x in project_details}
         topics = {k: list(v) for k, v in project_table.groupby('ID')['team']}
@@ -103,7 +103,8 @@ class Problem:
         students_file = dirname+"/students.csv"
         print("read ", students_file)
 
-        # grp_id;group;username;type;priority_list;student_id;full_name;email;timestamp
+        # grp_id;(group);username;type;priority_list;student_id;full_name;email;timestamp
+        # group is not needed
         student_table = pd.read_csv(dirname+"/students.csv", sep=";")
         student_table["username"] = student_table["username"].apply(str.lower)
         student_table.index = student_table["username"]
@@ -206,6 +207,15 @@ class Problem:
         return std_values, std_ranks_av, std_ranks_min
     
     def read_restrictions(self, dirname):
+        """ reads restrictions """
+        if os.path.exists(dirname+"/restrictions.json"):
+            return self.read_restrictions_json(dirname)
+        elif os.path.exists(dirname+"/restrictions.csv"):
+            return self.read_restrictions_csv(dirname)
+        else:
+            sys.exit("File restrictions.[json|csv] missing\n")
+
+    def read_restrictions_json(self, dirname):
         """ reads restrictions """
         with open(dirname+"/restrictions.json", "r") as jsonfile:
             restrictions=json.load(jsonfile)

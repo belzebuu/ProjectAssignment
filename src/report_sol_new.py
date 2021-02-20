@@ -83,13 +83,22 @@ def project_table(ass_std2team, ass_team2std, popularity, max_p, prob):
 
             project_details[pID]["assigned"] = []
             if (std_assigned > 0):
-                filehandle.write("%s: %s (advisors: %s; contact: %s) \n" %
-                         (pID,
-                          project_details[pID]["title"],
-                          project_details[pID]["teachers"],
-                          project_details[pID]["email"],
-                          )
-                         )
+                if "teachers" in project_details[pID]:
+                    filehandle.write("%s: %s (advisors: %s; contact: %s) \n" %
+                        (#pID,
+                        project_details[pID]["prj_id"],
+                        project_details[pID]["title"],
+                        project_details[pID]["teachers"],
+                        project_details[pID]["email"],
+                        )
+                        )
+                else:
+                    filehandle.write("%s: %s\n" %
+                        (#pID,
+                        project_details[pID]["prj_id"],
+                        project_details[pID]["title"]
+                        )
+                        )
                 for sID in sorted(ass_team2std[pID]):
                     project_details[pID]["assigned"].append(sID)
                     filehandle.write("%s, %s, %s\n" %

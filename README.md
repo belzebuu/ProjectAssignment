@@ -27,7 +27,7 @@ the python path of the system.
 Data
 ====
 
-The folloing files are required:
+The following files are required:
 - projects.csv
 - students.csv
 - types.csv

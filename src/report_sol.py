@@ -12,7 +12,9 @@ import os
 import codecs
 import string
 import csv
+import pandas as pd
 from collections import defaultdict
+from collections import OrderedDict
 from load_data import Problem
 
 studieretninger = False
@@ -191,6 +193,7 @@ def check_sol(ass_std2team, ass_team2std, prob, popularity, max_p):  # tablefile
 
     f1.close()
     f2.close()
+    sys.exit(0)
     # Now output to a file the info per student
     #
     # Info is:
@@ -293,8 +296,41 @@ def check_sol(ass_std2team, ass_team2std, prob, popularity, max_p):  # tablefile
     f.write(s)
     f.close()
 
-
 def count_popularity(prob):
+    outfile = os.path.join("out", "popularity")
+    
+    popularity = {}
+    max_p = 0
+    students = list(prob.student_details.keys())
+    for s in students:
+        if (len(prob.priorities[s]) > max_p):
+            max_p = len(prob.priorities[s])
+    for i in sorted(prob.topics.keys()):
+        popularity[i] = [0]*(max_p)
+    for s in students:
+        for i in range(len(prob.priorities[s])):
+            for pId in prob.priorities[s][i]:
+                if pId not in prob.topics:
+                    continue  # pId = int(prob.priorities[s][i])            
+                popularity[pId][i] += 1
+    
+    topic_popularity=OrderedDict()
+    for item in sorted(popularity.items(), key = lambda x: x[1][0], reverse=True ):
+        i = item[0]
+        pID = str(i)+prob.topics[i][0]
+        topic_popularity[i] = (prob.project_details[pID]).copy()
+        for j in range(max_p):
+            topic_popularity[i][str(j+1)+". prio."]=popularity[i][j]
+        topic_popularity[i]["tot_popularity"]=sum(popularity[i])
+
+    table = pd.DataFrame.from_dict(topic_popularity, orient='index')
+    columns = ["title","type","instit","tot_popularity"]+[str(j+1)+". prio." for j in range(max_p)]
+    table.to_csv(outfile+".csv", sep=";",index=False,columns=columns)
+
+    return popularity, max_p
+
+
+def count_popularity_old(prob):
     f = open(output4, "w")
     popularity = {}
     max_p = 0
