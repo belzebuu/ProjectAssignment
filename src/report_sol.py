@@ -16,6 +16,7 @@ import pandas as pd
 from collections import defaultdict
 from collections import OrderedDict
 from load_data import Problem
+import functools
 
 studieretninger = False
 # global constants:
@@ -125,6 +126,34 @@ def check_sol(ass_std2team, ass_team2std, prob, popularity, max_p):  # tablefile
                           ass_std2team[s1][0], ass_std2team[s1][1], ass_std2team[s2][0], ass_std2team[s2][1])
 
     # start reporting
+    count_teams = 0
+    count_prj = 0
+
+    for i in sorted(prob.topics.keys()):
+        prj = 0
+        for j in sorted(prob.topics[i]):
+            pID = str(int(i))+j
+            std_assigned = len(ass_team2std[pID]) if pID in ass_team2std else 0
+            if std_assigned > 0:
+                count_teams += 1
+                prj = 1
+        count_prj += prj
+
+    s = "\n\nNumb. of students: "+str(len(students))
+    s = s+"\nNumb. of active topics/topics offered: "+str(count_prj)+"/"+str(len(prob.topics))
+    s = s+"\nNumb. of active teams/teams offered: " + \
+        str(count_teams)+"/"+str(len(prob.project_details))
+    s = s+"\nStudents unassigned: "+str(unassigned)
+    s = s+"\nStudents assigned outside of preference: "+str(prioritized)+"\n"
+    for i in range(max_p):
+        out = str(i+1)+". priority: students "+str(counter[i])
+        s = s+out+"\n"
+
+    print(s)
+    f = open(output1, "a")
+    f.write(s)
+    f.close()
+
 
     # Print per project in std
     # and collect studnet assigned for later output
@@ -171,7 +200,7 @@ def check_sol(ass_std2team, ass_team2std, prob, popularity, max_p):  # tablefile
 
             if std_assigned > 0:
                 for sID in sorted(ass_team2std[pID]):
-                    f1.write("   "+sID+" "+str(prob.priorities[sID])+"\n")
+                    f1.write("   "+sID+" "+str(functools.reduce(lambda a,b: a+b, prob.priorities[sID]))+"\n")
                     wishlist = prob.priorities[sID]
                     sType = prob.std_type[sID]
                     f2.write("%s, %s\n" %
@@ -180,7 +209,7 @@ def check_sol(ass_std2team, ass_team2std, prob, popularity, max_p):  # tablefile
                               prob.student_details[sID]["email"]))
                     if (prob.project_details[pID]["instit"] == "IMADA"):
                         print(str(prob.student_details[sID]["full_name"])+" "+prob.student_details[sID]
-                              ["email"]+" "+str(prob.student_details[sID]["priority_list"]))
+                              ["email"]+" "+str(functools.reduce(lambda a,b: a+b, prob.student_details[sID]["priority_list"])))
                 # studentassignments.append([sID,sType,pID,ptitle,ptype,
                 #                                                   underfull,wishlist])
             f1.write("Underfull? ")
@@ -193,7 +222,87 @@ def check_sol(ass_std2team, ass_team2std, prob, popularity, max_p):  # tablefile
 
     f1.close()
     f2.close()
-    sys.exit(0)
+    return studentassignments
+    # sys.exit(0)
+
+
+def per_student(studentassignments, ass_std2team, ass_team2std, prob, popularity, max_p):  # tablefile=''):
+    # Now output to a file the info per student
+    #
+    # Info is:
+    #   StudentID, StudentType, ProjectID, ProjectTitle, ProjectType,
+    #   isProjectUnderfull?, wishlistOfStudent
+
+    # put into sID order (as sID is first element of list for each student):
+    studentassignments.sort()
+
+    # output:
+    f = open(output3, "w")
+    #        for [sID,sType,pID,ptitle,ptype,underfull,wishlist] in studentassignments:
+    #                wlist = ",".join(wishlist)
+    #                f.write("%s;%s;%s;%s;%s;%s;%s\n" %
+    #                                (sID,sType,pID,ptitle,ptype,underfull,wlist))
+    #        f.close()
+    students = list(prob.student_details.keys())
+    for s in students:  # problem.groups.keys():
+        prob.student_details[s]["DerfraIkkeTilladt"] = []
+        peek = prob.student_details[s]["type"]
+        # d={'biologi': ["alle", "natbidat"],"farmaci": ["alle","farmaci"],"natbidat": ["alle","natbidat"]} # which projects for students
+        valid_prjs = [x for x in sorted(prob.topics.keys()) if prob.project_details[str(
+            x)+prob.topics[x][0]]["type"] in prob.valid_prjtype[peek]]
+        # valid_prjs=filter(lambda x: prob.project_details[str(x)+prob.topics[x][0]]["MinProjektType"]==peek or prob.project_details[str(x)+prob.topics[x][0]]["ProjektType"]=='alle', sorted(prob.topics.keys()))
+        # print set(prob.student_details[s]["prob.prioritiesiteringsliste"])
+        diff = set(functools.reduce(lambda a,b: a+b, prob.student_details[s]["priority_list"])) - set(valid_prjs)
+        if len(diff) > 0:
+            tmp = []
+            for p in diff:
+                tmp.append(p)
+            prob.student_details[s]["DerfraIkkeTilladt"] = tmp
+
+    f.write("Brugernavn;StudType;ProjektNr;Undergruppe;ProjektTitel;ProjektType;ProjektStatus;TildeltPrio;PrioriteringsListe;DerfraIkkeTilladt;Min;Max;")
+    f.write("LedigePladser;Navn;Email;GruppeID;Tilmeldingstidspunkt;Institutforkortelse;")
+    f.write("Institut;Minikursus obligatorisk;Gruppeplacering\n")
+    students.sort()
+    for s in students:
+        pID = str(int(ass_std2team[s][0]))+ass_std2team[s][1]
+        # print pID;
+        #print(prob.student_details[s])
+        #print(prob.project_details[pID])
+        priolist = prob.student_details[s]["priority_list"]
+        valgt = [x for x in range(1, len(priolist)+1) if int(prob.project_details[pID]["ID"]) in priolist[x-1]]
+        gottenprio = '%s' % ', '.join(map(str, valgt))
+        f.write("%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s\n" %
+                (
+                    prob.student_details[s]["username"],
+                    prob.student_details[s]["type"],
+                    prob.project_details[pID]["ID"],
+                    prob.project_details[pID]["team"],
+                    prob.project_details[pID]["title"],
+                    prob.project_details[pID]["type"],
+                    prob.project_details[pID]["ProjektStatus"],
+                    gottenprio,
+                    str(functools.reduce(lambda a,b: a+b,prob.student_details[s]["priority_list"])),
+                    prob.student_details[s]["DerfraIkkeTilladt"],
+                    prob.project_details[pID]["min_cap"],
+                    prob.project_details[pID]["max_cap"],
+                    prob.project_details[pID]["LedigePladser"],
+                    # prob.project_details[pID]["ProjektNrBB"],
+                    # prob.student_details[s]["CprNr"],
+                    # prob.student_details[s]["Fornavne"],
+                    prob.student_details[s]["full_name"],
+                    prob.student_details[s]["email"],
+                    prob.student_details[s]["grp_id"],
+                    prob.student_details[s]["timestamp"],
+                    prob.project_details[pID]["instit"],
+                    prob.project_details[pID]["institute"],
+                    prob.project_details[pID]["mini"],
+                    # # prob.project_details[pID]["Minikursus_anb"],
+                    prob.project_details[pID]["wl"]))
+    f.close()
+
+
+
+def per_student_old(ass_std2team, ass_team2std, prob, popularity, max_p):  # tablefile=''):
     # Now output to a file the info per student
     #
     # Info is:
@@ -266,35 +375,8 @@ def check_sol(ass_std2team, ass_team2std, prob, popularity, max_p):  # tablefile
                     prob.project_details[pID]["Gruppeplacering"]))
     f.close()
 
-    # Now summarise
-    # in std output
-    count_teams = 0
-    count_prj = 0
 
-    for i in sorted(prob.topics.keys()):
-        prj = 0
-        for j in sorted(prob.topics[i]):
-            pID = str(int(i))+j
-            std_assigned = len(ass_team2std[pID]) if pID in ass_team2std else 0
-            if std_assigned > 0:
-                count_teams += 1
-                prj = 1
-        count_prj += prj
-
-    s = "\n\nNumb. of students: "+str(len(students))
-    s = s+"\nNumb. of active topics/topics offered: "+str(count_prj)+"/"+str(len(prob.topics))
-    s = s+"\nNumb. of active teams/teams offered: " + \
-        str(count_teams)+"/"+str(len(prob.project_details))
-    s = s+"\nStudents unassigned: "+str(unassigned)
-    s = s+"\nStudents assigned outside of preference: "+str(prioritized)+"\n"
-    for i in range(max_p):
-        out = str(i+1)+". priority: students "+str(counter[i])
-        s = s+out+"\n"
-
-    print(s)
-    f = open(output1, "a")
-    f.write(s)
-    f.close()
+    
 
 def count_popularity(prob):
     outfile = os.path.join("out", "popularity")
@@ -490,7 +572,8 @@ def main(argv):
     problem = Problem(dirname)
     ass_std2team, ass_team2std = read_solution(solfile)
     popularity, max_p = count_popularity(problem)
-    check_sol(ass_std2team, ass_team2std, problem, popularity, max_p)  # tablefile)
+    studentassignments = check_sol(ass_std2team, ass_team2std, problem, popularity, max_p)  # tablefile)
+    per_student(studentassignments, ass_std2team, ass_team2std, problem, popularity, max_p)  
     # institute_wise()
 
 
