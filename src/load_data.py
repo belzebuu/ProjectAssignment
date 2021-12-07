@@ -15,13 +15,13 @@ import random
 random.seed(3)
 
 class Problem:
-    def __init__(self, dirname):
+    def __init__(self, dirname, prioritize_all=False):
         self.study_programs = set()
         self.project_details, self.topics, self.projects = self.read_projects(dirname)
         self.student_details, self.priorities, self.groups, self.std_type = self.read_students(
             dirname)
         self.check_tot_capacity()
-        self.std_values, self.std_ranks_av, self.std_ranks_min = self.calculate_ranks_values()
+        self.std_values, self.std_ranks_av, self.std_ranks_min = self.calculate_ranks_values(prioritize_all)
 
         # self.minimax_sol = self.minimax_sol(dirname),
         self.valid_prjtype = self.type_compliance(dirname)
@@ -44,6 +44,7 @@ class Problem:
         topics = defaultdict(list)
         # We assume header to be:
         # ID;team;title;min_cap;max_cap;type;prj_id;instit;institute;mini;wl;teachers;email
+        # NEW: ProjektNr; Underprojek; Projekttitel; Min; Max;Projekttype; ProjektNr  i BB; Institut forkortelse; Institutnavn; Obligatorisk minikursus; Gruppeplacering
         # OLD: ProjektNr; Underprojek; Projekttitel; Min; Max;Projekttype; ProjektNr  i BB; Institut forkortelse; Obligatorisk minikursus; Gruppeplacering
         project_table = pd.read_csv(dirname+"/projects.csv", sep=";")
         project_table.team = project_table.team.fillna('')
@@ -103,8 +104,9 @@ class Problem:
         students_file = dirname+"/students.csv"
         print("read ", students_file)
 
-        # grp_id;(group);username;type;priority_list;student_id;full_name;email;timestamp
+        # grp_id;(group);username;type;priority_list;(student_id);full_name;email;timestamp
         # group is not needed
+        # GruppeId; Brugernavn; StudType; Prioteringsliste; Studentnavn;  Email; Tilmeldingstidspunkt
         student_table = pd.read_csv(dirname+"/students.csv", sep=";")
         student_table["username"] = student_table["username"].apply(str.lower)
         student_table.index = student_table["username"]

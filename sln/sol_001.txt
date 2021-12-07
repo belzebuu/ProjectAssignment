@@ -1,40 +1,276 @@
-emkuh20	7	
-dalun20	5	
-fredh20	5	
-sibaa19	8	
-clieb20	4	
-stquv14	1	a
-andra20	8	
-samad18	3	
-ralau20	2	
-cefli20	4	
-nastr20	4	
-jonmo19	9	
-katni20	5	
-siljo19	4	
-bjoje07	1	a
-nniel20	9	
-melni19	1	a
-antra20	2	
-asoer19	5	
-jasil20	3	
-jeols19	5	
-mavuu20	7	
-jofli20	2	
-liand20	4	
-saghe20	8	
-asmad20	8	
-junyg20	5	
-thomn19	1	a
-lcola20	7	
-anfri20	2	
-saali20	8	
-churn20	1	a
-jadyn20	1	a
-luket20	2	
-frfug20	8	
-belau19	9	
-essol20	3	
-cedan20	4	
-solse19	2	
-lthom19	9	
+roand20	22	
+tomey20	9	a
+mabru20	26	a
+simus20	18	
+frbil20	45	a
+siela20	72	b
+amayy20	58	
+alhar20	45	a
+emijo20	45	a
+ssoed20	50	
+ninis20	43	
+mpett20	67	a
+sijac20	40	
+fstri20	67	a
+majaa20	26	b
+anha120	31	b
+ligad20	26	b
+jekru20	11	
+sojak20	7	a
+saspr20	40	
+cchri20	33	c
+sissa20	36	
+mialn20	9	a
+pjoer20	26	a
+lihou20	21	
+ckrie20	13	
+kathn20	7	a
+lengu20	25	
+chfie20	52	
+nkris20	50	
+salin20	1	
+shtra19	72	a
+hehju20	11	
+asras20	22	
+vabui13	7	b
+ribak20	33	d
+nikro20	32	a
+larse20	6	
+sadam20	26	a
+moham19	19	
+amsta20	8	
+jovan18	31	b
+stgad20	13	
+khahm20	28	
+tosoe20	39	a
+malot19	50	
+lebaj20	20	a
+nalon20	56	b
+biram20	20	a
+nelsu18	3	
+simoh20	71	a
+thope20	35	
+evban19	60	a
+mawei03	26	a
+jeseb20	17	
+jjeya20	17	
+kajac20	67	a
+makal20	17	
+rigru20	56	b
+osras20	20	b
+cafis19	60	b
+kavil20	13	
+cewol20	60	b
+thkir20	35	
+anhus20	20	b
+ejens20	6	
+hetra20	19	
+carpe20	22	
+emjen20	67	b
+dethi20	52	
+soska20	52	
+rahov20	62	
+nanni20	20	a
+jesth20	11	
+eland20	49	
+emdef20	74	
+cabla20	44	
+laurh20	74	
+rajac20	71	a
+svjen20	38	
+maank20	8	
+sarla20	64	
+ttran20	29	
+emils20	60	a
+emshi20	39	a
+sabni19	14	a
+satid20	49	
+ghbac20	32	a
+abekh20	64	
+naand20	56	a
+sobad20	56	b
+mayan20	59	
+sanni20	47	a
+jasti20	32	a
+marih20	33	b
+mieje20	3	
+shnic20	33	b
+stira20	7	b
+tiver20	11	
+smors20	64	
+rajon20	5	
+hetho20	40	
+sohan20	7	a
+saahm20	33	d
+lehal20	33	d
+stinh20	67	b
+tojuu20	63	
+hujaw20	43	
+mabje18	66	
+eltoe20	1	
+mirje20	7	b
+saapp20	33	a
+lifey20	24	
+cschn20	44	
+selet20	44	
+lanic20	29	
+ameil20	56	a
+shtha20	10	
+nifog20	5	
+lamik20	56	a
+kabac20	60	a
+jaell20	26	a
+louni20	1	
+tgrav20	45	b
+lmikk20	45	b
+nibro20	25	
+annab20	25	
+emjul20	59	
+idtag20	48	
+daals20	13	
+rniel20	67	a
+amalj20	43	
+vasal20	45	a
+fadja19	56	b
+caly20	72	b
+molss20	29	
+chhjo20	59	
+tibag20	47	a
+sohow20	31	a
+nankr20	38	
+kasun20	26	b
+simon20	31	a
+agsch20	44	
+jepuk20	14	a
+senie20	63	
+olknu18	74	
+emhem20	37	
+ffelb20	47	a
+islet20	45	b
+kecro19	39	b
+dmans20	39	a
+lebuh20	10	
+mikkp20	66	
+sebjo20	60	b
+louis20	8	
+sanla20	10	
+dimad20	50	
+aneen20	14	a
+maeil20	27	
+listi20	72	a
+aldem20	62	
+sarjo20	72	a
+kalad20	60	a
+rebha20	61	
+rniel18	6	
+thhoa20	52	
+beeng20	25	
+emste20	25	
+sebic20	44	
+hole20	24	
+sobre20	6	
+nigop20	56	a
+carra20	5	
+thsiv20	74	
+hewei20	21	
+louan20	7	b
+jekap20	58	
+empe420	67	a
+viphu20	17	
+mitoe20	37	
+semat20	39	b
+jensc20	49	
+sgros20	27	
+majho20	1	
+lrasm20	1	
+belae20	50	
+fabar20	33	a
+waalh20	33	c
+memoe20	11	
+madix20	22	
+ramik20	61	
+cejuh20	64	
+nokho20	39	b
+lahol20	7	a
+mafog20	9	a
+jeaje20	59	
+emknu20	21	
+rivog20	66	
+schri20	56	a
+anan520	35	
+pehyl20	26	b
+sebso20	60	b
+memei20	63	
+azfal20	52	
+elbre20	58	
+hachr20	20	a
+sijon20	3	
+mclau20	26	b
+tadek20	36	
+tahma20	35	
+nhtra20	33	a
+siuru20	60	b
+jenic20	7	b
+desch20	67	b
+asmel20	22	
+mateu20	31	a
+shuth20	37	
+inuzu20	20	a
+mayas20	13	
+magnh20	8	
+robel20	33	a
+isabd20	62	
+mapat20	35	
+jaham20	18	
+huata20	33	c
+lafre20	25	
+vivei20	27	
+ompal20	48	
+musay20	20	b
+pocao20	61	
+chkat20	71	a
+kamma20	8	
+jowic20	31	b
+eldin20	67	b
+sutat20	19	
+zasun20	31	a
+masul20	39	b
+stboe19	18	
+msimo20	61	
+isfre20	29	
+agknu20	56	b
+salab20	37	
+kijav16	7	a
+alhin20	31	b
+zanir20	3	
+misoo18	32	a
+idbae20	28	
+madsh20	19	
+lisoe20	18	
+silay20	19	
+vistu20	63	
+frede20	24	
+lijak20	38	
+neuzc20	19	
+ssoee19	33	b
+krhja20	39	a
+abjne20	28	
+labec20	60	a
+flars20	9	a
+rbout20	36	
+naduc20	67	b
+aljou20	72	b
+chsoo20	6	
+siabd20	37	
+betir20	33	b
+simot20	18	
+moahm20	39	a
+ishen20	17	
+calni18	9	a
+ijoer20	59	
+sanaw20	62	
+rochi20	48	
+yoelt20	39	b
+sibon20	38	
+amahm20	27	
+kafis20	74	
