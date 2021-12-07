@@ -2,7 +2,7 @@
 # coding=utf-8
 
 import sys
-import getopt
+#import getopt
 import os
 import codecs
 import string
@@ -13,6 +13,7 @@ from collections import defaultdict
 from collections import OrderedDict
 from load_data import Problem
 import functools
+import cml_parser
 
 def read_solution(solfile):
     ass_std2team = {}
@@ -35,7 +36,7 @@ def check_sol(ass_std2team, ass_team2std, prob, max_p):  # tablefile=''):
         if s not in ass_std2team:
             isok = False
             print(s+" not assigned!")
-        elif (ass_std2team[s][0] not in functools.reduce(lambda x,y: x+y, prob.priorities[s])):
+        elif ass_std2team[s][0] not in prob.flatten(prob.priorities[s]): # functools.reduce(lambda x,y: x+y, prob.priorities[s])):
             isok = False
             print(s+" assigned to smth not in his priorities!")
 
@@ -115,7 +116,7 @@ def project_table(ass_std2team, ass_team2std, popularity, max_p, prob):
                   indent=4, separators=(',', ': '),  ensure_ascii=False)
 
     table = pd.DataFrame.from_dict(project_details, orient='index')
-    table.to_csv(output1+".csv")
+    table.to_csv(output1+".csv", sep=";",index=False)
 
 
 def student_table(ass_std2team, ass_team2std, prob):
@@ -127,8 +128,8 @@ def student_table(ass_std2team, ass_team2std, prob):
     for g in prob.groups.keys():
         for s in prob.groups[g]:
             student_details[s]=(prob.student_details[s]).copy()
-            student_details[s]["team_assigned"]="".join(map(str, ass_std2team[s]) )
             student_details[s]["topic_assigned"]=ass_std2team[s][0]
+            student_details[s]["team_assigned"]=ass_std2team[s][1] #"".join(map(str, ass_std2team[s]) )            
             student_details[s]["priority_assigned"]=prob.std_ranks_min[s][ass_std2team[s][0]]
   
     with codecs.open(outfile+".json",  "w", "utf-8") as filehandle:
@@ -136,7 +137,7 @@ def student_table(ass_std2team, ass_team2std, prob):
                   indent=4, separators=(',', ': '),  ensure_ascii=False)
   
     table = pd.DataFrame.from_dict(student_details, orient='index')
-    table.to_csv(outfile+".csv", sep=";",index=False,columns=["username","type","grp_id","topic_assigned","team_assigned","priority_assigned"])
+    table.to_csv(outfile+".csv", sep=";",index=False,columns=["username","type","stype","grp_id","topic_assigned","team_assigned","priority_assigned","priority_list_wties"])
 
     #filehandle = open(outfile+".csv", "w")
     #filehandle.close()
@@ -173,7 +174,7 @@ def summarize(ass_std2team, ass_team2std, max_p, prob):
         if s not in ass_std2team:
             unassigned = unassigned+1
             continue
-        if (ass_std2team[s][0] in functools.reduce(lambda x,y: x+y, prob.priorities[s])):
+        if ass_std2team[s][0] in prob.flatten(prob.priorities[s]): #functools.reduce(lambda x,y: x+y, prob.priorities[s])):
             for i in range(len(prob.priorities[s])):
                 if ass_std2team[s][0] in prob.priorities[s][i]:
                     counter[i] += 1
@@ -234,37 +235,13 @@ def count_popularity(prob):
 
 
 def main(argv):
-    dirname = "."
-    tablefile = ""
-
-    try:
-        opts, args = getopt.getopt(argv, "hd:t:s:", ["help", "dir=", "tbl=", "sol="])
-    except getopt.GetoptError:
-        usage()
-        sys.exit(2)
-
-    if (len(opts) < 1):
-        usage()
-    tablefile = ''
-    for opt, arg in opts:
-        if opt in ("-h", "--help"):
-            usage()
-            sys.exit()
-        elif opt in ("-d", "--dir"):
-            dirname = arg
-        elif opt in ("-s", "--sol"):
-            solfile = arg
-        elif opt in ("-t", "--tbl"):
-            tablefile = arg
-        else:
-            print(opt+" Not recognised\n")
-            usage()
-
-    problem = Problem(dirname)
-    ass_std2team, ass_team2std = read_solution(solfile)
+    options, dirname = cml_parser.cml_parse()
+    
+    problem = Problem(dirname,options)
+    ass_std2team, ass_team2std = read_solution(options.solution_file)
     popularity, max_p = count_popularity(problem)
     if not check_sol(ass_std2team, ass_team2std, problem, max_p):
-        sys.exit("Solution infeasible")
+        print("WARNING: Solution infeasible")
     project_table(ass_std2team, ass_team2std, popularity, max_p, problem)
     # institute_wise()
     student_table(ass_std2team, ass_team2std, problem)

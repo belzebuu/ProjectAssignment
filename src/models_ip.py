@@ -15,7 +15,10 @@ def model_ip(prob, config):
     cal_P = list(prob.projects.keys())
     for g in cal_G:
         s = prob.groups[g][0]  # we consider only first student, the other must have equal prefs
-        grp_ranks[g] = prob.std_ranks_av[s]
+        if len(prob.std_ranks_av[s])==len(prob.topics):
+            grp_ranks[g] = {}
+        else:
+            grp_ranks[g] = prob.std_ranks_av[s]
         if len(grp_ranks[g]) > max_rank:
             max_rank = len(grp_ranks[g])
 
@@ -65,17 +68,16 @@ def model_ip(prob, config):
     for g in cal_G:
         peek = prob.std_type[prob.groups[g][0]]
         valid_prjs = [x for x in cal_P if prob.projects[x][0].type in prob.valid_prjtype[peek]]
-        #valid_prjs=filter(lambda x: prob.projects[x][0][2]==peek or prob.projects[x][0][2]=='alle', prob.projects.keys())
-        #print(valid_prjs)
+        #valid_prjs=filter(lambda x: prob.projects[x][0][2]==peek or prob.projects[x][0][2]=='alle', prob.projects.keys())        
         working = [x[g, p, t] for p in valid_prjs for t in range(len(prob.projects[p]))]
         m.addConstr(quicksum(working) == 1, 'grp_%s' % g)
         for p in cal_P:
             if not p in valid_prjs:
                 for t in range(len(prob.projects[p])):
-                    m.addConstr(x[g, p, t] == 0, 'not_valid_%s' % g)
+                    m.addConstr(x[g, p, t] == 0, 'not_valid_%s_%s' % (g,p))
             if not p in prob.std_ranks_av[prob.groups[g][0]]:
                 for t in range(len(prob.projects[p])):
-                    m.addConstr(x[g, p, t] == 0, 'not_ranked_%s' % g)
+                    m.addConstr(x[g, p, t] == 0, 'not_ranked_%s_%s' % (g,p))
 
     # Capacity constraints
     for p in cal_P:

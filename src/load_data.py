@@ -15,18 +15,21 @@ import random
 random.seed(3)
 
 class Problem:
-    def __init__(self, dirname):
+    def __init__(self, dirname, options):
+        self.cml_options = options
         self.study_programs = set()
         self.project_details, self.topics, self.projects = self.read_projects(dirname)
-        self.student_details, self.priorities, self.groups, self.std_type = self.read_students(
-            dirname)
+        self.student_details, self.priorities, self.groups, self.std_type = self.read_students(dirname)
         self.check_tot_capacity()
-        self.std_values, self.std_ranks_av, self.std_ranks_min = self.calculate_ranks_values()
-
+        
+        self.std_values, self.std_ranks_av, self.std_ranks_min = self.calculate_ranks_values(prioritize_all=self.cml_options.prioritize_all)
+        
         # self.minimax_sol = self.minimax_sol(dirname),
         self.valid_prjtype = self.type_compliance(dirname)
+        
         self.restrictions = self.read_restrictions(dirname)
         self.minimax_sol = 0
+        print("Read instance... Done")
         # self.__dict__.update(kwds)
 
     def program_transform(self, program):
@@ -40,12 +43,13 @@ class Problem:
     def read_projects(self, dirname):
         projects_file = dirname+"/projects.csv"
         print("read ", projects_file)
-
+        
         topics = defaultdict(list)
         # We assume header to be:
         # ID;team;title;min_cap;max_cap;type;prj_id;instit;institute;mini;wl;teachers;email
         # OLD: ProjektNr; Underprojek; Projekttitel; Min; Max;Projekttype; ProjektNr  i BB; Institut forkortelse; Obligatorisk minikursus; Gruppeplacering
         project_table = pd.read_csv(dirname+"/projects.csv", sep=";")
+        print(project_table)
         project_table.team = project_table.team.fillna('')
         project_table.instit = project_table.instit.fillna('')
         project_table.prj_id = project_table.prj_id.astype(str)
@@ -86,6 +90,7 @@ class Problem:
                                             project_details[_id]["type"]
                                             )
                                        )
+        #print(topics.keys())
         return (project_details, topics, projects)
 
     def check_tot_capacity(self):
@@ -99,13 +104,18 @@ class Problem:
                 # file.write(str(len(project_dict)+1)+";;1;"+str(n_stds-capacity)+";"+program+"\n")
                 #project_dict[len(project_dict)+1] = n_stds-capacity
 
+
+    def flatten(self, List: list) -> list:
+            return [item for sublist in List for item in sublist]
+
     def read_students(self, dirname):
         students_file = dirname+"/students.csv"
         print("read ", students_file)
 
         # grp_id;(group);username;type;priority_list;student_id;full_name;email;timestamp
         # group is not needed
-        student_table = pd.read_csv(dirname+"/students.csv", sep=";")
+        student_table = pd.read_csv(dirname+"/students.csv", sep=";",  converters={"priority_list":str})
+        print(student_table)
         student_table["username"] = student_table["username"].apply(str.lower)
         student_table.index = student_table["username"]
         student_details = student_table.to_dict("index", into=OrderedDict)
@@ -132,8 +142,17 @@ class Problem:
 
         ## Note: we assume a well formed string
         for s in student_details:
+            
             student_details[s]["priority_list_wties"]=student_details[s]["priority_list"]
             student_details[s]["priority_list"]=process_string(student_details[s]["priority_list"].strip())
+
+            
+            if len(self.flatten(student_details[s]["priority_list"])) < self.cml_options.min_preferences:
+                print("WARNING: "+student_details[s]['username']+f" has less than {self.cml_options.min_preferences} preferences")
+
+            if self.cml_options.cut_off_type is not None and student_details[s]["stype"]==self.cml_options.cut_off_type:
+                student_details[s]["priority_list"]=student_details[s]["priority_list"][:self.cml_options.cut_off]
+                print("WARNING: updated", student_details[s])
 
             for t in student_details[s]["priority_list"]:
                 for p in t:
@@ -170,7 +189,7 @@ class Problem:
         for u in self.student_details:
             priorities = self.student_details[u]["priority_list"]
 
-            i = 7
+            i = self.cml_options.min_preferences
             j = 1
 
             values = {}
@@ -189,15 +208,25 @@ class Problem:
                 i=max(0,i-r)
 
             # if we need to ensure feasibility we can insert a low priority for all other projects
-            if prioritize_all:
-                prj_set = set(self.project_details.keys()) - set(priorities)
+            # we handle here also cases of students who did not input a preference list
+            # we assign to them a valuie that is the average value among all available values
+            # it should later imply that they get a large enough value as weight
+            if prioritize_all or len(priorities)==0:
+                prj_set = set(self.topics.keys()) - set(self.flatten(priorities))
                 prj_set = list(prj_set)
-                prj_list = random.sample(prj_set, k=len(prj_set))
-                for p in prj_list:
-                    values[p] = 2**i
-                    ranks_av[p] = j
-                    ranks_min[p] = j
-                    j += 1
+                if False: # old way decide a random order but it may lead to suboptimal sol
+                    prj_list = random.sample(prj_set, k=len(prj_set))
+                    for p in prj_list:
+                        values[p] = 2**i
+                        ranks_av[p] = j
+                        ranks_min[p] = j
+                        j += 1
+                else:
+                    M = self.cml_options.min_preferences+1 # sum(prj_list)/len(prj_list)  # a large enough value
+                    for p in prj_set:
+                        values[p] = 2**0
+                        ranks_av[p] = M
+                        ranks_min[p] = M
 
             std_values[u] = values
             std_ranks_av[u] = ranks_av
@@ -213,7 +242,7 @@ class Problem:
         elif os.path.exists(dirname+"/restrictions.csv"):
             return self.read_restrictions_csv(dirname)
         else:
-            sys.exit("File restrictions.[json|csv] missing\n")
+            sys.exit(f"File {dirname}/restrictions.[json|csv] missing\n")
 
     def read_restrictions_json(self, dirname):
         """ reads restrictions """
@@ -230,7 +259,7 @@ class Problem:
                 restrictions += [{"cum": int(row[0]), "topics": [int(row[t])
                                                                  for t in range(1, len(row))]}]
         except csv.Error as e:
-            sys.exit('file %s, line %d: %s' % (filename, reader.line_num, e))
+            sys.exit('file %s, line %d: %s' % ("/restrictions.csv", reader.line_num, e))
         return restrictions
 
     def type_compliance(self, dirname):
@@ -241,7 +270,7 @@ class Problem:
             for row in reader:
                 valid_prjtypes[row[0]] = [row[t] for t in range(1, len(row))]
         except csv.Error as e:
-            sys.exit('file %s, line %d: %s' % (filename, reader.line_num, e))
+            sys.exit('file %s, line %d: %s' % ("/restrictions.csv", reader.line_num, e))
             # return {'biologi': ["alle", "natbidat"],"farmaci": ["alle","farmaci"],"natbidat": ["alle","natbidat"]}
         #print(valid_prjtypes)
         return valid_prjtypes

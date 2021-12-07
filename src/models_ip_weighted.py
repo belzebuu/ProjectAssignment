@@ -42,6 +42,7 @@ def calculate_weight(weight_method, max_rank, rank):
 
 
 def model_ip_weighted(prob, config, minimax):
+    print("Solving model_ip_weighted")
     start = perf_counter()
     m = Model('weighted')
 
@@ -54,7 +55,11 @@ def model_ip_weighted(prob, config, minimax):
     max_rank = 0
     for g in cal_G:
         s = prob.groups[g][0]  # we consider only first student, the other must have equal prefs
-        grp_ranks[g] = prob.std_ranks_av[s]
+        #grp_ranks[g] = prob.std_ranks_av[s]
+        if len(prob.std_ranks_av[s])==len(prob.topics):
+            grp_ranks[g] = {}
+        else:
+            grp_ranks[g] = prob.std_ranks_av[s]
         if len(grp_ranks[g]) > max_rank:
             max_rank = len(grp_ranks[g])
 
@@ -184,7 +189,8 @@ def model_ip_weighted(prob, config, minimax):
 
     ############################################################
     # instability
-    if config.instability == False:
+    if config.instability == True:
+        print("Post instability constraints")
         for p in cal_P:
             for t in range(len(prob.projects[p])):
                 for g in list(prob.groups.keys()):

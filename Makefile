@@ -1,7 +1,9 @@
 #DATADIR=data/
-DATADIR=../ProjectAssignment_git_imada/data/
-CASE=2021-zhiru
+#DATADIR=../ProjectAssignment_git_imada/data/
+DATADIR=/home/marco/workspace/git/TT/ProjectAssignment_git_imada/data
+#CASE=2021-zhiru
 #CASE=2019-bachelor
+CASE=2021-psy
 PROGRAM=python3
 
 
@@ -9,7 +11,7 @@ assignment:
 	python3 src/main.py ${DATADIR}/${CASE} -g post
 
 output:
-	python3 src/report_sol_new.py -d ${DATADIR}/${CASE} -s sln/sol_001.txt
+	python3 src/report_sol_new.py -s sln/sol_001.txt ${DATADIR}/${CASE} 
 
 
 
@@ -24,6 +26,8 @@ publish:
 
 
 
+
+
 # owa"; do # "powers"  "identity"
 psy:
-	${PROGRAM} src/main.py -d data/2018-psy -m minimax_instab_weighted -W owa | tee res/2018-psy-owa-minimax_instab_weighted.txt; done
+	${PROGRAM} src/main.py ${DATADIR}/${CASE} -i --Wmethod owa --groups post --min_preferences 7 --cut_off_type stype --cut_off 2 | tee ${DATADIR}/${CASE}/owa.txt
