@@ -15,10 +15,10 @@ def model_ip(prob, config):
     cal_P = list(prob.projects.keys())
     for g in cal_G:
         s = prob.groups[g][0]  # we consider only first student, the other must have equal prefs
-        if len(prob.std_ranks_av[s])==len(prob.topics):
-            grp_ranks[g] = {}
-        else:
-            grp_ranks[g] = prob.std_ranks_av[s]
+        #if len(prob.std_ranks_av[s])==len(prob.topics):
+        #    grp_ranks[g] = {}
+        #else:
+        grp_ranks[g] = prob.std_ranks_av[s]
         if len(grp_ranks[g]) > max_rank:
             max_rank = len(grp_ranks[g])
 
@@ -102,6 +102,13 @@ def model_ip(prob, config):
         for rest in prob.restrictions['nteams']:
             m.addConstr(quicksum(y[p, t] for p in rest["topics"] for t in range(
                 len(prob.projects[p]))) <= rest["groups_max"], "rest_%s" % rest["username"])
+
+    # enforce restrictions on number of students assigned across different topics:
+    if 'nteams' in prob.restrictions:
+        for rest in prob.restrictions['nteams']:
+            m.addConstr(quicksum(a[g]*x[g, p, t] for g in cal_G for p in rest["topics"] for t in range(
+                len(prob.projects[p]))) <= rest["capacity_max"], "rest_nstds_%s" % rest["username"])
+
 
     # Symmetry breaking on the teams
     for p in cal_P:

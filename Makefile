@@ -4,7 +4,7 @@ DATADIR=/home/marco/workspace/git/TT/ProjectAssignment_git_imada/data
 #CASE=2021-zhiru
 #CASE=2019-bachelor
 #CASE=2021-psy
-CASE=2021-badm500
+CASE=2022-badm500
 PROGRAM=python3
 
 
@@ -32,3 +32,7 @@ publish:
 # owa"; do # "powers"  "identity"
 psy:
 	${PROGRAM} src/main.py ${DATADIR}/${CASE} -i --Wmethod owa --groups post --min_preferences 7 --cut_off_type stype --cut_off 2 | tee ${DATADIR}/${CASE}/owa.txt
+
+
+badm:
+	${PROGRAM} src/main.py ${DATADIR}/${CASE} --Wmethod owa --groups pre --min_preferences 6  | tee ${DATADIR}/${CASE}/owa.txt

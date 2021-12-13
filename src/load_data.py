@@ -15,7 +15,14 @@ import random
 random.seed(3)
 
 class Problem:
-    def __init__(self, dirname, options):
+
+    def __init__(self):
+        return
+
+
+    def __init__(self, dirname=None, options=None):
+        if dirname is None and options is None:
+            return
         self.cml_options = options
         self.study_programs = set()
         self.project_details, self.topics, self.projects = self.read_projects(dirname)
@@ -29,6 +36,7 @@ class Problem:
         
         self.restrictions = self.read_restrictions(dirname)
         self.minimax_sol = 0
+        self.check_capacity()
         print("Read instance... Done")
         # self.__dict__.update(kwds)
 
@@ -204,12 +212,16 @@ class Problem:
                 for t in p:
                     values[t] = 2**av_exp
                     ranks_av[t] = av_rank
-                    #ce1f9bc5329daf1811c13b35fc02402cae6f6d91
+                    ranks_min[t] = j
+                j=j+r
+                i=max(0,i-r)
+
             # we handle here also cases of students who did not input a preference list
-            # we assign to them a valuie that is the average value among all available values
+            # we assign to them a value that is the average value among all available values
             # it should later imply that they get a large enough value as weight
+            
             if prioritize_all or len(priorities)==0:
-                prj_set = set(self.topics.keys()) - set(self.flatten(priorities))
+                prj_set = set(self.topics.keys()).difference( set(self.flatten(priorities)) )
                 prj_set = list(prj_set)
                 if False: # old way decide a random order but it may lead to suboptimal sol
                     prj_list = random.sample(prj_set, k=len(prj_set))
@@ -219,6 +231,7 @@ class Problem:
                         ranks_min[p] = j
                         j += 1
                 else:
+                    print(prj_set)
                     M = self.cml_options.min_preferences+1 # sum(prj_list)/len(prj_list)  # a large enough value
                     for p in prj_set:
                         values[p] = 2**0
@@ -271,3 +284,14 @@ class Problem:
             # return {'biologi': ["alle", "natbidat"],"farmaci": ["alle","farmaci"],"natbidat": ["alle","natbidat"]}
         #print(valid_prjtypes)
         return valid_prjtypes
+
+    def check_capacity(self):
+        n_stds=len(self.student_details)
+        n_groups=len(self.groups)
+        teams=0
+        for p in self.projects.keys():
+            teams += len(self.projects[p])
+        print(f"Numer of students: {n_stds}")
+        print(f"Teams available: {teams}")
+        print(f"Number of groups: {n_groups}")
+        assert teams>=n_groups, "No teams enough" 

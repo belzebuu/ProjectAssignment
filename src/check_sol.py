@@ -1,3 +1,4 @@
+import sys
 
 def check_sol(solutions, problem, soldirname=""):
     logs = []
@@ -23,7 +24,7 @@ def check_sol(solutions, problem, soldirname=""):
             if s not in sol.topics:
                 unass_students += 1
             elif sol.topics[s] not in list(problem.std_ranks_min[s].keys()):
-                print(sol.topics[s], list(problem.std_ranks_min[s].keys()))
+                print(sol.topics[s], problem.std_ranks_min[s])
                 sys.exit("%s student assigned to a project not ranked" % s)
 
         # group members are assigned to the same teams

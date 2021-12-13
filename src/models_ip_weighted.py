@@ -6,10 +6,10 @@ from owa import *
 import numpy as np
 
 
-def calculate_weights(weight_method, max_rank):    
+def calculate_weights(weight_method, max_rank):
     if weight_method == "identity":
         weights = np.arange(max_rank + 1, dtype="float")
-        weights[0] = np.nan # max_rank + 1
+        weights[0] = np.nan  # max_rank + 1
     elif weight_method == "owa":
         weights = owa_weights(max_rank)
         # beta=1-0.001 #1.0/max_rank - 0.001
@@ -18,16 +18,17 @@ def calculate_weights(weight_method, max_rank):
         # weights[1] = rescale*f_i[0]*beta**(max_rank-1)/(1+beta)**(max_rank-1)
         # weights[2:] = map(lambda x: rescale*f_i[x-1]*beta**(max_rank-x)/(1+beta)**(max_rank+1-x), range(2,max_rank+1))
         # weights[0] = max(weights[1:])+1
-    elif weight_method == "powers":        
-        weights = np.array([np.nan]+[-2 ** max(8 - x, 0) for x in range(1, max_rank + 1)],dtype="float")        
+    elif weight_method == "powers":
+        weights = np.array([np.nan]+[-2 ** max(8 - x, 0)
+                           for x in range(1, max_rank + 1)], dtype="float")
     print(weights)
     #raise SystemExit
     return weights
 
 
-def calculate_weight(weight_method, max_rank, rank):    
+def calculate_weight(weight_method, max_rank, rank):
     if weight_method == "identity":
-        weight = rank #np.arange(max_rank + 1, dtype="float")
+        weight = rank  # np.arange(max_rank + 1, dtype="float")
     elif weight_method == "owa":
         weight = owa_single_weight(rank, max_rank)
         # beta=1-0.001 #1.0/max_rank - 0.001
@@ -36,8 +37,8 @@ def calculate_weight(weight_method, max_rank, rank):
         # weights[1] = rescale*f_i[0]*beta**(max_rank-1)/(1+beta)**(max_rank-1)
         # weights[2:] = map(lambda x: rescale*f_i[x-1]*beta**(max_rank-x)/(1+beta)**(max_rank+1-x), range(2,max_rank+1))
         # weights[0] = max(weights[1:])+1
-    elif weight_method == "powers":        
-        weight = -2 ** max(8 - rank, 0) 
+    elif weight_method == "powers":
+        weight = -2 ** max(8 - rank, 0)
     return weight
 
 
@@ -54,12 +55,13 @@ def model_ip_weighted(prob, config, minimax):
     grp_ranks = {}
     max_rank = 0
     for g in cal_G:
-        s = prob.groups[g][0]  # we consider only first student, the other must have equal prefs
+        # we consider only first student, the other must have equal prefs
+        s = prob.groups[g][0]
         #grp_ranks[g] = prob.std_ranks_av[s]
-        if len(prob.std_ranks_av[s])==len(prob.topics):
-            grp_ranks[g] = {}
-        else:
-            grp_ranks[g] = prob.std_ranks_av[s]
+        #if len(prob.std_ranks_av[s]) == len(prob.topics):
+        #    grp_ranks[g] = {}
+        #else:
+        grp_ranks[g] = prob.std_ranks_av[s]
         if len(grp_ranks[g]) > max_rank:
             max_rank = len(grp_ranks[g])
 
@@ -95,8 +97,9 @@ def model_ip_weighted(prob, config, minimax):
                                    obj=0.0,
                                    name='slack_%s_%s' % (p, t))
 
-    v = m.addVar(lb=-GRB.INFINITY, #-2 ** 8 * len(list(prob.std_type.keys())),
-                 ub=GRB.INFINITY, #len(list(prob.std_type.keys())) * max_rank, 
+    v = m.addVar(lb=-GRB.INFINITY,  # -2 ** 8 * len(list(prob.std_type.keys())),
+                 # len(list(prob.std_type.keys())) * max_rank,
+                 ub=GRB.INFINITY,
                  vtype=GRB.CONTINUOUS, obj=1.0, name='v')
 
     ############################################################
@@ -127,7 +130,8 @@ def model_ip_weighted(prob, config, minimax):
     if minimax > 0:
         u = {}  # rank assigned per group
         for g in cal_G:
-            u[g] = m.addVar(lb=0.0, ub=max_rank, vtype=GRB.INTEGER, obj=0.0, name='u_%s' % (g))
+            u[g] = m.addVar(lb=0.0, ub=max_rank,
+                            vtype=GRB.INTEGER, obj=0.0, name='u_%s' % (g))
         f = m.addVar(lb=0.0, ub=len(list(prob.groups.keys())) * max_rank,
                      vtype=GRB.CONTINUOUS,
                      obj=0.0,
@@ -147,10 +151,12 @@ def model_ip_weighted(prob, config, minimax):
     # Assignment constraints
     for g in cal_G:
         peek = prob.std_type[prob.groups[g][0]]
-        valid_prjs = [x for x in cal_P if prob.projects[x][0].type in prob.valid_prjtype[peek]]
+        valid_prjs = [x for x in cal_P if prob.projects[x]
+                      [0].type in prob.valid_prjtype[peek]]
         # valid_prjs=filter(lambda x: prob.projects[x][0][2]==peek or prob.projects[x][0][2]=='alle', prob.projects.keys())
 
-        working = [x[g, p, t] for p in valid_prjs for t in range(len(prob.projects[p]))]
+        working = [x[g, p, t]
+                   for p in valid_prjs for t in range(len(prob.projects[p]))]
         m.addConstr(quicksum(working) == 1, 'grp_%s' % g)
         for p in cal_P:
             if not p in valid_prjs:
@@ -167,13 +173,21 @@ def model_ip_weighted(prob, config, minimax):
                         == prob.projects[p][t][1] * y[p, t], 'ub_%s_%d' % (p, t))
             m.addConstr(quicksum(a[g] * x[g, p, t] for g in list(prob.groups.keys()))
                         >= prob.projects[p][t][0] * y[p, t], 'lb_%s_%d' % (p, t))
-            if config.groups=="pre":
-                m.addConstr(quicksum(x[g, p, t] for g in cal_G) <= 1, 'max_one_grp_%s%s' % (p, t))
+            if config.groups == "pre":
+                m.addConstr(quicksum(x[g, p, t] for g in cal_G)
+                            <= 1, 'max_one_grp_%s%s' % (p, t))
 
     # enforce restrictions on number of teams open across different topics:
-    if 'nteams' in prob.restrictions: 
+    if 'nteams' in prob.restrictions:
         for rest in prob.restrictions['nteams']:
-            m.addConstr(quicksum(y[p, t] for p in rest["topics"] for t in range(len(prob.projects[p]))) <= rest["groups_max"], "rest_%s" % rest["username"])
+            m.addConstr(quicksum(y[p, t] for p in rest["topics"] for t in range(
+                len(prob.projects[p]))) <= rest["groups_max"], "rest_%s" % rest["username"])
+
+    # enforce restrictions on number of students assigned across different topics:
+    if 'nteams' in prob.restrictions:
+        for rest in prob.restrictions['nteams']:
+            m.addConstr(quicksum(a[g]*x[g, p, t] for g in cal_G for p in rest["topics"] for t in range(
+                len(prob.projects[p]))) <= rest["capacity_max"], "rest_nstds_%s" % rest["username"])
 
     ############################################################
     # Symmetry breaking on the teams
@@ -200,7 +214,8 @@ def model_ip_weighted(prob, config, minimax):
                         m.addConstr(a[g] + 1 - (1 - y[p, t]) * prob.projects[p][t][0] <= prob.projects[p][t][1]
                                     * z[g, p, t] + (prob.projects[p][t][1] + 1) * y[p, t], 'c31_%s_%s_%s' % (g, p, t))
                     else:
-                        m.addConstr(z[g, p, t] == 0, 'c3031_%s_%s_%s' % (g, p, t))
+                        m.addConstr(z[g, p, t] == 0,
+                                    'c3031_%s_%s_%s' % (g, p, t))
         for g in cal_G:
             for p in list(grp_ranks[g].keys()):
                 for p2 in list(grp_ranks[g].keys()):
@@ -272,7 +287,8 @@ def model_ip_weighted(prob, config, minimax):
                         expr += x[g, p, t]
         print("solution " + str(i) + " found\n")
         elapsed = (perf_counter() - start)
-        solutions.append(Solution(topics=topics, teams=teams, solved=[elapsed]))
+        solutions.append(
+            Solution(topics=topics, teams=teams, solved=[elapsed]))
         if m.status != GRB.status.OPTIMAL or not config.allsol or elapsed >= 3600:
             break
         m.addConstr(expr, GRB.GREATER_EQUAL, 1.0, "no_good" + str(i))
