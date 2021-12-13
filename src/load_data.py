@@ -47,6 +47,7 @@ class Problem:
         topics = defaultdict(list)
         # We assume header to be:
         # ID;team;title;min_cap;max_cap;type;prj_id;instit;institute;mini;wl;teachers;email
+        # NEW: ProjektNr; Underprojek; Projekttitel; Min; Max;Projekttype; ProjektNr  i BB; Institut forkortelse; Institutnavn; Obligatorisk minikursus; Gruppeplacering
         # OLD: ProjektNr; Underprojek; Projekttitel; Min; Max;Projekttype; ProjektNr  i BB; Institut forkortelse; Obligatorisk minikursus; Gruppeplacering
         project_table = pd.read_csv(dirname+"/projects.csv", sep=";")
         print(project_table)
@@ -112,7 +113,7 @@ class Problem:
         students_file = dirname+"/students.csv"
         print("read ", students_file)
 
-        # grp_id;(group);username;type;priority_list;student_id;full_name;email;timestamp
+        # grp_id;(group);username;type;priority_list;(student_id);full_name;email;timestamp
         # group is not needed
         student_table = pd.read_csv(dirname+"/students.csv", sep=";",  converters={"priority_list":str})
         print(student_table)
@@ -203,11 +204,7 @@ class Problem:
                 for t in p:
                     values[t] = 2**av_exp
                     ranks_av[t] = av_rank
-                    ranks_min[t] = j
-                j=j+r
-                i=max(0,i-r)
-
-            # if we need to ensure feasibility we can insert a low priority for all other projects
+                    #ce1f9bc5329daf1811c13b35fc02402cae6f6d91
             # we handle here also cases of students who did not input a preference list
             # we assign to them a valuie that is the average value among all available values
             # it should later imply that they get a large enough value as weight
