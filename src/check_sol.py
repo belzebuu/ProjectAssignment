@@ -163,16 +163,18 @@ def check_sol(solutions, problem, soldirname=""):
         print(s)
 
         ############################################
+        print(problem.topics)
         if soldirname != "":
             filename = "%s/sol_%03d.txt" % (soldirname, num_solutions)
             f = open(filename, "w")
             for s in problem.std_type:
                 if s in sol.topics:
-                    if sol.teams[s] == 0 and len(problem.projects[sol.topics[s]]) == 1:
-                        f.write(s + "\t" + str(sol.topics[s]) + "\t" + "" + "\n")
-                    else:
-                        f.write(s + "\t" + str(sol.topics[s]) +
-                                "\t" + 'abcdefghi'[sol.teams[s]] + "\n")
+                    f.write(s + "\t" + str(sol.topics[s]) + "\t" + str(problem.topics[sol.topics[s]][sol.teams[s]]) + "\n")
+                    #if sol.teams[s] == 0 and len(problem.projects[sol.topics[s]]) == 1:
+                    #    f.write(s + "\t" + str(sol.topics[s]) + "\t" + "" + "\n")
+                    #else:
+                    #    f.write(s + "\t" + str(sol.topics[s]) +
+                    #            "\t" + 'abcdefghi'[sol.teams[s]] + "\n")
         log += sol.solved
         logs += [log]
         num_solutions = num_solutions-1

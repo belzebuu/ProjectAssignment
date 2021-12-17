@@ -68,15 +68,16 @@ def project_table(ass_std2team, ass_team2std, popularity, max_p, prob):
         for j in sorted(prob.topics[i]):
             pID = str(int(i))+j
             project_details[pID] = prob.project_details[pID]
-            project_details[pID]["popularity_tot"] = popularity[i][0]
-            project_details[pID]["popularity_details"] = str(popularity[i][1:(max_p+1)])
+            project_details[pID]["popularity_tot"] = sum(popularity[i])
+            project_details[pID]["popularity_details"] = str(popularity[i])
             std_assigned = len(ass_team2std[pID]) if pID in ass_team2std else 0
+            project_details[pID]["assigned_stds"] = std_assigned
             project_details[pID]["places_available"] = prob.project_details[pID]["max_cap"]-std_assigned
             if (project_details[pID]["places_available"] < 0):
                 sys.exit('project %s has places_available %s ' %
                          (pID, project_details[pID]["places_available"]))
             if std_assigned == 0:
-                project_details[pID]["team_status"] = "Not open"
+                project_details[pID]["team_status"] = "Not used"
             elif prob.project_details[pID]["max_cap"] > std_assigned:
                 project_details[pID]["team_status"] = "Underfull"
             else:
@@ -229,7 +230,7 @@ def count_popularity(prob):
 
     table = pd.DataFrame.from_dict(topic_popularity, orient='index')
     columns = ["title","type","instit","tot_popularity"]+[str(j+1)+". prio." for j in range(max_p)]
-    table.to_csv(outfile+".csv", sep=";",index=False,columns=columns)
+    table.to_csv(outfile+".csv", sep=";",index=True,columns=columns)
 
     return popularity, max_p
 

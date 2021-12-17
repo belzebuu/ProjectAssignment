@@ -253,11 +253,13 @@ class Problem:
             return self.read_restrictions_csv(dirname)
         else:
             sys.exit(f"File {dirname}/restrictions.[json|csv] missing\n")
+        
 
     def read_restrictions_json(self, dirname):
         """ reads restrictions """
         with open(dirname+"/restrictions.json", "r") as jsonfile:
             restrictions=json.load(jsonfile)
+        print({x["username"]:x["groups_max"] for x in restrictions["nteams"]})
         return restrictions
 
     def read_restrictions_csv(self, dirname):

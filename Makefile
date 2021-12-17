@@ -21,10 +21,11 @@ output:
 
 
 publish: 
-	/bin/rm -rf /home/marco/WWWpublic/Teaching/FF501/Ekstern/${CASE}/out
+	#/bin/rm -rf /home/marco/WWWpublic/Teaching/FF501/Ekstern/${CASE}/out
 	#/bin/mkdir /home/marco/WWWpublic/Teaching/FF501/Ekstern/${YEAR}
-	/bin/cp -rf out /home/marco/WWWpublic/Teaching/FF501/Ekstern/${CASE}/
-
+	#/bin/cp -rf out /home/marco/WWWpublic/Teaching/FF501/Ekstern/${CASE}/
+	Rscript scripts/make_gtables.R
+	cp out/*html /home/marco/public_html/out/
 
 
 
@@ -36,3 +37,8 @@ psy:
 
 badm:
 	${PROGRAM} src/main.py ${DATADIR}/${CASE} --Wmethod owa --groups pre --min_preferences 6  | tee ${DATADIR}/${CASE}/owa.txt
+
+
+
+update: #updates teams on basis of requirements. Careful it overwrites projects.csv and eliminates topics if the supervisor has max_groups 0. 
+	python3 src/update_projects.py  ${DATADIR}/${CASE}
