@@ -34,16 +34,53 @@ The following files are required:
 - restrictions.[csv|json]
 
 
+See `data/2021-example` for an example of this input.
 
 
-Work Flow
+Work flow
 =========
 
 To find an assignment:
 ```
 python3 src/main.py data/2021-example/ -g post
 ```
+This will output a solution in the directory `sln`.
+
+Check the options available:
+```
+python3 src/main.py -h
+```
+
 To produce different types of reporting:
 ```
 python3 src/report_sol_new.py -d data/2021-example/ -s sln/sol_001.txt
+```
+
+
+
+Work flow in association with valkyrien.imada.sdu.dk/BADM500 Portal
+===================================================================
+
+First, update teams on basis of requirements. Careful it overwrites
+projects.csv and eliminates topics if the supervisor has max_groups 0.
+
+```{bash}
+python3 src/update_projects.py  ${DATADIR}/${CASE}
+# or
+make projects
+```
+
+then solve the assignment problem with `src/main.py` and the needed parameters. For
+an example, see `Makefile` targets `psy` and `badm`. The solution is
+written in `sln`.
+
+Next, generate the output in different formats in `out` with:
+
+```
+make output
+```
+
+Finally, publish online:
+```
+make publish
 ```
