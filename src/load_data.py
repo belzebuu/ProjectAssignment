@@ -297,4 +297,5 @@ class Problem:
         print(f"Numer of students: {n_stds}")
         print(f"Teams available: {teams}")
         print(f"Number of groups: {n_groups}")
-        assert teams>=n_groups, "No teams enough" 
+        if self.options.groups=="pre":
+            assert teams>=n_groups, "No teams enough" 
