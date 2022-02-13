@@ -4,7 +4,8 @@ DATADIR=/home/marco/workspace/git/TT/ProjectAssignment_git_imada/data
 #CASE=2021-zhiru
 #CASE=2019-bachelor
 #CASE=2021-psy
-CASE=2022-badm500
+#CASE=2022-badm500
+CASE=2022-ff501-mat
 
 PROGRAM=python3
 SOLDIR=sln
