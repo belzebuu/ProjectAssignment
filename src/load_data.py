@@ -36,7 +36,7 @@ class Problem:
         
         self.restrictions = self.read_restrictions(dirname)
         self.minimax_sol = 0
-        self.check_capacity()
+        self.check_capacity(options.groups=="pre")
         print("Read instance... Done")
         # self.__dict__.update(kwds)
 
@@ -288,7 +288,7 @@ class Problem:
         #print(valid_prjtypes)
         return valid_prjtypes
 
-    def check_capacity(self):
+    def check_capacity(self, pre):
         n_stds=len(self.student_details)
         n_groups=len(self.groups)
         teams=0
@@ -297,5 +297,5 @@ class Problem:
         print(f"Numer of students: {n_stds}")
         print(f"Teams available: {teams}")
         print(f"Number of groups: {n_groups}")
-        if self.options.groups=="pre":
+        if pre:
             assert teams>=n_groups, "No teams enough" 
