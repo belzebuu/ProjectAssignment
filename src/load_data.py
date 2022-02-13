@@ -124,9 +124,10 @@ class Problem:
         # grp_id;(group);username;type;priority_list;(student_id);full_name;email;timestamp
         # group is not needed
         student_table = pd.read_csv(dirname+"/students.csv", sep=";",  converters={"priority_list":str})
-        print(student_table)
+        
         student_table["username"] = student_table["username"].apply(str.lower)
         student_table.index = student_table["username"]
+        print(student_table)
         student_details = student_table.to_dict("index", into=OrderedDict)
 
         #for s in student_details:
