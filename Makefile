@@ -42,13 +42,14 @@ $(OUTPUTDIR):
 
 output: | $(OUTPUTDIR)
 	python3 src/report_sol_new.py -s ${SOLDIR}/sol_001.txt ${DATADIR}/${CASE} 
+	python3 src/report_sol.py -s ${SOLDIR}/sol_001.txt -d ${DATADIR}/${CASE}
 	Rscript scripts/make_gtables.R
 
 publish: 
 	#/bin/rm -rf /home/marco/public_html/out/
 	#/bin/mkdir -p /home/marco/public_html/out/
 	#/bin/cp -rf out /home/marco/public_html/
-	cp -f out/*html /home/marco/public_html/out/
+	cp -f out/* /home/marco/public_html/ff501-2022/
 
 
 

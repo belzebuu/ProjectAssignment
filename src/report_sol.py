@@ -163,7 +163,7 @@ def check_sol(ass_std2team, ass_team2std, prob, popularity, max_p):  # tablefile
     for i in sorted(prob.topics.keys()):
         for j in sorted(prob.topics[i]):
             pID = str(int(i))+j
-            s = "ProjectID: "+pID+"\n"
+            s = "ProjectID: "+prob.project_details[pID]["prj_id"]+prob.project_details[pID]["team"]+"\n"
             s = s + "Project title: \""+prob.project_details[pID]["title"]+"\""+"\n"
             s = s + "Popularity: (tot. "+str(popularity[i][0])+") " + \
                 str(popularity[i][1:(max_p+1)])+"\n"
@@ -188,7 +188,7 @@ def check_sol(ass_std2team, ass_team2std, prob, popularity, max_p):  # tablefile
 
             if (std_assigned > 0):
                 f2.write("%s: %s\n" %
-                         (pID,
+                         (prob.project_details[pID]["prj_id"]+prob.project_details[pID]["team"],
                           prob.project_details[pID]["title"])
                          )
 
@@ -275,7 +275,7 @@ def per_student(studentassignments, ass_std2team, ass_team2std, prob, popularity
                 (
                     prob.student_details[s]["username"],
                     prob.student_details[s]["type"],
-                    prob.project_details[pID]["ID"],
+                    prob.project_details[pID]["prj_id"],
                     prob.project_details[pID]["team"],
                     prob.project_details[pID]["title"],
                     prob.project_details[pID]["type"],
@@ -441,7 +441,7 @@ def count_popularity_old(prob):
     return popularity, max_p
 
 
-def institute_wise():
+def institute_wise(prob):
     f = open(output5, "w")
     pIDs_per_institute = {}
     pIDs = []
@@ -486,9 +486,9 @@ def institute_wise():
     print("Written "+output5)
 
     # 'Institut for Matematik og Datalogi': [2, 3, 15, 28, 52, 58, 62, 68, 72, 77, 80, 92],
-    del topics_per_institute['Institut for Matematik og Datalogi']
-    topics_per_institute['IMADA Mat'] = [27, 86, 52, 4, 63, 71, 31, 55, 13, 92]
-    topics_per_institute['IMADA Dat'] = [15, 78, 95, 1, 81, 26, 40, 12, 17, 14, 77, 60]
+    #del topics_per_institute['Institut for Matematik og Datalogi']
+    #topics_per_institute['IMADA Mat'] = [27, 86, 52, 4, 63, 71, 31, 55, 13, 92]
+    #topics_per_institute['IMADA Dat'] = [15, 78, 95, 1, 81, 26, 40, 12, 17, 14, 77, 60]
     fields = set([prob.student_details[s]["Studieretning"] for s in prob.student_details])
     # fields=topics_per_institute.keys()
     print(topics_per_institute)
@@ -569,12 +569,17 @@ def main(argv):
             print(opt+" Not recognised\n")
             usage()
 
-    problem = Problem(dirname)
+    class options:
+        min_preferences=6
+        cut_off_type=None
+        prioritize_all=False
+        groups="Post"
+    problem = Problem(dirname, options=options)
     ass_std2team, ass_team2std = read_solution(solfile)
     popularity, max_p = count_popularity(problem)
     studentassignments = check_sol(ass_std2team, ass_team2std, problem, popularity, max_p)  # tablefile)
     per_student(studentassignments, ass_std2team, ass_team2std, problem, popularity, max_p)  
-    # institute_wise()
+    #institute_wise(problem)
 
 
 def usage():
