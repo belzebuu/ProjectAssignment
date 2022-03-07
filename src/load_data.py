@@ -6,6 +6,7 @@ import os
 import csv
 import json
 import codecs
+from numpy import std
 import pandas as pd
 from collections import defaultdict
 from collections import OrderedDict
@@ -85,6 +86,7 @@ class Problem:
         # Gruppeplacering=(((len(line)>6 and len(line)==12) and line[11]) or (len(line)>6 and line[10]) or "") # to take into account format before 2012
         # )
 
+        print(project_table.type.unique())
         filehandle = codecs.open(os.path.join("log", "projects.json"),  "w", "utf-8")
         json.dump(project_details, fp=filehandle, sort_keys=True,
                   indent=4, separators=(',', ': '),  ensure_ascii=False)
@@ -100,6 +102,8 @@ class Problem:
                                             )
                                        )
         #print(topics.keys())
+        #print(project_details)
+        #raise SystemExit
         return (project_details, topics, projects)
 
     def check_tot_capacity(self):
@@ -285,7 +289,19 @@ class Problem:
         except csv.Error as e:
             sys.exit('file %s, line %d: %s' % ("/restrictions.csv", reader.line_num, e))
             # return {'biologi': ["alle", "natbidat"],"farmaci": ["alle","farmaci"],"natbidat": ["alle","natbidat"]}
-        #print(valid_prjtypes)
+        print(valid_prjtypes)
+
+        ## check
+        for s in self.std_type:
+            t = self.std_type[s]
+            
+            valid_prjs =  [x for x in self.topics if self.projects[x][0].type in valid_prjtypes[t]] 
+            filtered = list(filter(lambda x: x in self.flatten(self.priorities[s]),  valid_prjs ) )
+            if (len(filtered)<=1):
+                print( s, valid_prjtypes[t], self.std_type[s], sorted(self.priorities[s])) # prob.std_ranks_av[prob.groups[g][0]])
+                print( valid_prjs, filtered, self.priorities) 
+                raise SystemError
+
         return valid_prjtypes
 
     def check_capacity(self, pre):

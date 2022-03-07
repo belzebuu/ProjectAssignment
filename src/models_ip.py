@@ -70,12 +70,12 @@ def model_ip(prob, config):
         valid_prjs = [x for x in cal_P if prob.projects[x][0].type in prob.valid_prjtype[peek]]
         #valid_prjs=filter(lambda x: prob.projects[x][0][2]==peek or prob.projects[x][0][2]=='alle', prob.projects.keys())        
         working = [x[g, p, t] for p in valid_prjs for t in range(len(prob.projects[p]))]
-        m.addConstr(quicksum(working) == 1, 'grp_%s' % g)
+        m.addConstr(quicksum(working) == 1, 'grp_%s' % g)       
         for p in cal_P:
             if not p in valid_prjs:
                 for t in range(len(prob.projects[p])):
                     m.addConstr(x[g, p, t] == 0, 'not_valid_%s_%s' % (g,p))
-            if not p in prob.std_ranks_av[prob.groups[g][0]]:
+            if not p in grp_ranks[g]: # prob.std_ranks_av[prob.groups[g][0]]:
                 for t in range(len(prob.projects[p])):
                     m.addConstr(x[g, p, t] == 0, 'not_ranked_%s_%s' % (g,p))
 
@@ -122,6 +122,17 @@ def model_ip(prob, config):
 
     m.write("model_ip.lp")
     m.optimize()
+
+    if m.status == GRB.status.INFEASIBLE:  # do IIS
+        print('The model is infeasible; computing IIS')
+        m.computeIIS()
+        m.write(os.path.join("optprj_IIS.ilp"))
+        print('\nThe following constraint(s) cannot be satisfied:')
+        for c in m.getConstrs():
+            if c.IISConstr:
+                print(('%s' % c.constrName))
+        print("\nSee optexam_IIS.ilp for explicit constraints.\n")
+        exit(0)
 
     # Print solution
     teams = {}

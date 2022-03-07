@@ -196,9 +196,10 @@ def summarize(ass_std2team, ass_team2std, max_p, prob):
     print(s)
     print("{Topic: (n_teams, n_stds)}")
     print(wload_topic)
-    #f = open(output1, "a")
-    # f.write(s)
-    # f.close()
+    outfile = os.path.join("out", "summary.txt")
+    f = open(outfile, "w")
+    f.write(s)
+    f.close()
 
 
 def count_popularity(prob):
