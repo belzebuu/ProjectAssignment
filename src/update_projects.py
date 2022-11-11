@@ -5,6 +5,7 @@ import pandas as pd
 import os
 from collections import OrderedDict
 import string
+import shutil
 
 usage = "usage: %prog [options] DIRNAME"
 parser = OptionParser(usage)
@@ -19,9 +20,13 @@ problem = ld.Problem()
 
 project_details, topics, projects = problem.read_projects(dirname)
 
-#print(project_details)
-DF = pd.DataFrame.from_dict(project_details,orient="index")
-DF.to_csv(os.path.join(dirname,"projects.csv.bk"),sep=";",index=False)
+
+src=os.path.join(dirname,"projects.csv")
+dst=os.path.join(dirname,"projects.csv.bk")
+shutil.copy2(src,dst)
+
+#DF = pd.DataFrame.from_dict(project_details,orient="index")
+#DF.to_csv(os.path.join(dirname,"projects.csv.bk"),sep=";",index=False)
 
 restrictions = problem.read_restrictions_json(dirname)
 
@@ -29,7 +34,10 @@ OD=OrderedDict()
 letters = string.ascii_lowercase[:26]
 for topic in topics:
     k = str(topic)+topics[topic][0]   
-    advisor = project_details[k]["email"].split('@')[0]
+    if type(project_details[k]["email"]) is str:
+        advisor = project_details[k]["email"].split('@')[0]
+    else:
+        advisor = str(project_details[k]["email"])
     n_teams=0
     for r in restrictions["nteams"]:
         if advisor == r["username"]:

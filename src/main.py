@@ -29,22 +29,27 @@ def main():
 
     model = "minimax"
 
-    minimax, solutions = model_ip(problem, options)
-    stat = check_sol(solutions, problem, soldirname="sln")
+    if options.Wmethod in ["identity", "owa", "powers"]:
+        minimax, solutions = model_ip(problem, options)
+        stat = check_sol(solutions, problem, soldirname="sln")
 
-    for st in stat:
-        log = ['x']+[model]+solutions[0].solved+[os.path.basename(dirname)]+st
-        print('%s' % ' '.join(map(str, log)))
+        for st in stat:
+            log = ['x']+[model]+solutions[0].solved+[os.path.basename(dirname)]+st
+            print('%s' % ' '.join(map(str, log)))
 
-    if options.Wmethod not in ["identity", "owa", "powers"]:
+
+        start = perf_counter()
+        model = "minimax_instab_weighted"
+        model = model+"-"+options.Wmethod
+        value, solutions = model_ip_weighted(problem, options, minimax)
+        elapsed = (perf_counter() - start)
+    elif options.Wmethod=="lexi":
+        solutions = lex_ip_procedure(problem, options)
+    else:
         sys.exit("Wmethod not recognized")
 
-    start = perf_counter()
-    model = "minimax_instab_weighted"
-    model = model+"-"+options.Wmethod
-    value, solutions = model_ip_weighted(problem, options, minimax)
 
-    elapsed = (perf_counter() - start)
+
 
     stat = check_sol(solutions, problem, soldirname="sln")
     for st in stat:

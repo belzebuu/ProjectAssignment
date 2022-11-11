@@ -160,7 +160,6 @@ class Problem:
             student_details[s]["priority_list_wties"]=student_details[s]["priority_list"]
             student_details[s]["priority_list"]=process_string(student_details[s]["priority_list"].strip())
 
-            
             if len(self.flatten(student_details[s]["priority_list"])) < self.cml_options.min_preferences:
                 print("WARNING: "+student_details[s]['username']+f" has less than {self.cml_options.min_preferences} preferences")
 
@@ -171,10 +170,14 @@ class Problem:
             for t in student_details[s]["priority_list"]:
                 for p in t:
                     if p not in self.topics:
-                        print("WARNING:" + u + " expressed a preference for a project " + str(p)+" which is not available")
+                        print("WARNING: " + s + " expressed a preference for a project " + str(p)+" which is not available")
                         answer = input("Continue? (y/n)\n")
                         if answer not in ['', 'Y', 'y']:
                             sys.exit("You decided to stop")
+                        #t.remove(p)
+                #if len(t)==0:
+                #    remove(t)
+                    
 
         #print(json.dumps(student_details,indent=4))
 

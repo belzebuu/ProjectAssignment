@@ -3,7 +3,7 @@ from load_data import *
 import time
 from gurobipy import *
 from functools import reduce
-
+from typing import Dict
 
 def model_ip(prob, config):
     start = time.perf_counter()
@@ -151,17 +151,15 @@ def model_ip(prob, config):
     return v.x, solution
 
 
-def lex_ip_procedure(prob, instability):
-    MR = 40
-
-    v = model_ip(prob)[0]
+def lex_ip_procedure(prob, options: Dict):
+    v = model_ip(prob, options)[0]
     print(v)
     h = int(v)
     z = []
-    solved = [0]*(MR+1)
+    solved = [0]*(h+1)
     while h > 0:
         start = time.perf_counter()
-        (z, sol) = model_lex(prob, int(v), h, z, False, instability, "bottomup")
+        (z, sol) = model_lex(prob, int(v), h, z, options, direction="bottomup")
         elapsed = (time.perf_counter() - start)
         solved[h] = elapsed
         h -= 1
@@ -170,7 +168,7 @@ def lex_ip_procedure(prob, instability):
     return [Solution(topics=sol["topics"], teams=sol["teams"], solved=[sum(solved)])]
 
 
-def greedy_maximum_matching_ip_procedure(prob, minimax, instability):
+def greedy_maximum_matching_ip_procedure(prob, minimax, options):
     MR = 40
     if minimax:
         v = prob.minimax_sol  # model_ip(prob)[0]
@@ -182,7 +180,7 @@ def greedy_maximum_matching_ip_procedure(prob, minimax, instability):
     solved = [0]*(MR+1)
     while h < int(v):
         start = time.perf_counter()
-        (z, sol) = model_lex(prob, int(v), h, z, minimax, instability, "topdown")
+        (z, sol) = model_lex(prob, int(v), h, z, options, "topdown")
         elapsed = (time.perf_counter() - start)
         solved[h] = elapsed
         h += 1
@@ -192,7 +190,7 @@ def greedy_maximum_matching_ip_procedure(prob, minimax, instability):
     return [Solution(topics=sol["topics"], teams=sol["teams"], solved=[sum(solved)])]
 
 
-def model_lex(prob, v, h, z, minimax, instability, direction):
+def model_lex(prob, v, h, z, options: Dict, direction: str):
     start = time.perf_counter()
     m = Model('leximin')
 
@@ -258,7 +256,7 @@ def model_lex(prob, v, h, z, minimax, instability, direction):
                    name='z_%s' % (h))
 
     ############################################################
-    if instability == True:
+    if options.instability:
         z2 = {}  # binary variable to indicate whether there is space left in a team
         q = {}  # counts if space free in some better project
         for p in list(prob.projects.keys()):
@@ -290,37 +288,57 @@ def model_lex(prob, v, h, z, minimax, instability, direction):
     #m.addConstr(quicksum(working) == 1, 'grp_%s' % g)
 
     # Assignment constraints
-    for g in list(prob.groups.keys()):
+    for g in cal_G:
         peek = prob.std_type[prob.groups[g][0]]
-        valid_prjs = [x for x in list(prob.projects.keys())
-                      if prob.projects[x][0][2] in prob.valid_prjtype[peek]]
-        #valid_prjs=filter(lambda x: prob.projects[x][0][2]==peek or prob.projects[x][0][2]=='alle', prob.projects.keys())
+        valid_prjs = [x for x in cal_P if prob.projects[x]
+                      [0].type in prob.valid_prjtype[peek]]
+        # valid_prjs=filter(lambda x: prob.projects[x][0][2]==peek or prob.projects[x][0][2]=='alle', prob.projects.keys())
 
-        working = [x[g, p, t] for p in valid_prjs for t in range(len(prob.projects[p]))]
+        working = [x[g, p, t]
+                   for p in valid_prjs for t in range(len(prob.projects[p]))]
         m.addConstr(quicksum(working) == 1, 'grp_%s' % g)
-        for p in list(prob.projects.keys()):
+        for p in cal_P:
             if not p in valid_prjs:
                 for t in range(len(prob.projects[p])):
-                    m.addConstr(x[g, p, t] == 0, 'ngrp_%s' % g)
+                    m.addConstr(x[g, p, t] == 0, 'not_valid_%s' % g)
             if not p in prob.std_ranks_av[prob.groups[g][0]]:
                 for t in range(len(prob.projects[p])):
-                    m.addConstr(x[g, p, t] == 0, 'ngrp_%s' % g)
+                    m.addConstr(x[g, p, t] == 0, 'not_ranked_%s' % g)
 
     # Capacity constraints
-    for p in list(prob.projects.keys()):
+    for p in cal_P:
         for t in range(len(prob.projects[p])):
-            m.addConstr(quicksum(a[g]*x[g, p, t] for g in list(prob.groups.keys())) + slack[p, t]
-                        == prob.projects[p][t][1]*y[p, t], 'ub_%s' % (t))
-            m.addConstr(quicksum(a[g]*x[g, p, t] for g in list(prob.groups.keys()))
-                        >= prob.projects[p][t][0]*y[p, t], 'lb_%s' % (t))
-            m.addConstr(quicksum(x[g, p, t] for g in cal_G) <= 1, 'max_one_grp_%s%s' % (p, t))
-
+            m.addConstr(quicksum(a[g] * x[g, p, t] for g in list(prob.groups.keys())) + slack[p, t]
+                        == prob.projects[p][t][1] * y[p, t], 'ub_%s_%d' % (p, t))
+            m.addConstr(quicksum(a[g] * x[g, p, t] for g in list(prob.groups.keys()))
+                        >= prob.projects[p][t][0] * y[p, t], 'lb_%s_%d' % (p, t))
+            if options.groups == "pre":
+                m.addConstr(quicksum(x[g, p, t] for g in cal_G)
+                            <= 1, 'max_one_grp_%s%s' % (p, t))
+    
     # enforce restrictions on number of teams open across different topics:
-    for rest in prob.restrictions:
-        m.addConstr(quicksum(y[p, t] for p in rest["topics"] for t in range(
-            len(prob.projects[p]))) <= rest["cum"], "rest_%s" % "-".join(map(str, rest["topics"])))
+    if 'nteams' in prob.restrictions:
+        for rest in prob.restrictions['nteams']:
+            m.addConstr(quicksum(y[p, t] for p in rest["topics"] for t in range(
+                len(prob.projects[p]))) <= rest["groups_max"], "rest_%s" % rest["username"])
 
-    if minimax:
+
+    # enforce restrictions on number of students assigned across different topics:
+    if 'nteams' in prob.restrictions:
+        for rest in prob.restrictions['nteams']:
+            m.addConstr(quicksum(a[g]*x[g, p, t] for g in cal_G for p in rest["topics"] for t in range(
+                len(prob.projects[p]))) <= rest["capacity_max"], "rest_nstds_%s" % rest["username"])
+
+    ############################################################
+    # Symmetry breaking on the teams
+    for p in cal_P:
+        for t in range(len(prob.projects[p]) - 1):
+            m.addConstr(quicksum(x[g, p, t] for g in list(prob.groups.keys())) >= quicksum(
+                x[g, p, t + 1] for g in list(prob.groups.keys())), "symbreak_%s" % (p))
+
+    ############################################################
+    # instability
+    if options.instability:
         # u={} # rank assigned per group
         # for g in cal_G:
         #	u[g]=m.addVar(lb=0.0,ub=max_rank,
@@ -339,8 +357,8 @@ def model_lex(prob, v, h, z, minimax, instability, direction):
                                  for t in range(len(prob.projects[p]))),
                         'u_%s' % (g))
             m.addConstr(v >= u[g], 'v_%s' % g)
-
-    if direction == "bootomup":
+    ############################################################
+    if direction == "bottomup":
         l = v
         while l > h:
             # print z,v,l
@@ -369,7 +387,7 @@ def model_lex(prob, v, h, z, minimax, instability, direction):
 
     ############################################################
     # instability
-    if instability == True:
+    if options.instability:
         for p in cal_P:
             for t in range(len(prob.projects[p])):
                 for g in list(prob.groups.keys()):

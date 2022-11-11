@@ -231,7 +231,7 @@ def count_popularity(prob):
 
     table = pd.DataFrame.from_dict(topic_popularity, orient='index')
     columns = ["title","type","instit","tot_popularity"]+[str(j+1)+". prio." for j in range(max_p)]
-    table.to_csv(outfile+".csv", sep=";",index=True,columns=columns)
+    table.to_csv(outfile+".csv", sep=";",index=True,index_label="ID",columns=columns)
 
     return popularity, max_p
 

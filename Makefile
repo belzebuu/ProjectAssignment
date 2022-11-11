@@ -6,7 +6,8 @@ DATADIR=/home/marco/workspace/git/TT/ProjectAssignment_git_imada/data
 #CASE=2021-psy
 #CASE=2022-badm500
 #CASE=2022-ff501-mat
-CASE=2022-ff501
+#CASE=2022-ff501
+CASE=2022-psy
 
 PROGRAM=python3
 SOLDIR=sln
@@ -42,7 +43,7 @@ $(OUTPUTDIR):
 
 
 output: | $(OUTPUTDIR)
-	python3 src/report_sol_new.py -s ${SOLDIR}/sol_001.txt ${DATADIR}/${CASE} 
+	python3 src/report_sol_new.py --prioritize_all -s ${SOLDIR}/sol_001.txt ${DATADIR}/${CASE} 
 	python3 src/report_sol.py -s ${SOLDIR}/sol_001.txt -d ${DATADIR}/${CASE}
 	Rscript scripts/make_gtables.R
 

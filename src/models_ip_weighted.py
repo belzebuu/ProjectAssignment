@@ -239,6 +239,13 @@ def model_ip_weighted(prob, config, minimax):
             m.addConstr(f >= u[g], 'minimax_%s' % g)
         m.addConstr(f <= minimax, 'minimax')
         # W_f = 1.0 #max_rank*len(prob.std_type.keys())*len(prob.std_type.keys())*1000
+    for g in cal_G:
+        if prob.student_details[prob.groups[g][0]]["stype"]==config.cut_off_type:
+            m.addConstr(config.cut_off >=
+                        quicksum(grp_ranks[g][p] * x[g, p, t] for p in list(grp_ranks[g].keys())
+                                 for t in range(len(prob.projects[p]))),
+                        'cutoff_special_%s' % (g))
+ 
     ############################################################
     # Compute optimal solution
     W_v = 1.0
