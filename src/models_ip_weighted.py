@@ -50,6 +50,7 @@ def model_ip_weighted(prob, config, minimax):
     # weight_method, instability, minimax, allsol
 
     cal_P = list(prob.projects.keys())
+    print(cal_P)
     cal_G = list(prob.groups.keys())
     array_ranks = {}
     grp_ranks = {}
@@ -149,10 +150,11 @@ def model_ip_weighted(prob, config, minimax):
     # m.addConstr(quicksum(working) == 1, 'grp_%s' % g)
 
     # Assignment constraints
+    print(cal_P)
+    print(prob.projects)
     for g in cal_G:
         peek = prob.std_type[prob.groups[g][0]]
-        valid_prjs = [x for x in cal_P if prob.projects[x]
-                      [0].type in prob.valid_prjtype[peek]]
+        valid_prjs = [x for x in cal_P if prob.projects[x][0].type in prob.valid_prjtype[peek]]
         # valid_prjs=filter(lambda x: prob.projects[x][0][2]==peek or prob.projects[x][0][2]=='alle', prob.projects.keys())
 
         working = [x[g, p, t]
@@ -178,16 +180,14 @@ def model_ip_weighted(prob, config, minimax):
                             <= 1, 'max_one_grp_%s%s' % (p, t))
 
     # enforce restrictions on number of teams open across different topics:
-    if 'nteams' in prob.restrictions:
-        for rest in prob.restrictions['nteams']:
-            m.addConstr(quicksum(y[p, t] for p in rest["topics"] for t in range(
-                len(prob.projects[p]))) <= rest["groups_max"], "rest_%s" % rest["username"])
+    for rest in prob.restrictions:
+        m.addConstr(quicksum(y[p, t] for p in rest["topics"] for t in range(
+            len(prob.projects[p]))) <= rest["groups_max"], "rest_%s" % rest["username"])
 
     # enforce restrictions on number of students assigned across different topics:
-    if 'nteams' in prob.restrictions:
-        for rest in prob.restrictions['nteams']:
-            m.addConstr(quicksum(a[g]*x[g, p, t] for g in cal_G for p in rest["topics"] for t in range(
-                len(prob.projects[p]))) <= rest["capacity_max"], "rest_nstds_%s" % rest["username"])
+    for rest in prob.restrictions:
+        m.addConstr(quicksum(a[g]*x[g, p, t] for g in cal_G for p in rest["topics"] for t in range(
+            len(prob.projects[p]))) <= rest["capacity_max"], "rest_nstds_%s" % rest["username"])
 
     ############################################################
     # Symmetry breaking on the teams

@@ -1,13 +1,16 @@
 #DATADIR=data/
 #DATADIR=../ProjectAssignment_git_imada/data/
-DATADIR=/home/marco/workspace/git/TT/ProjectAssignment_git_imada/data
+#DATADIR=/home/marco/workspace/git/TT/ProjectAssignment_git_imada/data
+DATADIR=/home/marco/workspace/git/flask/Assignment/Assign/data/2023-badm500/Assignment/
 #CASE=2021-zhiru
 #CASE=2019-bachelor
 #CASE=2021-psy
 #CASE=2022-badm500
 #CASE=2022-ff501-mat
 #CASE=2022-ff501
-CASE=2022-psy
+#CASE=2022-psy
+CASE=2023-badm500
+
 
 PROGRAM=python3
 SOLDIR=sln
@@ -51,7 +54,8 @@ publish:
 	#/bin/rm -rf /home/marco/public_html/out/
 	#/bin/mkdir -p /home/marco/public_html/out/
 	#/bin/cp -rf out /home/marco/public_html/
-	cp -f out/* /home/marco/public_html/ff501-2022/
+	#cp -f out/* /home/marco/public_html/ff501-2022/
+	cp -f out/* ~/public_html/BADM500/2023/a/
 
 
 

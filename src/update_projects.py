@@ -6,6 +6,7 @@ import os
 from collections import OrderedDict
 import string
 import shutil
+import json
 
 usage = "usage: %prog [options] DIRNAME"
 parser = OptionParser(usage)
@@ -28,7 +29,12 @@ shutil.copy2(src,dst)
 #DF = pd.DataFrame.from_dict(project_details,orient="index")
 #DF.to_csv(os.path.join(dirname,"projects.csv.bk"),sep=";",index=False)
 
-restrictions = problem.read_restrictions_json(dirname)
+""" reads restrictions """
+#restrictions = problem.read_restrictions_json(dirname)
+with open(dirname+"/restrictions.json", "r") as jsonfile:
+    restrictions=json.load(jsonfile)
+print({x["username"]:x["groups_max"] for x in restrictions["nteams"]})
+
 
 OD=OrderedDict()
 letters = string.ascii_lowercase[:26]

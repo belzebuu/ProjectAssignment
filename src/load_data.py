@@ -31,13 +31,12 @@ class Problem:
         self.check_tot_capacity()
         
         self.std_values, self.std_ranks_av, self.std_ranks_min = self.calculate_ranks_values(prioritize_all=self.cml_options.prioritize_all)
-        
         # self.minimax_sol = self.minimax_sol(dirname),
-        self.valid_prjtype = self.type_compliance(dirname)
-        
-        self.restrictions = self.read_restrictions(dirname)
+        self.valid_prjtype = self.type_compliance(dirname)        
+        self.restrictions = self.read_restrictions(dirname)  
         self.minimax_sol = 0
         self.check_capacity(options.groups=="pre")
+        
         print("Read instance... Done")
         # self.__dict__.update(kwds)
 
@@ -268,7 +267,14 @@ class Problem:
         with open(dirname+"/restrictions.json", "r") as jsonfile:
             restrictions=json.load(jsonfile)
         print({x["username"]:x["groups_max"] for x in restrictions["nteams"]})
-        return restrictions
+        # Adjust for topics not available
+        processed = []        
+        for (i,r) in enumerate(restrictions["nteams"]):
+            topics = [t for t in r["topics"] if t in self.projects.keys()]
+            if len(topics)!=0:
+                r["topics"]=topics
+                processed+=[r]
+        return processed
 
     def read_restrictions_csv(self, dirname):
         """ reads restrictions """
@@ -276,8 +282,9 @@ class Problem:
         restrictions = []
         try:
             for row in reader:
-                restrictions += [{"cum": int(row[0]), "topics": [int(row[t])
-                                                                 for t in range(1, len(row))]}]
+                restrictions += [{"cum": int(row[0]), 
+                        "topics": [int(row[t]) for t in range(1, len(row))]}]
+        
         except csv.Error as e:
             sys.exit('file %s, line %d: %s' % ("/restrictions.csv", reader.line_num, e))
         return restrictions
@@ -290,7 +297,7 @@ class Problem:
             for row in reader:
                 valid_prjtypes[row[0]] = [row[t] for t in range(1, len(row))]
         except csv.Error as e:
-            sys.exit('file %s, line %d: %s' % ("/restrictions.csv", reader.line_num, e))
+            sys.exit('file %s, line %d: %s' % ("/types.csv", reader.line_num, e))
             # return {'biologi': ["alle", "natbidat"],"farmaci": ["alle","farmaci"],"natbidat": ["alle","natbidat"]}
         print(valid_prjtypes)
 

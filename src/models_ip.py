@@ -25,7 +25,7 @@ def model_ip(prob, config):
     a = dict()  # the size of the group
     for g in cal_G:
         a[g] = len(prob.groups[g])
-
+    print("=>",prob.projects.keys())
     ############################################################
     # Create variables
     x = {}  # assignment vars
@@ -63,7 +63,7 @@ def model_ip(prob, config):
     # for g in prob.groups.keys():
     #working=[x[g,p,t] for p in prob.projects.keys() for t in range(len(prob.projects[p]))]
     #m.addConstr(quicksum(working) == 1, 'grp_%s' % g)
-
+    print("xx",prob.projects.keys())
     # Assignment constraints
     for g in cal_G:
         peek = prob.std_type[prob.groups[g][0]]
@@ -78,7 +78,7 @@ def model_ip(prob, config):
             if not p in grp_ranks[g]: # prob.std_ranks_av[prob.groups[g][0]]:
                 for t in range(len(prob.projects[p])):
                     m.addConstr(x[g, p, t] == 0, 'not_ranked_%s_%s' % (g,p))
-
+    print("++",prob.projects.keys())
     # Capacity constraints
     for p in cal_P:
         for t in range(len(prob.projects[p])):
@@ -96,20 +96,18 @@ def model_ip(prob, config):
                              for t in range(len(prob.projects[p]))),
                     'u_%s' % (g))
         m.addConstr(v >= u[g], 'v_%s' % g)
-
+    
     # enforce restrictions on number of teams open across different topics:
-    if 'nteams' in prob.restrictions:
-        for rest in prob.restrictions['nteams']:
-            m.addConstr(quicksum(y[p, t] for p in rest["topics"] for t in range(
-                len(prob.projects[p]))) <= rest["groups_max"], "rest_%s" % rest["username"])
+    for rest in prob.restrictions:
+        m.addConstr(quicksum(y[p, t] for p in rest["topics"] for t in range(
+            len(prob.projects[p]))) <= rest["groups_max"], "rest_%s" % rest["username"])
 
     # enforce restrictions on number of students assigned across different topics:
-    if 'nteams' in prob.restrictions:
-        for rest in prob.restrictions['nteams']:
-            m.addConstr(quicksum(a[g]*x[g, p, t] for g in cal_G for p in rest["topics"] for t in range(
-                len(prob.projects[p]))) <= rest["capacity_max"], "rest_nstds_%s" % rest["username"])
+    for rest in prob.restrictions:
+        m.addConstr(quicksum(a[g]*x[g, p, t] for g in cal_G for p in rest["topics"] for t in range(
+            len(prob.projects[p]))) <= rest["capacity_max"], "rest_nstds_%s" % rest["username"])
 
-
+    
     # Symmetry breaking on the teams
     for p in cal_P:
         for t in range(len(prob.projects[p])-1):
@@ -119,10 +117,10 @@ def model_ip(prob, config):
     ############################################################
     # Compute optimal solution
     m.setObjective(v, GRB.MINIMIZE)
-
+    print("==",prob.projects.keys())
     m.write("model_ip.lp")
     m.optimize()
-
+    print("==",prob.projects.keys())
     if m.status == GRB.status.INFEASIBLE:  # do IIS
         print('The model is infeasible; computing IIS')
         m.computeIIS()
@@ -134,6 +132,7 @@ def model_ip(prob, config):
         print("\nSee optexam_IIS.ilp for explicit constraints.\n")
         exit(0)
 
+    
     # Print solution
     teams = {}
     topics = {}
@@ -147,6 +146,7 @@ def model_ip(prob, config):
                             topics[s] = p
     elapsed = (time.perf_counter() - start)
     solution = []
+    
     solution.append(Solution(topics=topics, teams=teams, solved=[elapsed]))
     return v.x, solution
 

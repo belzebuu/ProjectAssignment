@@ -28,16 +28,18 @@ def main():
     problem = Problem(dirname, options)
 
     model = "minimax"
-
+    print(problem.projects.keys())
     if options.Wmethod in ["identity", "owa", "powers"]:
+        print(problem.projects.keys())
         minimax, solutions = model_ip(problem, options)
+        print(problem.projects.keys())
         stat = check_sol(solutions, problem, soldirname="sln")
 
         for st in stat:
             log = ['x']+[model]+solutions[0].solved+[os.path.basename(dirname)]+st
             print('%s' % ' '.join(map(str, log)))
 
-
+        
         start = perf_counter()
         model = "minimax_instab_weighted"
         model = model+"-"+options.Wmethod
