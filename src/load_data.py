@@ -10,35 +10,41 @@ from numpy import std
 import pandas as pd
 from collections import defaultdict
 from collections import OrderedDict
-from collections import namedtuple
-import random
+import utils
 
+import random
+import numpy
 random.seed(3)
+
 
 class Problem:
 
     def __init__(self):
         return
 
-
     def __init__(self, dirname=None, options=None):
         if dirname is None and options is None:
             return
         self.cml_options = options
         self.study_programs = set()
-        self.project_details, self.topics, self.projects = self.read_projects(dirname)
-        self.student_details, self.priorities, self.groups, self.std_type = self.read_students(dirname)
-        self.check_tot_capacity()
+        self.team_details, self.teams_per_topic = self.read_projects(
+            dirname)
+        self.student_details, self.priorities, self.groups, self.std_type = self.read_students(
+            dirname)
+        self.valid_prjtype = self.type_compliance(dirname)
+        self.restrictions = self.read_restrictions(dirname)
+
+        #self.check_tot_capacity()
+        if not self.check_capacity(options.groups == "pre") and options.allow_unassigned:
+            self.add_capacity()
+        self.std_values, self.std_ranks_av, self.std_ranks_min = self.calculate_ranks_values()
         
-        self.std_values, self.std_ranks_av, self.std_ranks_min = self.calculate_ranks_values(prioritize_all=self.cml_options.prioritize_all)
-        # self.minimax_sol = self.minimax_sol(dirname),
-        self.valid_prjtype = self.type_compliance(dirname)        
-        self.restrictions = self.read_restrictions(dirname)  
+        # self.minimax_sol = self.minimax_sol(dirname)
         self.minimax_sol = 0
-        self.check_capacity(options.groups=="pre")
-        
+
         print("Read instance... Done")
         # self.__dict__.update(kwds)
+        
 
     def program_transform(self, program):
         # study_programs = ["anvendt matematik", "biokemi og molekylær biologi", "biologi", "biomedicin", "datalogi", "farmaci","fysik","kemi", "matematik", "psychology"]
@@ -51,8 +57,8 @@ class Problem:
     def read_projects(self, dirname):
         projects_file = dirname+"/projects.csv"
         print("read ", projects_file)
-        
-        topics = defaultdict(list)
+
+        teams_per_topic_short = defaultdict(list)
         # We assume header to be:
         # ID;team;title;min_cap;max_cap;type;prj_id;instit;institute;mini;wl;teachers;email
         # NEW: ProjektNr; Underprojek; Projekttitel; Min; Max;Projekttype; ProjektNr  i BB; Institut forkortelse; Institutnavn; Obligatorisk minikursus; Gruppeplacering
@@ -63,10 +69,11 @@ class Problem:
         project_table.instit = project_table.instit.fillna('')
         project_table.prj_id = project_table.prj_id.astype(str)
         project_table.ID = project_table.ID.astype(int)
-        project_table.index = project_table["ID"].astype(str)+project_table["team"].astype(str) # project_table["prj_id"]
-        project_details = project_table.to_dict("index", into=OrderedDict)
-        # topics = {x: list(map(lambda p: p["team"], project_details[x])) for x in project_details}
-        topics = {k: list(v) for k, v in project_table.groupby('ID')['team']}
+        project_table.index = project_table["ID"].astype(
+            str)+project_table["team"].astype(str)  # project_table["prj_id"]
+        team_details = project_table.to_dict("index", into=OrderedDict)
+        # topics = {x: list(map(lambda p: p["team"], team_details[x])) for x in team_details}
+        teams_per_topic_short = {k: list(v) for k, v in project_table.groupby('ID')['team']}
 
         # OrderedDict(
         # ProjektNr=row[],
@@ -86,39 +93,27 @@ class Problem:
         # )
 
         print(project_table.type.unique())
-        filehandle = codecs.open(os.path.join("log", "projects.json"),  "w", "utf-8")
-        json.dump(project_details, fp=filehandle, sort_keys=True,
+        filehandle = codecs.open(os.path.join(
+            "log", "projects.json"),  "w", "utf-8")
+        json.dump(team_details, fp=filehandle, sort_keys=True,
                   indent=4, separators=(',', ': '),  ensure_ascii=False)
 
-        projects = defaultdict(list)
-        Team = namedtuple("Team", ("min", "max", "type"))
-        for topic in topics:
-            for t in topics[topic]:
-                _id = str(topic)+t                
-                projects[topic].append(Team(project_details[_id]["min_cap"],
-                                            project_details[_id]["max_cap"],
-                                            project_details[_id]["type"]
+        teams_per_topic = defaultdict(list)
+        
+        for topic in teams_per_topic_short:
+            for t in teams_per_topic_short[topic]:
+                _id = str(topic)+t
+                teams_per_topic[topic].append(utils.Team(t,
+                                            team_details[_id]["min_cap"],
+                                            team_details[_id]["max_cap"],
+                                            team_details[_id]["type"]
                                             )
                                        )
-        #print(topics.keys())
-        #print(project_details)
-        #raise SystemExit
-        return (project_details, topics, projects)
+        return (team_details, teams_per_topic)
 
-    def check_tot_capacity(self):
-        capacity = sum([self.project_details[k]["max_cap"] for k in self.project_details])
-        n_stds = len(self.student_details)
-        if (capacity < n_stds):
-            answer = input(
-                "Not enough capacity from all projects\nHandle this by including a dummy project with the needed capacity? (y/n)\n")
-            if answer in ['Y', 'y']:
-                sys.exit("to implement")
-                # file.write(str(len(project_dict)+1)+";;1;"+str(n_stds-capacity)+";"+program+"\n")
-                #project_dict[len(project_dict)+1] = n_stds-capacity
-
-
+   
     def flatten(self, List: list) -> list:
-            return [item for sublist in List for item in sublist]
+        return [item for sublist in List for item in sublist]
 
     def read_students(self, dirname):
         students_file = dirname+"/students.csv"
@@ -126,66 +121,71 @@ class Problem:
 
         # grp_id;(group);username;type;priority_list;(student_id);full_name;email;timestamp
         # group is not needed
-        student_table = pd.read_csv(dirname+"/students.csv", sep=";",  converters={"priority_list":str})
-        
+        student_table = pd.read_csv(
+            dirname+"/students.csv", sep=";",  converters={"priority_list": str})
+
         student_table["username"] = student_table["username"].apply(str.lower)
         student_table.index = student_table["username"]
         print(student_table)
         student_details = student_table.to_dict("index", into=OrderedDict)
 
-        #for s in student_details:
+        # for s in student_details:
         #    student_details[s]["priority_list"] = [
         #        int(x.strip()) for x in student_details[s]["priority_list"].split(",")]
         def handle_tie(part):
             ties = [int(x.strip()) for x in part.split(",")]
-            #random.shuffle(ties)
+            # random.shuffle(ties)
             return [ties]
 
         def process_string(instring):
-            instring=instring.strip(",")
-            #print(instring)
-            if len(instring)==0:
+            instring = instring.strip(",")
+            # print(instring)
+            if len(instring) == 0:
                 return []
             pos_s = instring.find("(")
             if pos_s == -1:
                 return [[int(x.strip())] for x in instring.split(",")]
             else:
                 pos_e = instring.find(")")
-                return process_string(instring[0:pos_s]) + handle_tie(instring[pos_s+1:pos_e]) + process_string(instring[pos_e+1:]) 
+                return process_string(instring[0:pos_s]) + handle_tie(instring[pos_s+1:pos_e]) + process_string(instring[pos_e+1:])
 
-        ## Note: we assume a well formed string
+        # Note: we assume a well formed string
         for s in student_details:
-            
-            student_details[s]["priority_list_wties"]=student_details[s]["priority_list"]
-            student_details[s]["priority_list"]=process_string(student_details[s]["priority_list"].strip())
+
+            student_details[s]["priority_list_wties"] = student_details[s]["priority_list"]
+            student_details[s]["priority_list"] = process_string(
+                student_details[s]["priority_list"].strip())
 
             if len(self.flatten(student_details[s]["priority_list"])) < self.cml_options.min_preferences:
-                print("WARNING: "+student_details[s]['username']+f" has less than {self.cml_options.min_preferences} preferences")
+                print("WARNING: " +
+                      f" {len(self.flatten(student_details[s]['priority_list']))} < {self.cml_options.min_preferences} preferences for "+student_details[s]['username'])
 
-            if self.cml_options.cut_off_type is not None and student_details[s]["stype"]==self.cml_options.cut_off_type:
-                student_details[s]["priority_list"]=student_details[s]["priority_list"][:self.cml_options.cut_off]
+            if self.cml_options.cut_off_type is not None and student_details[s]["stype"] == self.cml_options.cut_off_type:
+                student_details[s]["priority_list"] = student_details[s]["priority_list"][:self.cml_options.cut_off]
                 print("WARNING: updated", student_details[s])
 
             for t in student_details[s]["priority_list"]:
                 for p in t:
-                    if p not in self.topics:
-                        print("WARNING: " + s + " expressed a preference for a project " + str(p)+" which is not available")
+                    if p not in self.teams_per_topic.keys():
+                        print("WARNING: " + s + " expressed a preference for a project " +
+                              str(p)+" which is not available")
                         answer = input("Continue? (y/n)\n")
                         if answer not in ['', 'Y', 'y']:
                             sys.exit("You decided to stop")
-                        #t.remove(p)
-                #if len(t)==0:
+                        # t.remove(p)
+                # if len(t)==0:
                 #    remove(t)
-                    
 
-        #print(json.dumps(student_details,indent=4))
+        # print(json.dumps(student_details,indent=4))
 
-        filehandle = codecs.open(os.path.join("log", "students.json"),  "w", "utf-8")
+        filehandle = codecs.open(os.path.join(
+            "log", "students.json"),  "w", "utf-8")
         json.dump(student_details, fp=filehandle, sort_keys=True,
                   indent=4, separators=(',', ': '),  ensure_ascii=False)
 
-        priorities = {u: student_details[u]["priority_list"] for u in student_details}
-        
+        priorities = {u: student_details[u]["priority_list"]
+                      for u in student_details}
+
         tmp = {u: (student_details[u]["grp_id"], student_details[u]["type"])
                for u in student_details}
         group_ids = {student_details[u]["grp_id"] for u in student_details}
@@ -193,12 +193,12 @@ class Problem:
             filter(lambda u: student_details[u]["grp_id"] == g, student_details.keys())) for g in group_ids}
 
         student_types = {student_details[u]["type"] for u in student_details}
-        print(student_types)
+        #print(student_types)
         std_type = {u: student_details[u]["type"] for u in student_details}
 
         return (student_details, priorities, groups, std_type)
 
-    def calculate_ranks_values(self, prioritize_all=False):
+    def calculate_ranks_values(self):
         std_values = {}
         std_ranks_av = {}
         std_ranks_min = {}
@@ -211,26 +211,27 @@ class Problem:
             values = {}
             ranks_av = {}
             ranks_min = {}
-            #print(priorities)
+            # print(priorities)
             for p in priorities:
                 r = len(p)
-                av_exp = sum(range(i-r+1,i+1))/r
-                av_rank = sum(range(j,j+r))/r
+                av_exp = sum(range(i-r+1, i+1))/r
+                av_rank = sum(range(j, j+r))/r
                 for t in p:
                     values[t] = 2**av_exp
                     ranks_av[t] = av_rank
                     ranks_min[t] = j
-                j=j+r
-                i=max(0,i-r)
+                j = j+r
+                i = max(0, i-r)
 
             # we handle here also cases of students who did not input a preference list
             # we assign to them a value that is the average value among all available values
             # it should later imply that they get a large enough value as weight
-            
-            if prioritize_all or len(priorities)==0:
-                prj_set = set(self.topics.keys()).difference( set(self.flatten(priorities)) )
+
+            if self.cml_options.prioritize_all or len(priorities) == 0:
+                prj_set = set(self.teams_per_topic.keys()).difference(
+                    set(self.flatten(priorities)))
                 prj_set = list(prj_set)
-                if False: # old way decide a random order but it may lead to suboptimal sol
+                if False:  # old way decide a random order but it may lead to suboptimal sol
                     prj_list = random.sample(prj_set, k=len(prj_set))
                     for p in prj_list:
                         values[p] = 2**i
@@ -238,8 +239,9 @@ class Problem:
                         ranks_min[p] = j
                         j += 1
                 else:
-                    print(prj_set)
-                    M = self.cml_options.min_preferences+1 # sum(prj_list)/len(prj_list)  # a large enough value
+                    #print(prj_set)
+                    # sum(prj_list)/len(prj_list)  # a large enough value
+                    M = self.cml_options.min_preferences + 1
                     for p in prj_set:
                         values[p] = 2**0
                         ranks_av[p] = M
@@ -249,9 +251,15 @@ class Problem:
             std_ranks_av[u] = ranks_av
             std_ranks_min[u] = ranks_min
 
-        #print(std_ranks,std_values)
+        # print(std_ranks,std_values)
         return std_values, std_ranks_av, std_ranks_min
-    
+
+
+    def recalculate_ranks_values(self) -> None:
+        self.std_values, self.std_ranks_av, self.std_ranks_min = self.calculate_ranks_values()
+
+
+
     def read_restrictions(self, dirname):
         """ reads restrictions """
         if os.path.exists(dirname+"/restrictions.json"):
@@ -260,33 +268,34 @@ class Problem:
             return self.read_restrictions_csv(dirname)
         else:
             sys.exit(f"File {dirname}/restrictions.[json|csv] missing\n")
-        
 
     def read_restrictions_json(self, dirname):
         """ reads restrictions """
         with open(dirname+"/restrictions.json", "r") as jsonfile:
-            restrictions=json.load(jsonfile)
-        print({x["username"]:x["groups_max"] for x in restrictions["nteams"]})
+            restrictions = json.load(jsonfile)
+        print({x["username"]: x["groups_max"] for x in restrictions["nteams"]})
         # Adjust for topics not available
-        processed = []        
-        for (i,r) in enumerate(restrictions["nteams"]):
-            topics = [t for t in r["topics"] if t in self.projects.keys()]
-            if len(topics)!=0:
-                r["topics"]=topics
-                processed+=[r]
+        processed = []
+        for (i, r) in enumerate(restrictions["nteams"]):
+            topics = [t for t in r["topics"] if t in self.teams_per_topic.keys()]
+            if len(topics) != 0:
+                r["topics"] = topics
+                processed += [r]
         return processed
 
     def read_restrictions_csv(self, dirname):
         """ reads restrictions """
-        reader = csv.reader(open(dirname+"/restrictions.csv", "r"), delimiter=";")
+        reader = csv.reader(
+            open(dirname+"/restrictions.csv", "r"), delimiter=";")
         restrictions = []
         try:
             for row in reader:
-                restrictions += [{"cum": int(row[0]), 
-                        "topics": [int(row[t]) for t in range(1, len(row))]}]
-        
+                restrictions += [{"cum": int(row[0]),
+                                  "topics": [int(row[t]) for t in range(1, len(row))]}]
+
         except csv.Error as e:
-            sys.exit('file %s, line %d: %s' % ("/restrictions.csv", reader.line_num, e))
+            sys.exit('file %s, line %d: %s' %
+                     ("/restrictions.csv", reader.line_num, e))
         return restrictions
 
     def type_compliance(self, dirname):
@@ -297,31 +306,107 @@ class Problem:
             for row in reader:
                 valid_prjtypes[row[0]] = [row[t] for t in range(1, len(row))]
         except csv.Error as e:
-            sys.exit('file %s, line %d: %s' % ("/types.csv", reader.line_num, e))
+            sys.exit('file %s, line %d: %s' %
+                     ("/types.csv", reader.line_num, e))
             # return {'biologi': ["alle", "natbidat"],"farmaci": ["alle","farmaci"],"natbidat": ["alle","natbidat"]}
         print(valid_prjtypes)
 
-        ## check
+        # check
         for s in self.std_type:
             t = self.std_type[s]
-            
-            valid_prjs =  [x for x in self.topics if self.projects[x][0].type in valid_prjtypes[t]] 
-            filtered = list(filter(lambda x: x in self.flatten(self.priorities[s]),  valid_prjs ) )
-            if (len(filtered)<=1):
-                print( s, valid_prjtypes[t], self.std_type[s], sorted(self.priorities[s])) # prob.std_ranks_av[prob.groups[g][0]])
-                print( valid_prjs, filtered, self.priorities) 
+                
+            valid_prjs = [x for x, item in self.teams_per_topic.items() if item[0].type in valid_prjtypes[t]]
+            filtered = list(filter(lambda x: x in self.flatten(
+                self.priorities[s]),  valid_prjs))
+            if (len(filtered) <= 1):
+                # prob.std_ranks_av[prob.groups[g][0]])
+                print(s, valid_prjtypes[t], self.std_type[s], sorted(
+                    self.priorities[s]))
+                print(valid_prjs, filtered, self.priorities)
                 raise SystemError
 
         return valid_prjtypes
 
-    def check_capacity(self, pre):
-        n_stds=len(self.student_details)
-        n_groups=len(self.groups)
-        teams=0
-        for p in self.projects.keys():
-            teams += len(self.projects[p])
-        print(f"Numer of students: {n_stds}")
-        print(f"Teams available: {teams}")
-        print(f"Number of groups: {n_groups}")
-        if pre:
-            assert teams>=n_groups, "No teams enough" 
+    def add_fake_project(self, topic_nr: int) -> None:
+        """Must occurr before calculating ranks and values"""
+
+        #Team = namedtuple("Team", ("team_id", "min", "max", "type"))
+        letters="abcdef"
+        
+        type = self.teams_per_topic[1][0].type # copy the type of the first team
+    
+        n = len(self.teams_per_topic[topic_nr]) if topic_nr in self.teams_per_topic else 0
+        
+        self.teams_per_topic[topic_nr].append(utils.Team(letters[n],0,5,type))
+        
+        _id = str(topic_nr)+letters[n]
+        self.team_details[_id] = {'ID': topic_nr, 'team': letters[n], 
+            'title': 'Unassigned', 'min_cap': 0, 'max_cap': 5, 'type': type, 
+            'prj_id': _id, 'instit': 'IMADA', 'institute': 'IMADA', 'mini': numpy.nan, 'wl': numpy.nan,
+            'teachers': 'Nobody', 'email': 'nobody@sdu.dk'}
+        
+        for s in self.priorities:
+            if not any([topic_nr in x for x in self.priorities[s]]):
+                self.priorities[s]+=[[topic_nr]]
+        for s in self.student_details:
+            if not any([topic_nr in x for x in self.student_details[s]["priority_list"]]):
+                self.student_details[s]["priority_list"]+=[[topic_nr]]
+            #print(self.student_details[s]["priority_list"])
+
+
+    def add_capacity(self, pre_grouping: bool) -> None:
+        """Must occurr before calculating ranks and values"""
+        
+        n_stds = len(self.student_details)
+        n_groups = len(self.groups)
+        teams = 0
+        for p in self.teams_per_topic.keys():
+            teams += len(self.teams_per_topic[p])
+        n_places = 0
+        for x in self.restrictions:
+            n_places += x["capacity_max"]
+        
+        if  n_stds > n_places:
+            missing_places = n_stds - n_places
+            topic_nr = max(self.teams_per_topic.keys())+1
+            for _ in range(missing_places):
+                self.add_fake_project(topic_nr)
+        if n_groups > teams and pre_grouping:
+            missing_groups = n_groups - teams
+            topic_nr = max(self.teams_per_topic.keys())+1
+            for _ in range(missing_groups):
+                self.add_fake_project(topic_nr)
+
+
+    def check_capacity(self, pre_grouping: bool) -> bool:                
+        n_stds = len(self.student_details)
+        n_groups = len(self.groups)
+        teams = 0
+        for p in self.teams_per_topic.keys():
+            teams += len(self.teams_per_topic[p])
+        n_places = 0
+        for x in self.restrictions:
+            n_places += x["capacity_max"]
+        print("-"*70)
+        print(f"Number of students: {n_stds} on number of places available: {n_places}")
+        print(f"Number of student groups: {n_groups} on number of teams available: {teams}")
+        print("-"*70)
+        
+        if n_stds > n_places:  
+            raise SystemExit("Potential places not enough for all students")
+        elif n_groups > teams and pre_grouping:
+            raise SystemExit("No teams enough to cover all groups")
+        else:
+            return True
+
+    def check_tot_capacity(self) -> None:
+        capacity = sum([self.team_details[k]["max_cap"]
+                       for k in self.team_details])
+        n_stds = len(self.student_details)
+        if (capacity < n_stds):
+            answer = input(
+                "Not enough capacity from all projects\nHandle this by including a dummy project with the needed capacity? (y/n)\n")
+            if answer in ['Y', 'y']:
+                sys.exit("to implement")
+                # file.write(str(len(project_dict)+1)+";;1;"+str(n_stds-capacity)+";"+program+"\n")
+                #project_dict[len(project_dict)+1] = n_stds-capacity

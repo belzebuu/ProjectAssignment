@@ -49,7 +49,7 @@ def model_ip_weighted(prob, config, minimax):
 
     # weight_method, instability, minimax, allsol
 
-    cal_P = list(prob.projects.keys())
+    cal_P = list(prob.teams_per_topic.keys())
     print(cal_P)
     cal_G = list(prob.groups.keys())
     array_ranks = {}
@@ -76,7 +76,7 @@ def model_ip_weighted(prob, config, minimax):
     x = {}  # # assignment vars
     for g in cal_G:
         for p in cal_P:
-            for t in range(len(prob.projects[p])):
+            for t in range(len(prob.teams_per_topic[p])):
                 x[g, p, t] = m.addVar(lb=0.0, ub=1.0,
                                       vtype=GRB.BINARY,
                                       obj=0.0,
@@ -84,7 +84,7 @@ def model_ip_weighted(prob, config, minimax):
 
     y = {}  # # is team t of project p used?
     for p in cal_P:
-        for t in range(len(prob.projects[p])):
+        for t in range(len(prob.teams_per_topic[p])):
             y[p, t] = m.addVar(lb=0.0, ub=1.0,
                                vtype=GRB.BINARY,
                                obj=0.0,
@@ -92,7 +92,7 @@ def model_ip_weighted(prob, config, minimax):
 
     slack = {}  # # slack in team t of project p
     for p in cal_P:
-        for t in range(len(prob.projects[p])):
+        for t in range(len(prob.teams_per_topic[p])):
             slack[p, t] = m.addVar(lb=0.0, ub=10.0,
                                    vtype=GRB.CONTINUOUS,
                                    obj=0.0,
@@ -108,7 +108,7 @@ def model_ip_weighted(prob, config, minimax):
         z = {}  # z: binary variable to indicate whether there is space left in a team
         q = {}  # d: counts if space free in some better project
         for p in cal_P:
-            for t in range(len(prob.projects[p])):
+            for t in range(len(prob.teams_per_topic[p])):
                 for g in list(prob.groups.keys()):
                     z[g, p, t] = m.addVar(lb=0.0, ub=1.0,
                                           vtype=GRB.BINARY,
@@ -146,35 +146,35 @@ def model_ip_weighted(prob, config, minimax):
     ############################################################
     # Assignment constraints
     # for g in prob.groups.keys():
-    # working=[x[g,p,t] for p in prob.projects.keys() for t in range(len(prob.projects[p]))]
+    # working=[x[g,p,t] for p in prob.teams_per_topic.keys() for t in range(len(prob.teams_per_topic[p]))]
     # m.addConstr(quicksum(working) == 1, 'grp_%s' % g)
 
     # Assignment constraints
     print(cal_P)
-    print(prob.projects)
+    print(prob.teams_per_topic)
     for g in cal_G:
         peek = prob.std_type[prob.groups[g][0]]
-        valid_prjs = [x for x in cal_P if prob.projects[x][0].type in prob.valid_prjtype[peek]]
-        # valid_prjs=filter(lambda x: prob.projects[x][0][2]==peek or prob.projects[x][0][2]=='alle', prob.projects.keys())
+        valid_prjs = [x for x in cal_P if prob.teams_per_topic[x][0].type in prob.valid_prjtype[peek]]
+        # valid_prjs=filter(lambda x: prob.teams_per_topic[x][0][2]==peek or prob.teams_per_topic[x][0][2]=='alle', prob.teams_per_topic.keys())
 
         working = [x[g, p, t]
-                   for p in valid_prjs for t in range(len(prob.projects[p]))]
+                   for p in valid_prjs for t in range(len(prob.teams_per_topic[p]))]
         m.addConstr(quicksum(working) == 1, 'grp_%s' % g)
         for p in cal_P:
             if not p in valid_prjs:
-                for t in range(len(prob.projects[p])):
+                for t in range(len(prob.teams_per_topic[p])):
                     m.addConstr(x[g, p, t] == 0, 'not_valid_%s' % g)
             if not p in prob.std_ranks_av[prob.groups[g][0]]:
-                for t in range(len(prob.projects[p])):
+                for t in range(len(prob.teams_per_topic[p])):
                     m.addConstr(x[g, p, t] == 0, 'not_ranked_%s' % g)
 
     # Capacity constraints
     for p in cal_P:
-        for t in range(len(prob.projects[p])):
+        for t in range(len(prob.teams_per_topic[p])):
             m.addConstr(quicksum(a[g] * x[g, p, t] for g in list(prob.groups.keys())) + slack[p, t]
-                        == prob.projects[p][t][1] * y[p, t], 'ub_%s_%d' % (p, t))
+                        == prob.teams_per_topic[p][t].max * y[p, t], 'ub_%s_%d' % (p, t))
             m.addConstr(quicksum(a[g] * x[g, p, t] for g in list(prob.groups.keys()))
-                        >= prob.projects[p][t][0] * y[p, t], 'lb_%s_%d' % (p, t))
+                        >= prob.teams_per_topic[p][t].min * y[p, t], 'lb_%s_%d' % (p, t))
             if config.groups == "pre":
                 m.addConstr(quicksum(x[g, p, t] for g in cal_G)
                             <= 1, 'max_one_grp_%s%s' % (p, t))
@@ -182,37 +182,37 @@ def model_ip_weighted(prob, config, minimax):
     # enforce restrictions on number of teams open across different topics:
     for rest in prob.restrictions:
         m.addConstr(quicksum(y[p, t] for p in rest["topics"] for t in range(
-            len(prob.projects[p]))) <= rest["groups_max"], "rest_%s" % rest["username"])
+            len(prob.teams_per_topic[p]))) <= rest["groups_max"], "rest_%s" % rest["username"])
 
     # enforce restrictions on number of students assigned across different topics:
     for rest in prob.restrictions:
         m.addConstr(quicksum(a[g]*x[g, p, t] for g in cal_G for p in rest["topics"] for t in range(
-            len(prob.projects[p]))) <= rest["capacity_max"], "rest_nstds_%s" % rest["username"])
+            len(prob.teams_per_topic[p]))) <= rest["capacity_max"], "rest_nstds_%s" % rest["username"])
 
     ############################################################
     # Symmetry breaking on the teams
     for p in cal_P:
-        for t in range(len(prob.projects[p]) - 1):
+        for t in range(len(prob.teams_per_topic[p]) - 1):
             m.addConstr(quicksum(x[g, p, t] for g in list(prob.groups.keys())) >= quicksum(
                 x[g, p, t + 1] for g in list(prob.groups.keys())), "symbreak_%s" % (p))
 
     ############################################################
     # weighted # weights[grp_ranks[g][p]]
     m.addConstr(v >= quicksum(calculate_weight(config.Wmethod, max_rank, grp_ranks[g][p]) * a[g] * x[g, p, t] for g in list(
-        prob.groups.keys()) for p in list(grp_ranks[g].keys()) for t in range(len(prob.projects[p]))), 'weight_v')
+        prob.groups.keys()) for p in list(grp_ranks[g].keys()) for t in range(len(prob.teams_per_topic[p]))), 'weight_v')
 
     ############################################################
     # instability
     if config.instability == True:
         print("Post instability constraints")
         for p in cal_P:
-            for t in range(len(prob.projects[p])):
+            for t in range(len(prob.teams_per_topic[p])):
                 for g in list(prob.groups.keys()):
-                    if a[g] <= prob.projects[p][t][1]:
-                        m.addConstr(slack[p, t] + 1 - a[g] <= prob.projects[p][t]
+                    if a[g] <= prob.teams_per_topic[p][t][1]:
+                        m.addConstr(slack[p, t] + 1 - a[g] <= prob.teams_per_topic[p][t]
                                     [1] * z[g, p, t], 'c30_%s_%s_%s' % (g, p, t))
-                        m.addConstr(a[g] + 1 - (1 - y[p, t]) * prob.projects[p][t][0] <= prob.projects[p][t][1]
-                                    * z[g, p, t] + (prob.projects[p][t][1] + 1) * y[p, t], 'c31_%s_%s_%s' % (g, p, t))
+                        m.addConstr(a[g] + 1 - (1 - y[p, t]) * prob.teams_per_topic[p][t][0] <= prob.teams_per_topic[p][t][1]
+                                    * z[g, p, t] + (prob.teams_per_topic[p][t][1] + 1) * y[p, t], 'c31_%s_%s_%s' % (g, p, t))
                     else:
                         m.addConstr(z[g, p, t] == 0,
                                     'c3031_%s_%s_%s' % (g, p, t))
@@ -220,13 +220,13 @@ def model_ip_weighted(prob, config, minimax):
             for p in list(grp_ranks[g].keys()):
                 for p2 in list(grp_ranks[g].keys()):
                     if (grp_ranks[g][p2] < grp_ranks[g][p]):
-                        for t in range(len(prob.projects[p])):
-                            for t2 in range(len(prob.projects[p2])):
+                        for t in range(len(prob.teams_per_topic[p])):
+                            for t2 in range(len(prob.teams_per_topic[p2])):
                                 m.addConstr(q[g, p, t] >= (grp_ranks[g][p] - grp_ranks[g][p2])
                                             * (x[g, p, t] + z[g, p2, t2] - 1), 'c32_%s_%s_%s' % (g, p, t))
-        # m.addConstr(tot_instability >= quicksum(q[g,p,t] for g in prob.groups.keys() for p in prob.projects.keys() for t in range(len(prob.projects[p]) ) ), 'instability')
+        # m.addConstr(tot_instability >= quicksum(q[g,p,t] for g in prob.groups.keys() for p in prob.teams_per_topic.keys() for t in range(len(prob.teams_per_topic[p]) ) ), 'instability')
         m.addConstr(0 == quicksum(q[g, p, t] for g in list(prob.groups.keys()) for p in list(
-            prob.projects.keys()) for t in range(len(prob.projects[p]))), 'instability')
+            prob.teams_per_topic.keys()) for t in range(len(prob.teams_per_topic[p]))), 'instability')
         # W_instability = max_rank*len(prob.std_type.keys()) #max_rank*len(prob.groups)*len(prob.groups) ##2^7 * len(prob.groups)*
     ############################################################
     # minimax
@@ -234,7 +234,7 @@ def model_ip_weighted(prob, config, minimax):
         for g in cal_G:
             m.addConstr(u[g] ==
                         quicksum(grp_ranks[g][p] * x[g, p, t] for p in list(grp_ranks[g].keys())
-                                 for t in range(len(prob.projects[p]))),
+                                 for t in range(len(prob.teams_per_topic[p]))),
                         'u_%s' % (g))
             m.addConstr(f >= u[g], 'minimax_%s' % g)
         m.addConstr(f <= minimax, 'minimax')
@@ -243,7 +243,7 @@ def model_ip_weighted(prob, config, minimax):
         if prob.student_details[prob.groups[g][0]]["stype"]==config.cut_off_type:
             m.addConstr(config.cut_off >=
                         quicksum(grp_ranks[g][p] * x[g, p, t] for p in list(grp_ranks[g].keys())
-                                 for t in range(len(prob.projects[p]))),
+                                 for t in range(len(prob.teams_per_topic[p]))),
                         'cutoff_special_%s' % (g))
  
     ############################################################
@@ -284,7 +284,7 @@ def model_ip_weighted(prob, config, minimax):
         expr = LinExpr()
         for g in prob.groups:
             for p in cal_P:
-                for t in range(len(prob.projects[p])):
+                for t in range(len(prob.teams_per_topic[p])):
                     if x[g, p, t].x > 0.5:
                         for s in prob.groups[g]:
                             teams[s] = t

@@ -10,8 +10,8 @@ def check_sol(solutions, problem, soldirname=""):
         # let's check
         unass_students = 0
         members = {}
-        for p in problem.projects:
-            for t in range(len(problem.projects[p])):
+        for p in problem.teams_per_topic:
+            for t in range(len(problem.teams_per_topic[p])):
                 if p in members:
                     members[p].append([x for x in list(sol.topics.keys()) if p ==
                                        sol.topics[x] and t == sol.teams[x]])
@@ -38,19 +38,19 @@ def check_sol(solutions, problem, soldirname=""):
         # team creation and cardinality
         nteams = 0
         underfull = 0
-        for p in problem.projects:
-            for t in range(len(problem.projects[p])):
+        for p in problem.teams_per_topic:
+            for t in range(len(problem.teams_per_topic[p])):
                 nteams += 1
-                # print str(len(members[p][t])) +" "+ str(problem.projects[p][t][1])
-                assert (len(members[p][t]) <= problem.projects[p][t][1])
-                if len(members[p][t]) < problem.projects[p][t][0] and len(members[p][t]) > 0:
+                # print str(len(members[p][t])) +" "+ str(problem.teams_per_topic[p][t][1])
+                assert (len(members[p][t]) <= problem.teams_per_topic[p][t].max)
+                if len(members[p][t]) < problem.teams_per_topic[p][t].min and len(members[p][t]) > 0:
                     underfull += 1
         # check how many students are not assigned to their area
         counter_area = 0
         for s in problem.std_type:
             if s in sol.topics:
                 p = sol.topics[s]
-                prj_type = problem.projects[p][0][2]
+                prj_type = problem.teams_per_topic[p][0][2]
                 if prj_type != problem.std_type[s] and prj_type != "alle":
                     counter_area += 1
         # count unstable students
@@ -61,12 +61,12 @@ def check_sol(solutions, problem, soldirname=""):
                 rank = problem.std_ranks_min[s][sol.topics[s]]
                 for p in list(problem.std_ranks_min[s].keys()):
                     if (problem.std_ranks_min[s][p] < rank):
-                        for t in range(len(problem.projects[p])):
+                        for t in range(len(problem.teams_per_topic[p])):
                             if len(members[p][t]) > 0:
-                                if len(members[p][t])+len(problem.groups[g]) <= problem.projects[p][t][1]:
+                                if len(members[p][t])+len(problem.groups[g]) <= problem.teams_per_topic[p][t][1]:
                                     print("student " + str(s) + " could go in "+str(p))
                                     unstable += len(problem.groups[g])
-                            elif len(problem.groups[g]) >= problem.projects[p][t][0] and (len(problem.groups[g]) <= problem.projects[p][t][1]):
+                            elif len(problem.groups[g]) >= problem.teams_per_topic[p][t].min and (len(problem.groups[g]) <= problem.teams_per_topic[p][t].max):
                                 print("student " + str(s) + " could go in unopened "+str(p))
                                 unstable += len(problem.groups[g])
         # count classical utility
@@ -103,8 +103,8 @@ def check_sol(solutions, problem, soldirname=""):
 # 				max_rank=len(grp_ranks[g])+1
 #
 # 		for g in problem.groups.keys():
-# 			values=map(lambda x: max_rank if x not in grp_ranks[g].keys() else grp_ranks[g][x], problem.projects.keys())
-# 			array_ranks[g]=dict(zip(problem.projects.keys(),values))
+# 			values=map(lambda x: max_rank if x not in grp_ranks[g].keys() else grp_ranks[g][x], problem.teams_per_topic.keys())
+# 			array_ranks[g]=dict(zip(problem.teams_per_topic.keys(),values))
 #
 # 		tot_envy1=0
 # 		values = map(lambda x: problem.std_ranks_min[problem.groups[x][0]], problem.groups.keys())
@@ -129,7 +129,7 @@ def check_sol(solutions, problem, soldirname=""):
         print("feasible solution")
         print("Numb. of students: " + str(len(problem.std_type)))
         print("Numb. of groups: " + str(len(problem.groups)))
-        print("Numb. of topics: " + str(len(problem.projects)))
+        print("Numb. of topics: " + str(len(problem.teams_per_topic)))
         print("\nNumb. of unassigned students: " + str(unass_students))
         print("Numb. of underfull teams: " + str(underfull))
         print("Students assigned outside of their area: ", counter_area)
@@ -139,7 +139,7 @@ def check_sol(solutions, problem, soldirname=""):
 
         log += [len(problem.std_type)]
         log += [nteams]
-        log += [len(problem.projects)]
+        log += [len(problem.teams_per_topic)]
         log += [unass_students]
         log += [underfull]
         log += [unstable]
@@ -163,14 +163,14 @@ def check_sol(solutions, problem, soldirname=""):
         print(s)
 
         ############################################
-        print(problem.topics)
+        # print({x: [y.team_id for y in item] for x, item in problem.teams_per_topic.items()})
         if soldirname != "":
             filename = "%s/sol_%03d.txt" % (soldirname, num_solutions)
             f = open(filename, "w")
             for s in problem.std_type:
                 if s in sol.topics:
-                    f.write(s + "\t" + str(sol.topics[s]) + "\t" + str(problem.topics[sol.topics[s]][sol.teams[s]]) + "\n")
-                    #if sol.teams[s] == 0 and len(problem.projects[sol.topics[s]]) == 1:
+                    f.write(s + "\t" + str(sol.topics[s]) + "\t" + str(problem.teams_per_topic[sol.topics[s]][sol.teams[s]]) + "\n")
+                    #if sol.teams[s] == 0 and len(problem.teams_per_topic[sol.topics[s]]) == 1:
                     #    f.write(s + "\t" + str(sol.topics[s]) + "\t" + "" + "\n")
                     #else:
                     #    f.write(s + "\t" + str(sol.topics[s]) +

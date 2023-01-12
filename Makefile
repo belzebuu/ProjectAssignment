@@ -1,7 +1,7 @@
 #DATADIR=data/
 #DATADIR=../ProjectAssignment_git_imada/data/
 #DATADIR=/home/marco/workspace/git/TT/ProjectAssignment_git_imada/data
-DATADIR=/home/marco/workspace/git/flask/Assignment/Assign/data/2023-badm500/Assignment/
+DATADIR=/home/marco/workspace/git/flask/Assignment/Assign/data/
 #CASE=2021-zhiru
 #CASE=2019-bachelor
 #CASE=2021-psy
@@ -9,7 +9,7 @@ DATADIR=/home/marco/workspace/git/flask/Assignment/Assign/data/2023-badm500/Assi
 #CASE=2022-ff501-mat
 #CASE=2022-ff501
 #CASE=2022-psy
-CASE=2023-badm500
+CASE=2023-badm500/Assignment
 
 
 PROGRAM=python3
@@ -46,8 +46,8 @@ $(OUTPUTDIR):
 
 
 output: | $(OUTPUTDIR)
-	python3 src/report_sol_new.py --prioritize_all -s ${SOLDIR}/sol_001.txt ${DATADIR}/${CASE} 
-	python3 src/report_sol.py -s ${SOLDIR}/sol_001.txt -d ${DATADIR}/${CASE}
+	python3 src/report_sol_new.py --allow_unassigned -s ${SOLDIR}/sol_001.txt ${DATADIR}/${CASE} 
+	python3 src/report_sol.py --allow_unassigned -s ${SOLDIR}/sol_001.txt ${DATADIR}/${CASE}
 	Rscript scripts/make_gtables.R
 
 publish: 

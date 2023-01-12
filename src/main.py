@@ -26,13 +26,20 @@ def main():
     options, dirname = cml_parser.cml_parse()
   
     problem = Problem(dirname, options)
-
+    max_topic = max(problem.teams_per_topic.keys())
+    
     model = "minimax"
-    print(problem.projects.keys())
+
     if options.Wmethod in ["identity", "owa", "powers"]:
-        print(problem.projects.keys())
-        minimax, solutions = model_ip(problem, options)
-        print(problem.projects.keys())
+        while True:
+            try:
+                minimax, solutions = model_ip(problem, options)
+                break
+            except ProblemInfeasible:
+                problem.add_fake_project(max_topic+1)
+                problem.recalculate_ranks_values()
+                
+
         stat = check_sol(solutions, problem, soldirname="sln")
 
         for st in stat:

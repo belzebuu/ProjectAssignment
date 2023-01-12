@@ -1,3 +1,9 @@
+from collections import namedtuple
+
+
+Team = namedtuple("Team", ("team_id", "min", "max", "type"))
+
+
 class Stat:
 
 	def __init__(self):
@@ -22,3 +28,16 @@ class Stat:
 class Solution:
 	def __init__(self, **kwds):
 		self.__dict__.update(kwds)
+
+
+class ProblemInfeasible(Exception):
+	"""Exception raised for models that turned out to be infeasible.
+
+    Attributes:
+        message -- explanation of the error
+    """
+
+	def __init__(self, message="Problem infeasible. Maybe insufficient capacity?"):
+		self.message = message
+		super().__init__(self.message)
+

@@ -14,10 +14,10 @@ def model_ip_envy(prob):
 	max_rank = 0
 
 	# Insieme di progetti e team
-	P = prob.projects.keys()
+	P = prob.teams_per_topic.keys()
 	T = {}
 	for p in P:
-		T[p] = range(len(prob.projects[p]))
+		T[p] = range(len(prob.teams_per_topic[p]))
 
 	# Insieme di gruppi
 	G = prob.groups.keys()
@@ -28,7 +28,7 @@ def model_ip_envy(prob):
 		grp_ranks[g] = prob.std_ranks[prob.groups[g][0]]
 		ranked_projects = grp_ranks[g].keys()
 		peek=prob.std_type[prob.groups[g][0]]
-		V[g]=filter(lambda x: x in ranked_projects and prob.projects[x][0][2] in prob.valid_prjtype[peek], P)
+		V[g]=filter(lambda x: x in ranked_projects and prob.teams_per_topic[x][0][2] in prob.valid_prjtype[peek], P)
 
 		max_g = 1 + max(map(lambda p: grp_ranks[g][p], V[g]))
 		array_ranks[g] = map(lambda p: max_g if p not in V[g] else grp_ranks[g][p], P)
@@ -70,12 +70,12 @@ def model_ip_envy(prob):
 		# Metti il vincolo
 		if Gp:
 			for t in T[p]:
-				m.addConstr(quicksum(a[g]*x[g,p,t] for g in Gp) <= prob.projects[p][t][1]*y[p,t], 'ub_%s' % (t))
-				m.addConstr(quicksum(a[g]*x[g,p,t] for g in Gp) >= prob.projects[p][t][0]*y[p,t], 'lb_%s' % (t))
+				m.addConstr(quicksum(a[g]*x[g,p,t] for g in Gp) <= prob.teams_per_topic[p][t][1]*y[p,t], 'ub_%s' % (t))
+				m.addConstr(quicksum(a[g]*x[g,p,t] for g in Gp) >= prob.teams_per_topic[p][t][0]*y[p,t], 'lb_%s' % (t))
 
 	# enforce restrictions on number of teams open across different topics:
 	for rest in prob.restrictions:
-		m.addConstr(quicksum(y[p,t] for p in rest["topics"] for t in range(len(prob.projects[p]))) <= rest["cum"], "rest_%s" % "-".join(map(str,rest["topics"])))
+		m.addConstr(quicksum(y[p,t] for p in rest["topics"] for t in range(len(prob.teams_per_topic[p]))) <= rest["cum"], "rest_%s" % "-".join(map(str,rest["topics"])))
 
 
 	############################################################
