@@ -1,7 +1,10 @@
 #DATADIR=data/
 #DATADIR=../ProjectAssignment_git_imada/data/
 #DATADIR=/home/marco/workspace/git/TT/ProjectAssignment_git_imada/data
-DATADIR=/home/marco/workspace/git/flask/Assignment/Assign/data/
+
+#DATADIR=/home/marco/workspace/git/flask/Assignment/Assign/data/
+DATADIR=/Users/march/workspace/git/flask/Assignment/Assign/data/
+
 #CASE=2021-zhiru
 #CASE=2019-bachelor
 #CASE=2021-psy

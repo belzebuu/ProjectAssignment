@@ -35,8 +35,15 @@ class Problem:
         self.restrictions = self.read_restrictions(dirname)
 
         #self.check_tot_capacity()
-        if not self.check_capacity(options.groups == "pre") and options.allow_unassigned:
-            self.add_capacity()
+        try:
+            self.check_capacity(options.groups == "pre")
+        except utils.MissingCapacity as e:
+            if options.allow_unassigned:
+                self.add_capacity(options.groups == "pre")
+            else:
+                print(e.message())
+                raise SystemExit
+            
         self.std_values, self.std_ranks_av, self.std_ranks_min = self.calculate_ranks_values()
         
         # self.minimax_sol = self.minimax_sol(dirname)
@@ -359,9 +366,9 @@ class Problem:
         
         n_stds = len(self.student_details)
         n_groups = len(self.groups)
-        teams = 0
-        for p in self.teams_per_topic.keys():
-            teams += len(self.teams_per_topic[p])
+        n_teams = 0
+        for x in self.restrictions: #self.teams_per_topic.keys():
+            n_teams += x["groups_max"] #len(self.teams_per_topic[p])
         n_places = 0
         for x in self.restrictions:
             n_places += x["capacity_max"]
@@ -371,34 +378,32 @@ class Problem:
             topic_nr = max(self.teams_per_topic.keys())+1
             for _ in range(missing_places):
                 self.add_fake_project(topic_nr)
-        if n_groups > teams and pre_grouping:
-            missing_groups = n_groups - teams
+        if n_groups > n_teams and pre_grouping:
+            missing_teams = n_groups - n_teams +3
             topic_nr = max(self.teams_per_topic.keys())+1
-            for _ in range(missing_groups):
+            for _ in range(missing_teams):
                 self.add_fake_project(topic_nr)
 
 
-    def check_capacity(self, pre_grouping: bool) -> bool:                
+    def check_capacity(self, pre_grouping: bool) -> None:                
         n_stds = len(self.student_details)
         n_groups = len(self.groups)
-        teams = 0
-        for p in self.teams_per_topic.keys():
-            teams += len(self.teams_per_topic[p])
+        n_teams = 0
+        for x in self.restrictions: #self.teams_per_topic.keys():
+            n_teams += x["groups_max"] #len(self.teams_per_topic[p])
         n_places = 0
         for x in self.restrictions:
             n_places += x["capacity_max"]
         print("-"*70)
         print(f"Number of students: {n_stds} on number of places available: {n_places}")
-        print(f"Number of student groups: {n_groups} on number of teams available: {teams}")
+        print(f"Number of student groups: {n_groups} on number of teams available: {n_teams}")
         print("-"*70)
         
         if n_stds > n_places:  
-            raise SystemExit("Potential places not enough for all students")
-        elif n_groups > teams and pre_grouping:
-            raise SystemExit("No teams enough to cover all groups")
-        else:
-            return True
-
+            raise utils.MissingCapacity("Potential places not enough for all students")
+        elif n_groups > n_teams and pre_grouping:
+            raise utils.MissingCapacity("No teams enough to cover all groups")
+        
     def check_tot_capacity(self) -> None:
         capacity = sum([self.team_details[k]["max_cap"]
                        for k in self.team_details])

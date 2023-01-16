@@ -525,13 +525,20 @@ def main(argv):
     options, dirname = cml_parser.cml_parse()
     
     problem = Problem(dirname,options)
-    
-    if options.allow_unassigned:
-        problem.add_fake_project(max(problem.teams_per_topic.keys())+1)
-        problem.recalculate_ranks_values()
-
-
     ass_std2team, ass_team2std = read_solution(options.solution_file)
+    S = set(ass_team2std.keys()) - set(problem.team_details.keys())
+    
+    if len(S) > 0:
+        if options.allow_unassigned:
+            N = max(problem.teams_per_topic.keys())
+            for t in S:
+                problem.add_fake_project(N+1)
+            problem.recalculate_ranks_values()
+            print(problem.team_details)
+        else:
+            raise SystemExit("Some team assigned not among those available")
+
+
     popularity, max_p = count_popularity(problem)
     studentassignments = check_sol(ass_std2team, ass_team2std, problem, popularity, max_p)  # tablefile)
     per_student(studentassignments, ass_std2team, ass_team2std, problem, popularity, max_p)  

@@ -50,7 +50,7 @@ def check_sol(solutions, problem, soldirname=""):
         for s in problem.std_type:
             if s in sol.topics:
                 p = sol.topics[s]
-                prj_type = problem.teams_per_topic[p][0][2]
+                prj_type = problem.teams_per_topic[p][0].type
                 if prj_type != problem.std_type[s] and prj_type != "alle":
                     counter_area += 1
         # count unstable students
@@ -63,7 +63,7 @@ def check_sol(solutions, problem, soldirname=""):
                     if (problem.std_ranks_min[s][p] < rank):
                         for t in range(len(problem.teams_per_topic[p])):
                             if len(members[p][t]) > 0:
-                                if len(members[p][t])+len(problem.groups[g]) <= problem.teams_per_topic[p][t][1]:
+                                if len(members[p][t])+len(problem.groups[g]) <= problem.teams_per_topic[p][t].max:
                                     print("student " + str(s) + " could go in "+str(p))
                                     unstable += len(problem.groups[g])
                             elif len(problem.groups[g]) >= problem.teams_per_topic[p][t].min and (len(problem.groups[g]) <= problem.teams_per_topic[p][t].max):
@@ -169,7 +169,7 @@ def check_sol(solutions, problem, soldirname=""):
             f = open(filename, "w")
             for s in problem.std_type:
                 if s in sol.topics:
-                    f.write(s + "\t" + str(sol.topics[s]) + "\t" + str(problem.teams_per_topic[sol.topics[s]][sol.teams[s]]) + "\n")
+                    f.write(s + "\t" + str(sol.topics[s]) + "\t" + str(problem.teams_per_topic[sol.topics[s]][sol.teams[s]].team_id) + "\n")
                     #if sol.teams[s] == 0 and len(problem.teams_per_topic[sol.topics[s]]) == 1:
                     #    f.write(s + "\t" + str(sol.topics[s]) + "\t" + "" + "\n")
                     #else:

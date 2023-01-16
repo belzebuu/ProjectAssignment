@@ -19,7 +19,7 @@ dirname = args[0]
 
 problem = ld.Problem()
 
-project_details, topics, projects = problem.read_projects(dirname)
+team_details, teams_per_topic = problem.read_projects(dirname)
 
 
 src=os.path.join(dirname,"projects.csv")
@@ -38,12 +38,12 @@ print({x["username"]:x["groups_max"] for x in restrictions["nteams"]})
 
 OD=OrderedDict()
 letters = string.ascii_lowercase[:26]
-for topic in topics:
-    k = str(topic)+topics[topic][0]   
-    if type(project_details[k]["email"]) is str:
-        advisor = project_details[k]["email"].split('@')[0]
+for topic in teams_per_topic.keys():
+    k = str(topic)+teams_per_topic[topic][0].team_id   
+    if type(team_details[k]["email"]) is str:
+        advisor = team_details[k]["email"].split('@')[0]
     else:
-        advisor = str(project_details[k]["email"])
+        advisor = str(team_details[k]["email"])
     n_teams=0
     for r in restrictions["nteams"]:
         if advisor == r["username"]:
@@ -53,8 +53,8 @@ for topic in topics:
         print(f"Topic {topic} removed")
     for t in range(n_teams):
         id = str(topic)+letters[t]
-        project_details[k]["team"]=letters[t]
-        OD[id]=project_details[k].copy()
+        team_details[k]["team"]=letters[t]
+        OD[id]=team_details[k].copy()
 
 DF = pd.DataFrame.from_dict(OD,orient="index")
 DF.to_csv(os.path.join(dirname,"projects.csv"),sep=";",index=False)

@@ -41,3 +41,16 @@ class ProblemInfeasible(Exception):
 		self.message = message
 		super().__init__(self.message)
 
+
+
+class MissingCapacity(Exception):
+	"""Exception raised for models that turned out to be infeasible.
+
+    Attributes:
+        message -- explanation of the error
+    """
+
+	def __init__(self, message="Problem infeasible. Maybe insufficient capacity?"):
+		self.message = message
+		super().__init__(self.message)
+

@@ -86,8 +86,8 @@ make publish
 ```
 
 ```
-python3 db_tools/update_cap.py Assign/data/2023-badm500/capacities.tsv
-python3 db_tools/extract_from_db_psy-2022.py Assign/data/2023-badm500/Assignment/ --exclude
+python3 db_tools/update_cap.py Assign/data/2023-badm500/capacities.tsv --commit
+python3 db_tools/extract_from_db_psy.py Assign/data/2023-badm500/Assignment/ --exclude
 python3 src/update_projects.py /home/marco/workspace/git/flask/Assignment/Assign/data/2023-badm500/Assignment/
 python3 src/main.py /home/marco/workspace/git/flask/Assignment/Assign/data/2023-badm500/Assignment/ --Wmethod owa --groups pre --min_preferences 7  | tee /home/marco/workspace/git/flask/Assignment/Assign/data/2023-badm500/Assignment/owa.txt
 python3 src/report_sol_new.py -s sln/sol_001.txt ~/workspace/git/flask/Assignment/Assign/data/2023-badm500/Assignment/
