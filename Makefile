@@ -2,8 +2,8 @@
 #DATADIR=../ProjectAssignment_git_imada/data/
 #DATADIR=/home/marco/workspace/git/TT/ProjectAssignment_git_imada/data
 
-#DATADIR=/home/marco/workspace/git/flask/Assignment/Assign/data/
-DATADIR=/Users/march/workspace/git/flask/Assignment/Assign/data/
+DATADIR=/home/marco/workspace/git/flask/Assignment/Assign/data/
+#DATADIR=/Users/march/workspace/git/flask/Assignment/Assign/data/
 
 #CASE=2021-zhiru
 #CASE=2019-bachelor
@@ -19,6 +19,8 @@ PROGRAM=python3
 SOLDIR=sln
 OUTPUTDIR=out
 
+OUTPUT_FLAGS=--allow_unassigned --min_preferences 5
+OUTPUT_FLAGS=--min_preferences 5
 
 
 projects: # careful, read README.md before use
@@ -49,8 +51,8 @@ $(OUTPUTDIR):
 
 
 output: | $(OUTPUTDIR)
-	python3 src/report_sol_new.py --allow_unassigned -s ${SOLDIR}/sol_001.txt ${DATADIR}/${CASE} 
-	python3 src/report_sol.py --allow_unassigned -s ${SOLDIR}/sol_001.txt ${DATADIR}/${CASE}
+	python3 src/report_sol_new.py ${OUTPUT_FLAGS} -s ${SOLDIR}/sol_001.txt ${DATADIR}/${CASE} 
+	python3 src/report_sol.py ${OUTPUT_FLAGS} -s ${SOLDIR}/sol_001.txt ${DATADIR}/${CASE}
 	Rscript scripts/make_gtables.R
 
 publish: 

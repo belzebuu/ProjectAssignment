@@ -6,16 +6,17 @@ import os
 import csv
 import json
 import codecs
-from numpy import std
 import pandas as pd
 from collections import defaultdict
 from collections import OrderedDict
 import utils
 
+import itertools
 import random
 import numpy
-random.seed(3)
+import pprint
 
+random.seed(3)
 
 class Problem:
 
@@ -44,7 +45,7 @@ class Problem:
                 print(e.message())
                 raise SystemExit
             
-        self.std_values, self.std_ranks_av, self.std_ranks_min = self.calculate_ranks_values()
+        self.std_values, self.std_ranks_av, self.std_ranks_min = self.calculate_ranks_and_values()
         
         # self.minimax_sol = self.minimax_sol(dirname)
         self.minimax_sol = 0
@@ -119,8 +120,10 @@ class Problem:
         return (team_details, teams_per_topic)
 
    
-    def flatten(self, List: list) -> list:
-        return [item for sublist in List for item in sublist]
+    def flatten_list_of_lists(self, List: list) -> list:
+        #return [item for sublist in List for item in sublist]
+        return list(itertools.chain.from_iterable(List))
+
 
     def read_students(self, dirname):
         students_file = dirname+"/students.csv"
@@ -162,13 +165,28 @@ class Problem:
             student_details[s]["priority_list_wties"] = student_details[s]["priority_list"]
             student_details[s]["priority_list"] = process_string(
                 student_details[s]["priority_list"].strip())
-
-            if len(self.flatten(student_details[s]["priority_list"])) < self.cml_options.min_preferences:
+            prj_prioritized = len(self.flatten_list_of_lists(student_details[s]["priority_list"]))
+            if prj_prioritized < self.cml_options.min_preferences:
                 print("WARNING: " +
-                      f" {len(self.flatten(student_details[s]['priority_list']))} < {self.cml_options.min_preferences} preferences for "+student_details[s]['username'])
+                      f" {prj_prioritized} < {self.cml_options.min_preferences} preferences for "+student_details[s]['username'])
+                raise SystemExit("Found a student who declared less priorities than requested. The case needs handling.")
 
             if self.cml_options.cut_off_type is not None and student_details[s]["stype"] == self.cml_options.cut_off_type:
-                student_details[s]["priority_list"] = student_details[s]["priority_list"][:self.cml_options.cut_off]
+                # We need to ensure all students have the eact same number of priorities
+                # we cut off and if a group of ties exceeds the cut off size, we select 
+                # remaining at random 
+                tmp=[]
+                size=0
+                for _ in student_details[s]["priority_list"]:                    
+                    if len(_) + size < self.cml_options.cut_off:
+                        tmp+=[_]                    
+                        size+=len(_)
+                    elif len(_) + size > self.cml_options.cut_off: 
+                        tmp+=[random.choices(_, k=self.cml_options.cut_off - size)]
+                        break
+                    else:
+                        break
+                student_details[s]["priority_list"] = tmp #student_details[s]["priority_list"][:self.cml_options.cut_off]
                 print("WARNING: updated", student_details[s])
 
             for t in student_details[s]["priority_list"]:
@@ -205,14 +223,14 @@ class Problem:
 
         return (student_details, priorities, groups, std_type)
 
-    def calculate_ranks_values(self):
+    def calculate_ranks_and_values(self):
         std_values = {}
         std_ranks_av = {}
         std_ranks_min = {}
         for u in self.student_details:
             priorities = self.student_details[u]["priority_list"]
 
-            i = self.cml_options.min_preferences
+            i = len(self.flatten_list_of_lists(priorities)) # self.cml_options.min_preferences
             j = 1
 
             values = {}
@@ -236,7 +254,7 @@ class Problem:
 
             if self.cml_options.prioritize_all or len(priorities) == 0:
                 prj_set = set(self.teams_per_topic.keys()).difference(
-                    set(self.flatten(priorities)))
+                    set(self.flatten_list_of_lists(priorities)))
                 prj_set = list(prj_set)
                 if False:  # old way decide a random order but it may lead to suboptimal sol
                     prj_list = random.sample(prj_set, k=len(prj_set))
@@ -258,12 +276,19 @@ class Problem:
             std_ranks_av[u] = ranks_av
             std_ranks_min[u] = ranks_min
 
-        # print(std_ranks,std_values)
+        with codecs.open(os.path.join("log", "ranks.json"),  "w", "utf-8") as filehandle:
+            sorted_computed_ranks = {x: sorted(std_ranks_av[x].items(), key=lambda item: item[1]) for x in std_ranks_av}
+            json.dump(sorted_computed_ranks, fp=filehandle, sort_keys=True,
+                      indent=4, separators=(',', ': '),  ensure_ascii=False)
+
+        #print(std_ranks_av,std_values)
+        ##pprint.pprint()
+        #raise SystemError
         return std_values, std_ranks_av, std_ranks_min
 
 
     def recalculate_ranks_values(self) -> None:
-        self.std_values, self.std_ranks_av, self.std_ranks_min = self.calculate_ranks_values()
+        self.std_values, self.std_ranks_av, self.std_ranks_min = self.calculate_ranks_and_values()
 
 
 
@@ -323,7 +348,7 @@ class Problem:
             t = self.std_type[s]
                 
             valid_prjs = [x for x, item in self.teams_per_topic.items() if item[0].type in valid_prjtypes[t]]
-            filtered = list(filter(lambda x: x in self.flatten(
+            filtered = list(filter(lambda x: x in self.flatten_list_of_lists(
                 self.priorities[s]),  valid_prjs))
             if (len(filtered) <= 1):
                 # prob.std_ranks_av[prob.groups[g][0]])

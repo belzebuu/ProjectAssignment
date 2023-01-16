@@ -36,7 +36,7 @@ def check_sol(ass_std2team, ass_team2std, prob, max_p):  # tablefile=''):
         if s not in ass_std2team:
             isok = False
             print(s+" not assigned!")
-        elif ass_std2team[s][0] not in prob.flatten(prob.priorities[s]): # functools.reduce(lambda x,y: x+y, prob.priorities[s])):
+        elif ass_std2team[s][0] not in prob.flatten_list_of_lists(prob.priorities[s]): # functools.reduce(lambda x,y: x+y, prob.priorities[s])):
             isok = False
             print(s+" assigned to smth not in his priorities!")
 
@@ -175,7 +175,7 @@ def summarize(ass_std2team, ass_team2std, max_p, prob):
         if s not in ass_std2team:
             unassigned = unassigned+1
             continue
-        if ass_std2team[s][0] in prob.flatten(prob.priorities[s]): #functools.reduce(lambda x,y: x+y, prob.priorities[s])):
+        if ass_std2team[s][0] in prob.flatten_list_of_lists(prob.priorities[s]): #functools.reduce(lambda x,y: x+y, prob.priorities[s])):
             for i in range(len(prob.priorities[s])):
                 if ass_std2team[s][0] in prob.priorities[s][i]:
                     counter[i] += 1

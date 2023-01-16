@@ -5,8 +5,9 @@ from gurobipy import *
 from owa import *
 import numpy as np
 
+import pprint
 
-def calculate_weights(weight_method, max_rank):
+def calculate_weights(weight_method: str, max_rank: int):
     if weight_method == "identity":
         weights = np.arange(max_rank + 1, dtype="float")
         weights[0] = np.nan  # max_rank + 1
@@ -21,12 +22,11 @@ def calculate_weights(weight_method, max_rank):
     elif weight_method == "powers":
         weights = np.array([np.nan]+[-2 ** max(8 - x, 0)
                            for x in range(1, max_rank + 1)], dtype="float")
-    print(weights)
-    #raise SystemExit
+  
     return weights
 
 
-def calculate_weight(weight_method, max_rank, rank):
+def calculate_weight(weight_method: str, max_rank: int, rank: int):
     if weight_method == "identity":
         weight = rank  # np.arange(max_rank + 1, dtype="float")
     elif weight_method == "owa":
@@ -50,7 +50,6 @@ def model_ip_weighted(prob, config, minimax):
     # weight_method, instability, minimax, allsol
 
     cal_P = list(prob.teams_per_topic.keys())
-    print(cal_P)
     cal_G = list(prob.groups.keys())
     array_ranks = {}
     grp_ranks = {}
@@ -69,8 +68,13 @@ def model_ip_weighted(prob, config, minimax):
     a = dict()  # the size of the group
     for g in cal_G:
         a[g] = len(prob.groups[g])
+    
     ############################################################
     weights = calculate_weights(config.Wmethod, max_rank)
+    pprint.pprint(grp_ranks)
+    print(len(cal_P),cal_P)
+    print(max_rank, weights)
+    
     ############################################################
     # Create variables
     x = {}  # # assignment vars
@@ -182,12 +186,16 @@ def model_ip_weighted(prob, config, minimax):
     # enforce restrictions on number of teams open across different topics:
     for rest in prob.restrictions:
         m.addConstr(quicksum(y[p, t] for p in rest["topics"] for t in range(
-            len(prob.teams_per_topic[p]))) <= rest["groups_max"], "rest_%s" % rest["username"])
+            len(prob.teams_per_topic[p]))) >= rest["groups_min"], "rstr_max_%s" % rest["username"])
+        m.addConstr(quicksum(y[p, t] for p in rest["topics"] for t in range(
+            len(prob.teams_per_topic[p]))) <= rest["groups_max"], "rstr_max_%s" % rest["username"])
 
     # enforce restrictions on number of students assigned across different topics:
     for rest in prob.restrictions:
         m.addConstr(quicksum(a[g]*x[g, p, t] for g in cal_G for p in rest["topics"] for t in range(
-            len(prob.teams_per_topic[p]))) <= rest["capacity_max"], "rest_nstds_%s" % rest["username"])
+            len(prob.teams_per_topic[p]))) >= rest["capacity_min"], "rstr_nstds_min_%s" % rest["username"])
+        m.addConstr(quicksum(a[g]*x[g, p, t] for g in cal_G for p in rest["topics"] for t in range(
+            len(prob.teams_per_topic[p]))) <= rest["capacity_max"], "rstr_nstds_max_%s" % rest["username"])
 
     ############################################################
     # Symmetry breaking on the teams
@@ -239,12 +247,13 @@ def model_ip_weighted(prob, config, minimax):
             m.addConstr(f >= u[g], 'minimax_%s' % g)
         m.addConstr(f <= minimax, 'minimax')
         # W_f = 1.0 #max_rank*len(prob.std_type.keys())*len(prob.std_type.keys())*1000
-    for g in cal_G:
-        if prob.student_details[prob.groups[g][0]]["stype"]==config.cut_off_type:
-            m.addConstr(config.cut_off >=
-                        quicksum(grp_ranks[g][p] * x[g, p, t] for p in list(grp_ranks[g].keys())
-                                 for t in range(len(prob.teams_per_topic[p]))),
-                        'cutoff_special_%s' % (g))
+    if False: # this is old, now dealt with in read_students
+        for g in cal_G:
+            if prob.student_details[prob.groups[g][0]]["stype"]==config.cut_off_type:
+                m.addConstr(config.cut_off >=
+                            quicksum(grp_ranks[g][p] * x[g, p, t] for p in list(grp_ranks[g].keys())
+                                    for t in range(len(prob.teams_per_topic[p]))),
+                            'cutoff_special_%s' % (g))
  
     ############################################################
     # Compute optimal solution

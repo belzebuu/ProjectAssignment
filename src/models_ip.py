@@ -97,12 +97,16 @@ def model_ip(prob, config):
     # enforce restrictions on number of teams open across different topics:
     for rest in prob.restrictions:
         m.addConstr(quicksum(y[p, t] for p in rest["topics"] for t in range(
-            len(prob.teams_per_topic[p]))) <= rest["groups_max"], "rest_%s" % rest["username"])
+            len(prob.teams_per_topic[p]))) >= rest["groups_min"], "rstr_max_%s" % rest["username"])
+        m.addConstr(quicksum(y[p, t] for p in rest["topics"] for t in range(
+            len(prob.teams_per_topic[p]))) <= rest["groups_max"], "rstr_max_%s" % rest["username"])
 
     # enforce restrictions on number of students assigned across different topics:
     for rest in prob.restrictions:
         m.addConstr(quicksum(a[g]*x[g, p, t] for g in cal_G for p in rest["topics"] for t in range(
-            len(prob.teams_per_topic[p]))) <= rest["capacity_max"], "rest_nstds_%s" % rest["username"])
+            len(prob.teams_per_topic[p]))) >= rest["capacity_min"], "rstr_nstds_min_%s" % rest["username"])
+        m.addConstr(quicksum(a[g]*x[g, p, t] for g in cal_G for p in rest["topics"] for t in range(
+            len(prob.teams_per_topic[p]))) <= rest["capacity_max"], "rstr_nstds_max_%s" % rest["username"])
 
     
     # Symmetry breaking on the teams
