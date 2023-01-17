@@ -64,7 +64,15 @@ def model_ip(prob, config):
     #m.addConstr(quicksum(working) == 1, 'grp_%s' % g)
     # Assignment constraints
     for g in cal_G:
+        print(prob.teams_per_topic)
+        print(cal_P)
+        print( prob.valid_prjtype)
+        
         peek = prob.std_type[prob.groups[g][0]]
+        print(peek)
+
+        for yyy in cal_P:
+            print(prob.teams_per_topic[yyy])
         valid_prjs = [x for x in cal_P if prob.teams_per_topic[x][0].type in prob.valid_prjtype[peek]]
         #valid_prjs=filter(lambda x: prob.teams_per_topic[x][0][2]==peek or prob.teams_per_topic[x][0][2]=='alle', prob.teams_per_topic.keys())        
         working = [x[g, p, t] for p in valid_prjs for t in range(len(prob.teams_per_topic[p]))]

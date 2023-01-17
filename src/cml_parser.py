@@ -7,6 +7,7 @@ def cml_parse() -> dict:
     parser.add_option("-a", "--allsol", action="store_true", dest="allsol", default=False,
                       help="All solutions")
     parser.add_option("-i", "--instability", action="store_true", dest="instability", default=False, help="Whether the constraint on instability should be included or not [default: %default]")
+    parser.add_option("-e", "--expand_topics", action="store_true", dest="expand_topics", default=False, help="Whether the file projects.csv contains teams or topics to be expanded into teams [default: %default]")
     parser.add_option("-g", "--groups", dest="groups", type="string", default="post", metavar="[pre|post]", help="Whether groups are formed pre or post, that is, if 'post' then possible to set more than one group in a team [default: %default]")
     parser.add_option("-w", "--Wmethod", dest="Wmethod", type="string", default="owa", metavar="[identity|owa|powers]",
                       help="The weighting scheme, eg, \"owa\". [default: %default]")
