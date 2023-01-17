@@ -181,7 +181,7 @@ def model_ip_weighted(prob, config, minimax):
                         >= prob.teams_per_topic[p][t].min * y[p, t], 'lb_%s_%d' % (p, t))
             if config.groups == "pre":
                 m.addConstr(quicksum(x[g, p, t] for g in cal_G)
-                            <= 1, 'max_one_grp_%s%s' % (p, t))
+                            <= 1, 'max_one_grp_%s_%s' % (p, t))
 
     # enforce restrictions on number of teams open across different topics:
     for rest in prob.restrictions:

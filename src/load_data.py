@@ -363,7 +363,7 @@ class Problem:
         """Must occurr before calculating ranks and values"""
 
         #Team = namedtuple("Team", ("team_id", "min", "max", "type"))
-        letters="abcdef"
+        letters="abcdefghi"
         
         type = self.teams_per_topic[1][0].type # copy the type of the first team
     
