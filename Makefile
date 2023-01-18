@@ -21,7 +21,7 @@ OUTPUTDIR=out
 
 OUTPUT_FLAGS=--allow_unassigned --min_preferences 5
 OUTPUT_FLAGS=--allow_unassigned --prioritize_all --min_preferences 5
-
+OUTPUT_FLAGS=-e --min_preferences 5
 
 projects: # careful, read README.md before use
 	python3 src/update_projects.py  ${DATADIR}/${CASE}

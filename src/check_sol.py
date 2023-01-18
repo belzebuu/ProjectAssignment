@@ -1,10 +1,38 @@
 import sys
 
+
+def search_unstable_students(k, sol, problem, members, soldirname="") -> int:
+    # returns number of unstable students        
+    unstable = 0
+    out_str = "-"*60+"\nInstability:\n"
+    for g in problem.groups:
+        s = problem.groups[g][0]
+        if s in sol.topics:
+            rank = problem.std_ranks_min[s][sol.topics[s]]
+            for p in list(problem.std_ranks_min[s].keys()):
+                if (problem.std_ranks_min[s][p] < rank):
+                    for t in range(len(problem.teams_per_topic[p])):
+                        if len(members[p][t]) > 0:
+                            if len(members[p][t])+len(problem.groups[g]) <= problem.teams_per_topic[p][t].max:
+                                out_str += "student " + str(s) + " could go in "+str(p) + "\n"
+                                unstable += len(problem.groups[g])
+                        elif len(problem.groups[g]) >= problem.teams_per_topic[p][t].min and (len(problem.groups[g]) <= problem.teams_per_topic[p][t].max):
+                            out_str+="student " + str(s) + " could go in unopened "+str(p)+"\n"
+                            unstable += len(problem.groups[g])
+    out_str += "-"*60
+    if soldirname != "":
+        filename = "%s/log_%03d.txt" % (soldirname, k)
+        with open(filename, "w") as filehandle:
+            filehandle.write(out_str)
+    return unstable
+
+
+
 def check_sol(solutions, problem, soldirname=""):
     logs = []
     num_solutions = len(solutions)
-    print("num_solutions: ", num_solutions)
-    for sol in solutions:
+    print("Number of solutions: ", num_solutions)
+    for k, sol in enumerate(solutions):        
         log = []
         # sol=solutions[0]
         # let's check
@@ -53,22 +81,10 @@ def check_sol(solutions, problem, soldirname=""):
                 prj_type = problem.teams_per_topic[p][0].type
                 if prj_type != problem.std_type[s] and prj_type != "alle":
                     counter_area += 1
-        # count unstable students
-        unstable = 0
-        for g in problem.groups:
-            s = problem.groups[g][0]
-            if s in sol.topics:
-                rank = problem.std_ranks_min[s][sol.topics[s]]
-                for p in list(problem.std_ranks_min[s].keys()):
-                    if (problem.std_ranks_min[s][p] < rank):
-                        for t in range(len(problem.teams_per_topic[p])):
-                            if len(members[p][t]) > 0:
-                                if len(members[p][t])+len(problem.groups[g]) <= problem.teams_per_topic[p][t].max:
-                                    print("student " + str(s) + " could go in "+str(p))
-                                    unstable += len(problem.groups[g])
-                            elif len(problem.groups[g]) >= problem.teams_per_topic[p][t].min and (len(problem.groups[g]) <= problem.teams_per_topic[p][t].max):
-                                print("student " + str(s) + " could go in unopened "+str(p))
-                                unstable += len(problem.groups[g])
+
+
+        unstable = search_unstable_students(k+1, sol, problem, members, soldirname)
+
         # count classical utility
         tot_util = 0
         for s in problem.std_type:
@@ -165,17 +181,16 @@ def check_sol(solutions, problem, soldirname=""):
         ############################################
         # print({x: [y.team_id for y in item] for x, item in problem.teams_per_topic.items()})
         if soldirname != "":
-            filename = "%s/sol_%03d.txt" % (soldirname, num_solutions)
-            f = open(filename, "w")
-            for s in problem.std_type:
-                if s in sol.topics:
-                    f.write(s + "\t" + str(sol.topics[s]) + "\t" + str(problem.teams_per_topic[sol.topics[s]][sol.teams[s]].team_id) + "\n")
-                    #if sol.teams[s] == 0 and len(problem.teams_per_topic[sol.topics[s]]) == 1:
-                    #    f.write(s + "\t" + str(sol.topics[s]) + "\t" + "" + "\n")
-                    #else:
-                    #    f.write(s + "\t" + str(sol.topics[s]) +
-                    #            "\t" + 'abcdefghi'[sol.teams[s]] + "\n")
+            filename = "%s/sol_%03d.txt" % (soldirname, k+1)
+            with open(filename, "w") as filehandle:
+                for s in problem.std_type:
+                    if s in sol.topics:
+                        filehandle.write(s + "\t" + str(sol.topics[s]) + "\t" + str(problem.teams_per_topic[sol.topics[s]][sol.teams[s]].team_id) + "\n")
+                        #if sol.teams[s] == 0 and len(problem.teams_per_topic[sol.topics[s]]) == 1:
+                        #    f.write(s + "\t" + str(sol.topics[s]) + "\t" + "" + "\n")
+                        #else:
+                        #    f.write(s + "\t" + str(sol.topics[s]) +
+                        #            "\t" + 'abcdefghi'[sol.teams[s]] + "\n")
         log += sol.solved
-        logs += [log]
-        num_solutions = num_solutions-1
+        logs += [log]        
     return logs

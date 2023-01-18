@@ -64,15 +64,7 @@ def model_ip(prob, config):
     #m.addConstr(quicksum(working) == 1, 'grp_%s' % g)
     # Assignment constraints
     for g in cal_G:
-        #print(prob.teams_per_topic)
-        #print(cal_P)
-        #print( prob.valid_prjtype)
-        
-        peek = prob.std_type[prob.groups[g][0]]
-        #print(peek)
-        #for yyy in cal_P:
-        #    print(prob.teams_per_topic[yyy])
-        
+        peek = prob.std_type[prob.groups[g][0]]        
         valid_prjs = [x for x in cal_P if prob.teams_per_topic[x][0].type in prob.valid_prjtype[peek]]
         #valid_prjs=filter(lambda x: prob.teams_per_topic[x][0][2]==peek or prob.teams_per_topic[x][0][2]=='alle', prob.teams_per_topic.keys())        
         working = [x[g, p, t] for p in valid_prjs for t in range(len(prob.teams_per_topic[p]))]
@@ -88,24 +80,16 @@ def model_ip(prob, config):
     for p in cal_P:
         for t in range(len(prob.teams_per_topic[p])):
             m.addConstr(quicksum(a[g]*x[g, p, t] for g in cal_G) <=
-                        prob.teams_per_topic[p][t].max * y[p, t], 'ub_%s' % (t))
+                        prob.teams_per_topic[p][t].max * y[p, t], 'ub_%s_%d' % (p,t))
             m.addConstr(quicksum(a[g]*x[g, p, t] for g in cal_G) >=
-                        prob.teams_per_topic[p][t].min * y[p, t], 'lb_%s' % (t))
+                        prob.teams_per_topic[p][t].min * y[p, t], 'lb_%s_%d' % (p,t))
             if config.groups=="pre":
                 m.addConstr(quicksum(x[g, p, t] for g in cal_G) <= 1, 'max_one_grp_%s_%s' % (p, t))
-
-    # put in u the rank assigned to the group
-    for g in cal_G:
-        m.addConstr(u[g] ==
-                    quicksum(grp_ranks[g][p] * x[g, p, t] for p in list(grp_ranks[g].keys())
-                             for t in range(len(prob.teams_per_topic[p]))),
-                    'u_%s' % (g))
-        m.addConstr(v >= u[g], 'v_%s' % g)
     
     # enforce restrictions on number of teams open across different topics:
     for rest in prob.restrictions:
         m.addConstr(quicksum(y[p, t] for p in rest["topics"] for t in range(
-            len(prob.teams_per_topic[p]))) >= rest["groups_min"], "rstr_max_%s" % rest["username"])
+            len(prob.teams_per_topic[p]))) >= rest["groups_min"], "rstr_min_%s" % rest["username"])
         m.addConstr(quicksum(y[p, t] for p in rest["topics"] for t in range(
             len(prob.teams_per_topic[p]))) <= rest["groups_max"], "rstr_max_%s" % rest["username"])
 
@@ -116,7 +100,14 @@ def model_ip(prob, config):
         m.addConstr(quicksum(a[g]*x[g, p, t] for g in cal_G for p in rest["topics"] for t in range(
             len(prob.teams_per_topic[p]))) <= rest["capacity_max"], "rstr_nstds_max_%s" % rest["username"])
 
-    
+     # put in u the rank assigned to the group
+    for g in cal_G:
+        m.addConstr(u[g] ==
+                    quicksum(grp_ranks[g][p] * x[g, p, t] for p in grp_ranks[g].keys()
+                             for t in range(len(prob.teams_per_topic[p]))),
+                    'u_%s' % (g))
+        m.addConstr(v >= u[g], 'v_%s' % g)
+
     # Symmetry breaking on the teams
     for p in cal_P:
         for t in range(len(prob.teams_per_topic[p])-1):
@@ -139,6 +130,8 @@ def model_ip(prob, config):
             for c in m.getConstrs():
                 if c.IISConstr:
                     print(('%s' % c.constrName))
+                    #m.getConstrByName(c.constrName)
+                    print(f"{m.getRow(c)} {c.Sense} {c.RHS}")
             print("\nSee optexam_IIS.ilp for explicit constraints.\n")
             raise SystemExit
     

@@ -146,7 +146,7 @@ class Problem:
         #print(team_details)
         #print(teams_per_topic)
         #raise SystemExit
-        return (teams_per_topic)
+        return (dict(teams_per_topic))
 
 
     def read_topics(self, dirname):
@@ -494,10 +494,11 @@ class Problem:
                 # file.write(str(len(project_dict)+1)+";;1;"+str(n_stds-capacity)+";"+program+"\n")
                 #project_dict[len(project_dict)+1] = n_stds-capacity
 
-    def check_student_priorities(self):
-        for s in self.student_details.keys():
-            for t in self.student_details[s]["priority_list"]:
-                for p in t:
+    def check_student_priorities(self) -> None:
+        
+        def remove_absent_prj(plist: list):
+            for sub_list in plist: #self.student_details[s]["priority_list"]:
+                for p in sub_list:
                     if p not in self.teams_per_topic.keys():
                         print("WARNING: " + s + " expressed a preference for a project " +
                                 str(p)+" which is not available")
@@ -505,7 +506,13 @@ class Problem:
                         answer = input("Continue? (y/n)\n")
                         if answer not in ['', 'Y', 'y']:
                             sys.exit("You decided to stop")
-                        t.remove(p)
-                        if len(t)==0:
-                            self.student_details[s]["priority_list"].remove(t)
+                        sub_list.remove(p)
+                        if len(sub_list)==0:
+                            self.student_details[s]["priority_list"].remove(sub_list)
                         print(self.student_details[s]["priority_list"])
+                        return True
+            return False
+
+        for s in self.student_details.keys():            
+            while remove_absent_prj(self.student_details[s]["priority_list"]):
+                pass

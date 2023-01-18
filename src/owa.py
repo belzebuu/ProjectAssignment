@@ -1,8 +1,9 @@
 #! /usr/bin/python3
 
+import numpy as np
 
 def owa_weights_values(number_of_values, beta):
-    """Calculates the OWA weights with the original Yager formula
+    """DISMISSED. Calculates the OWA weights with the original Yager formula
      More specifically, the function returns the weight w_i for the i-th smallest value.
 
     Parameters:
@@ -11,7 +12,7 @@ def owa_weights_values(number_of_values, beta):
     Returns:
          Weights for values [1, ... ,]. The first element (weights[0] is the largest weight)
     """
-    weights = np.zezros(number_of_values+1, dtype="float")
+    weights = np.zeros(number_of_values+1, dtype="float")
     rescale = 10000
     weights[1] = rescale*beta**(number_of_values-1) / \
         (1+beta)**(number_of_values-1)
@@ -37,24 +38,25 @@ def owa_weights_distribution(max_rank):
          Weights for rank values [0, 1, ... ,\Delta]. The first element (weights[0] is the largest value in weights)
     """
     number_of_values = max_rank  # the default, not used for numerical reasons and because in our instances it is never necessary to have m>8
-    number_of_values = 8  # max number for which to use Yager formula, hardcoded to 8
+    yager_n_values = 8  # max number for which to use Yager formula, hardcoded to 8
     # preparing weights element 0 will become the m-th element
-    weights = [0]*(number_of_values+1)
+    weights = np.zeros(number_of_values+1, dtype="float")
     # beta: smaller than the smallest perceived difference among values which is 1 and 1/Delta after normalization
     beta = 1.0/max_rank - 0.001
     # beta=1-0.001 # without normalization
     # f_i = [1]*(number_of_values+1)  # used in most of the calculations
-    f_i = [x*1./number_of_values for x in range(number_of_values+1)] # described in the paper
+    f_i = np.array([x*1./yager_n_values for x in range(yager_n_values+1)]) # described in the paper
     rescale = 10000
+    weights[0] = np.nan 
     weights[1] = rescale * f_i[1] * \
-        beta**(number_of_values-1)/(1+beta)**(number_of_values-1)  # 1
-    weights[2:] = [rescale * f_i[x] * beta**(number_of_values-x)/(1+beta)**(
-        number_of_values+1-x) for x in range(2, number_of_values+1)]  # 2,3,...,number_of_values
-    weights[0] = max(weights[1:])+1
-    
-    if max_rank > number_of_values:
-        for _ in range(number_of_values, max_rank):    
-            weights.append(weights[0])
+        beta**(yager_n_values-1)/(1+beta)**(yager_n_values-1)  # 1
+    for i in range(2, yager_n_values+1):
+        weights[i] = rescale * f_i[i] * beta**(yager_n_values-i)/(1+beta)**(yager_n_values+1-i)   # 2,3,...,number_of_values
+        
+    if number_of_values > yager_n_values:
+        default = max(weights[1:])+1
+        for _ in range(yager_n_values, number_of_values+1):    
+            weights[_] = default
 
     # print(["%0.5f" % x for x in weights[1:]])
     return weights

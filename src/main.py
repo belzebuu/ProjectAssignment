@@ -29,19 +29,19 @@ def main():
     max_topic = max(problem.teams_per_topic.keys())
     
     model = "minimax"
-
+    print(problem.teams_per_topic)
     if options.Wmethod in ["identity", "owa", "powers"]:
         while True:
             try:
                 minimax, solutions = model_ip(problem, options)
-                break
             except ProblemInfeasible:
                 problem.add_fake_project(max_topic+1)
                 problem.recalculate_ranks_values()
-                
-
+            else:
+                break
+        
         stat = check_sol(solutions, problem, soldirname="sln")
-
+        
         for st in stat:
             log = ['x']+[model]+solutions[0].solved+[os.path.basename(dirname)]+st
             print('%s' % ' '.join(map(str, log)))

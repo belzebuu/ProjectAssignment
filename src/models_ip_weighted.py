@@ -43,7 +43,7 @@ def calculate_weight(weight_method: str, max_rank: int, rank: int):
 
 
 def model_ip_weighted(prob, config, minimax):
-    print("Solving model_ip_weighted")
+    print("-"*60+"\nSolving model_ip_weighted")
     start = perf_counter()
     m = Model('weighted')
 
@@ -51,19 +51,20 @@ def model_ip_weighted(prob, config, minimax):
 
     cal_P = list(prob.teams_per_topic.keys())
     cal_G = list(prob.groups.keys())
-    array_ranks = {}
+    
     grp_ranks = {}
     max_rank = 0
     for g in cal_G:
-        # we consider only first student, the other must have equal prefs
+        # we consider only first student, the others must have equal prefs
         s = prob.groups[g][0]
         #grp_ranks[g] = prob.std_ranks_av[s]
         #if len(prob.std_ranks_av[s]) == len(prob.topics):
         #    grp_ranks[g] = {}
         #else:
         grp_ranks[g] = prob.std_ranks_av[s]
-        if len(grp_ranks[g]) > max_rank:
-            max_rank = len(grp_ranks[g])
+    
+    max_rank = max([len(grp_ranks[g]) for g in grp_ranks])
+    min_rank = min([len(grp_ranks[g]) for g in grp_ranks])
 
     a = dict()  # the size of the group
     for g in cal_G:
@@ -71,10 +72,10 @@ def model_ip_weighted(prob, config, minimax):
     
     ############################################################
     weights = calculate_weights(config.Wmethod, max_rank)
-    pprint.pprint(grp_ranks)
-    print(len(cal_P),cal_P)
-    print(max_rank, weights)
-    
+    #pprint.pprint(grp_ranks)
+    print(f"Topics available ({len(cal_P)}): {repr(cal_P)}")
+    print(f"Number of prioritized projects between {min_rank} and {max_rank}") 
+    print(f"Weights ({len(weights)}): "+repr(weights))
     ############################################################
     # Create variables
     x = {}  # # assignment vars
@@ -154,8 +155,7 @@ def model_ip_weighted(prob, config, minimax):
     # m.addConstr(quicksum(working) == 1, 'grp_%s' % g)
 
     # Assignment constraints
-    print(cal_P)
-    print(prob.teams_per_topic)
+   
     for g in cal_G:
         peek = prob.std_type[prob.groups[g][0]]
         valid_prjs = [x for x in cal_P if prob.teams_per_topic[x][0].type in prob.valid_prjtype[peek]]
@@ -271,7 +271,7 @@ def model_ip_weighted(prob, config, minimax):
     m.update()
     m.write("model.lp")
     m.optimize()
-
+    m.write("model.sol")
     if m.status == GRB.status.INFEASIBLE:  # do IIS
         print('The model is infeasible; computing IIS')
         m.computeIIS()
