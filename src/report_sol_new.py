@@ -235,6 +235,35 @@ def count_popularity(prob):
 
     return popularity, max_p
 
+def advisor_table(ass_std2team, ass_team2std, problem):
+    outfile = os.path.join("out", "advisors")
+    print(ass_std2team)
+    print(ass_team2std)
+    
+    for _, rest in problem.advisors.items():
+        groups=0
+        stds=0
+        for topic in rest["topics"]:
+            if topic in problem.teams_per_topic:
+                for team in problem.teams_per_topic[topic]:
+                    team_id = str(topic)+team.team_id
+                    if team_id in ass_team2std:
+                        groups+=1
+                        stds+=len(ass_team2std[team_id])
+        #rest["full_name"]=problem.advisors[rest["username"]]["full_name"] if rest["username"] in problem.advisors else ""
+        rest["assigned_groups"]=groups
+        rest["capacity_left_grps"]=rest["groups_max"]-groups
+        rest["assigned_stds"]=stds
+        rest["capacity_left_stds"]=rest["capacity_max"]-groups
+
+    advisors_dict = {k: problem.advisors[k] for k in problem.advisors}
+    table = pd.DataFrame.from_dict(advisors_dict, orient='index')
+    print(table)
+    columns = ["full_name", "groups_min", "groups_max", "capacity_min", "capacity_max", 
+                "assigned_groups", "capacity_left_grps", "assigned_stds", "capacity_left_stds"]
+    table[columns].to_csv(outfile+".csv", sep=";",index=True,index_label="username")#,columns=columns)
+    
+    raise SystemExit
 
 def main(argv):
     options, dirname = cml_parser.cml_parse()
@@ -259,6 +288,7 @@ def main(argv):
     project_table(ass_std2team, ass_team2std, popularity, max_p, problem)
     # institute_wise()
     student_table(ass_std2team, ass_team2std, problem)
+    advisor_table(ass_std2team, ass_team2std, problem)
     summarize(ass_std2team, ass_team2std, max_p, problem)
 
 

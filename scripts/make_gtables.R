@@ -32,3 +32,9 @@ print(Table,file="out/students.html")
 
 plot(Table)
 
+
+advisors <- read.csv("out/advisors.csv",header=TRUE,na.strings="NA",dec=".", sep=";")
+Table <- gvisTable(advisors)
+print(Table,file="out/advisors.html")
+
+plot(Table)

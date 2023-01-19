@@ -33,8 +33,9 @@ class Problem:
 
         self.student_details, self.priorities, self.groups, self.std_type = self.read_students(
             dirname)
-        self.restrictions = self.read_restrictions(dirname)
+        self.restrictions, self.advisors = self.read_restrictions(dirname)
         self.team_details, self.teams_per_topic = self.read_projects(dirname)
+        self.add_info_advisors_record(self.advisors)
         #DF = pd.DataFrame.from_dict(self.team_details,orient="index")
         #print(DF)
         #raise SystemError
@@ -95,6 +96,7 @@ class Problem:
         print(project_table)
         project_table.team = project_table.team.fillna('')
         project_table.instit = project_table.instit.fillna('')
+        project_table.email = project_table.email.apply(lambda x: x.lower())
         project_table.prj_id = project_table.prj_id.astype(str)
         project_table.ID = project_table.ID.astype(int)
         project_table.index = project_table["ID"].astype(
@@ -158,6 +160,7 @@ class Problem:
         print(project_table)
         project_table.team = project_table.team.fillna('')
         project_table.instit = project_table.instit.fillna('')
+        project_table.email = project_table.email.apply(lambda x: x.lower())
         project_table.prj_id = project_table.prj_id.astype(str)
         project_table.ID = project_table.ID.astype(int)
         project_table.index = project_table["ID"].astype(str) #+project_table["team"].astype(str)  # project_table["prj_id"]
@@ -168,6 +171,11 @@ class Problem:
         return topic_details
 
 
+    def add_info_advisors_record(self, advisors):
+        for _, x in self.team_details.items():
+            advisor_id = x["email"].split("@")[0].strip()
+            advisors[advisor_id].update({"full_name": x["teachers"].split(",")[0]})
+        
 
     def flatten_list_of_lists(self, List: list) -> list:
         # return [item for sublist in List for item in sublist]
@@ -349,8 +357,11 @@ class Problem:
         """ reads restrictions """
         with open(dirname+"/restrictions.json", "r") as jsonfile:
             restrictions = json.load(jsonfile)
-        print({x["username"]: x["groups_max"] for x in restrictions["nteams"]})
-        return restrictions["nteams"]
+        for r in restrictions["nteams"]:
+            r["username"] = r["username"].lower()
+        #print({x["username"]: x["groups_max"] for x in restrictions["nteams"]})
+        advisors = {k["username"].lower(): k for k in restrictions["nteams"]}
+        return restrictions["nteams"], dict(sorted(advisors.items()))
 
     def tighten_restrictions(self):
         # Adjust for topics not available
@@ -376,7 +387,8 @@ class Problem:
         except csv.Error as e:
             sys.exit('file %s, line %d: %s' %
                      ("/restrictions.csv", reader.line_num, e))
-        return restrictions
+        advisors = {k["username"].lower(): k for k in restrictions}
+        return restrictions, dict(sorted(advisors.items()))
 
     def type_compliance(self, dirname):
         """ reads types """
