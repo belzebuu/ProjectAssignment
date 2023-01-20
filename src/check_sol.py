@@ -1,15 +1,16 @@
 import sys
-
+import utils
 
 def search_unstable_students(k, sol, problem, members, soldirname="") -> int:
     # returns number of unstable students        
     unstable = 0
-    out_str = "-"*60+"\nInstability:\n"
+    out_str = "-"*60+"\nInstability:\n"    
     for g in problem.groups:
         s = problem.groups[g][0]
+        grp_prioritized = utils.flatten_list_of_lists(problem.student_details[s]["priority_list"])
         if s in sol.topics:
             rank = problem.std_ranks_min[s][sol.topics[s]]
-            for p in list(problem.std_ranks_min[s].keys()):
+            for p in grp_prioritized:
                 if (problem.std_ranks_min[s][p] < rank):
                     for t in range(len(problem.teams_per_topic[p])):
                         if len(members[p][t]) > 0:

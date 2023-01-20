@@ -14,6 +14,7 @@ from collections import OrderedDict
 from load_data import Problem
 import functools
 import cml_parser
+import utils
 
 def read_solution(solfile):
     ass_std2team = {}
@@ -36,7 +37,7 @@ def check_sol(ass_std2team, ass_team2std, prob, max_p):  # tablefile=''):
         if s not in ass_std2team:
             isok = False
             print(s+" not assigned!")
-        elif ass_std2team[s][0] not in prob.flatten_list_of_lists(prob.priorities[s]): # functools.reduce(lambda x,y: x+y, prob.priorities[s])):
+        elif ass_std2team[s][0] not in utils.flatten_list_of_lists(prob.priorities[s]): # functools.reduce(lambda x,y: x+y, prob.priorities[s])):
             isok = False
             print(s+" assigned to smth not in his priorities!")
 
@@ -270,7 +271,7 @@ def advisor_table(ass_std2team, ass_team2std, problem):
 def main(argv):
     options, dirname = cml_parser.cml_parse()
     
-    problem = Problem(dirname,options)
+    problem = Problem(dirname,options, True)
     ass_std2team, ass_team2std = read_solution(options.solution_file)    
     S = set(ass_team2std.keys()) - set(problem.team_details.keys())
     

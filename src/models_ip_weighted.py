@@ -53,6 +53,7 @@ def model_ip_weighted(prob, config, minimax):
     cal_G = list(prob.groups.keys())
     
     grp_ranks = {}
+    grp_prioritized = {}
     max_rank = 0
     for g in cal_G:
         # we consider only first student, the others must have equal prefs
@@ -61,7 +62,8 @@ def model_ip_weighted(prob, config, minimax):
         #if len(prob.std_ranks_av[s]) == len(prob.topics):
         #    grp_ranks[g] = {}
         #else:
-        grp_ranks[g] = prob.std_ranks_av[s]
+        grp_ranks[g] = prob.std_ranks_min[s]
+        grp_prioritized[g] = utils.flatten_list_of_lists(prob.student_details[s]["priority_list"])
     
     max_rank = max([len(grp_ranks[g]) for g in grp_ranks])
     min_rank = min([len(grp_ranks[g]) for g in grp_ranks])
@@ -168,7 +170,7 @@ def model_ip_weighted(prob, config, minimax):
             if not p in valid_prjs:
                 for t in range(len(prob.teams_per_topic[p])):
                     m.addConstr(x[g, p, t] == 0, 'not_valid_%s' % g)
-            if not p in prob.std_ranks_av[prob.groups[g][0]]:
+            if not p in grp_prioritized[g]: #prob.std_ranks_av[prob.groups[g][0]]:
                 for t in range(len(prob.teams_per_topic[p])):
                     m.addConstr(x[g, p, t] == 0, 'not_ranked_%s' % g)
 
@@ -207,7 +209,7 @@ def model_ip_weighted(prob, config, minimax):
     ############################################################
     # weighted # weights[grp_ranks[g][p]]
     m.addConstr(v >= quicksum(calculate_weight(config.Wmethod, max_rank, grp_ranks[g][p]) * a[g] * x[g, p, t] for g in list(
-        prob.groups.keys()) for p in list(grp_ranks[g].keys()) for t in range(len(prob.teams_per_topic[p]))), 'weight_v')
+        prob.groups.keys()) for p in grp_prioritized[g] for t in range(len(prob.teams_per_topic[p]))), 'weight_v')
 
     ############################################################
     # instability
@@ -225,8 +227,8 @@ def model_ip_weighted(prob, config, minimax):
                         m.addConstr(z[g, p, t] == 0,
                                     'c3031_%s_%s_%s' % (g, p, t))
         for g in cal_G:
-            for p in list(grp_ranks[g].keys()):
-                for p2 in list(grp_ranks[g].keys()):
+            for p in grp_prioritized[g]:
+                for p2 in grp_prioritized[g]:
                     if (grp_ranks[g][p2] < grp_ranks[g][p]):
                         for t in range(len(prob.teams_per_topic[p])):
                             for t2 in range(len(prob.teams_per_topic[p2])):
@@ -241,7 +243,7 @@ def model_ip_weighted(prob, config, minimax):
     if minimax > 0:
         for g in cal_G:
             m.addConstr(u[g] ==
-                        quicksum(grp_ranks[g][p] * x[g, p, t] for p in list(grp_ranks[g].keys())
+                        quicksum(grp_ranks[g][p] * x[g, p, t] for p in grp_prioritized[g]
                                  for t in range(len(prob.teams_per_topic[p]))),
                         'u_%s' % (g))
             m.addConstr(f >= u[g], 'minimax_%s' % g)
@@ -251,7 +253,7 @@ def model_ip_weighted(prob, config, minimax):
         for g in cal_G:
             if prob.student_details[prob.groups[g][0]]["stype"]==config.cut_off_type:
                 m.addConstr(config.cut_off >=
-                            quicksum(grp_ranks[g][p] * x[g, p, t] for p in list(grp_ranks[g].keys())
+                            quicksum(grp_ranks[g][p] * x[g, p, t] for p in grp_prioritized[g]
                                     for t in range(len(prob.teams_per_topic[p]))),
                             'cutoff_special_%s' % (g))
  

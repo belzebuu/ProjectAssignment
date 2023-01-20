@@ -1,7 +1,12 @@
 from collections import namedtuple
-
+import itertools
 
 Team = namedtuple("Team", ("team_id", "min", "max", "type"))
+
+
+def flatten_list_of_lists(List: list) -> list:
+    # return [item for sublist in List for item in sublist]
+    return list(itertools.chain.from_iterable(List))
 
 
 class Stat:

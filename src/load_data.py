@@ -25,7 +25,7 @@ class Problem:
     def __init__(self):
         return
 
-    def __init__(self, dirname=None, options=None):
+    def __init__(self, dirname=None, options=None, keep_original_priorities=False):
         if dirname is None and options is None:
             return
         self.cml_options = options
@@ -42,7 +42,8 @@ class Problem:
         self.valid_prjtype = self.type_compliance(dirname)
 
         self.restrictions = self.tighten_restrictions()
-        self.check_student_priorities()
+        
+
         # self.check_tot_capacity()
         try:
             self.check_capacity(options.groups == "pre")
@@ -54,6 +55,10 @@ class Problem:
                 raise SystemExit
 
         self.std_values, self.std_ranks_av, self.std_ranks_min = self.calculate_ranks_and_values()
+        if not keep_original_priorities:
+            self.tighten_student_priorities()
+
+        
         self.write_logs()
         # self.minimax_sol = self.minimax_sol(dirname)
         self.minimax_sol = 0
@@ -177,10 +182,6 @@ class Problem:
             advisors[advisor_id].update({"full_name": x["teachers"].split(",")[0]})
         
 
-    def flatten_list_of_lists(self, List: list) -> list:
-        # return [item for sublist in List for item in sublist]
-        return list(itertools.chain.from_iterable(List))
-
     def read_students(self, dirname):
         students_file = dirname+"/students.csv"
         print("read ", students_file)
@@ -221,8 +222,7 @@ class Problem:
             student_details[s]["priority_list_wties"] = student_details[s]["priority_list"]
             student_details[s]["priority_list"] = process_string(
                 student_details[s]["priority_list"].strip())
-            prj_prioritized = len(self.flatten_list_of_lists(
-                student_details[s]["priority_list"]))
+            prj_prioritized = len(utils.flatten_list_of_lists(student_details[s]["priority_list"]))
             if prj_prioritized < self.cml_options.min_preferences:
                 print("WARNING: " +
                       f" {prj_prioritized} < {self.cml_options.min_preferences} preferences for "+student_details[s]['username'])
@@ -290,7 +290,7 @@ class Problem:
             priorities = self.student_details[u]["priority_list"]
 
             # self.cml_options.min_preferences
-            i = len(self.flatten_list_of_lists(priorities))
+            i = len(utils.flatten_list_of_lists(priorities))
             j = 1
 
             values = {}
@@ -314,7 +314,7 @@ class Problem:
 
             if self.cml_options.prioritize_all or len(priorities) == 0:
                 prj_set = set(self.teams_per_topic.keys()).difference(
-                    set(self.flatten_list_of_lists(priorities)))
+                    set(utils.flatten_list_of_lists(priorities)))
                 prj_set = list(prj_set)
                 if False:  # old way decide a random order but it may lead to suboptimal sol
                     prj_list = random.sample(prj_set, k=len(prj_set))
@@ -409,7 +409,7 @@ class Problem:
 
             valid_prjs = [x for x, item in self.teams_per_topic.items(
             ) if item[0].type in valid_prjtypes[t]]
-            filtered = list(filter(lambda x: x in self.flatten_list_of_lists(
+            filtered = list(filter(lambda x: x in utils.flatten_list_of_lists(
                 self.priorities[s]),  valid_prjs))
             if (len(filtered) <= 1):
                 # prob.std_ranks_av[prob.groups[g][0]])
@@ -506,7 +506,7 @@ class Problem:
                 # file.write(str(len(project_dict)+1)+";;1;"+str(n_stds-capacity)+";"+program+"\n")
                 #project_dict[len(project_dict)+1] = n_stds-capacity
 
-    def check_student_priorities(self) -> None:
+    def tighten_student_priorities(self) -> None:
         
         def remove_absent_prj(plist: list):
             for sub_list in plist: #self.student_details[s]["priority_list"]:

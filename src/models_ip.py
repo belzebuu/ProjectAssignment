@@ -10,6 +10,7 @@ def model_ip(prob, config):
     m = Model('leximin')
 
     grp_ranks = {}
+    grp_prioritized = {}
     max_rank = 0
     cal_G = list(prob.groups.keys())
     cal_P = list(prob.teams_per_topic.keys())
@@ -18,7 +19,8 @@ def model_ip(prob, config):
         #if len(prob.std_ranks_av[s])==len(prob.topics):
         #    grp_ranks[g] = {}
         #else:
-        grp_ranks[g] = prob.std_ranks_av[s]
+        grp_ranks[g] = prob.std_ranks_min[s]
+        grp_prioritized[g] = utils.flatten_list_of_lists(prob.student_details[s]["priority_list"])
         if len(grp_ranks[g]) > max_rank:
             max_rank = len(grp_ranks[g])
 
@@ -73,7 +75,7 @@ def model_ip(prob, config):
             if not p in valid_prjs:
                 for t in range(len(prob.teams_per_topic[p])):
                     m.addConstr(x[g, p, t] == 0, 'not_valid_%s_%s' % (g,p))
-            if not p in grp_ranks[g]: # prob.std_ranks_av[prob.groups[g][0]]:
+            if not p in grp_prioritized[g]: # prob.std_ranks_av[prob.groups[g][0]]:
                 for t in range(len(prob.teams_per_topic[p])):
                     m.addConstr(x[g, p, t] == 0, 'not_ranked_%s_%s' % (g,p))
     # Capacity constraints
@@ -103,7 +105,7 @@ def model_ip(prob, config):
      # put in u the rank assigned to the group
     for g in cal_G:
         m.addConstr(u[g] ==
-                    quicksum(grp_ranks[g][p] * x[g, p, t] for p in grp_ranks[g].keys()
+                    quicksum(grp_ranks[g][p] * x[g, p, t] for p in grp_prioritized[g]
                              for t in range(len(prob.teams_per_topic[p]))),
                     'u_%s' % (g))
         m.addConstr(v >= u[g], 'v_%s' % g)
