@@ -72,10 +72,10 @@ def project_table(ass_std2team, ass_team2std, popularity, max_p, prob):
             team_details[pID]["popularity_details"] = str(popularity[i])
             std_assigned = len(ass_team2std[pID]) if pID in ass_team2std else 0
             team_details[pID]["assigned_stds"] = std_assigned
-            team_details[pID]["places_available"] = prob.team_details[pID]["max_cap"]-std_assigned
-            if (team_details[pID]["places_available"] < 0):
-                sys.exit('project %s has places_available %s ' %
-                         (pID, team_details[pID]["places_available"]))
+            team_details[pID]["places_left"] = prob.team_details[pID]["max_cap"]-std_assigned
+            if (team_details[pID]["places_left"] < 0):
+                sys.exit('project %s has places_left %s ' %
+                         (pID, team_details[pID]["places_left"]))
             if std_assigned == 0:
                 team_details[pID]["team_status"] = "Not used"
             elif prob.team_details[pID]["max_cap"] > std_assigned:
@@ -109,14 +109,16 @@ def project_table(ass_std2team, ass_team2std, popularity, max_p, prob):
                               prob.student_details[sID]["full_name"],
                               prob.student_details[sID]["priority_list"]))
                 filehandle.write("\n")
-
+            team_details[pID]["assigned"] = ", ".join(team_details[pID]["assigned"])
     filehandle.close()
 
     with codecs.open(output1+".json",  "w", "utf-8") as filehandle:
         json.dump(team_details, fp=filehandle, sort_keys=True,
                   indent=4, separators=(',', ': '),  ensure_ascii=False)
-
-    table = pd.DataFrame.from_dict(team_details, orient='index')
+    # "prj_id"
+    columns = ["ID","team","title","teachers","email","type","instit","mini","wl","popularity_tot","popularity_details",
+                "min_cap","max_cap","assigned_stds","places_left","team_status","assigned"]
+    table = pd.DataFrame.from_dict(team_details, orient='index', columns=columns)
     table.to_csv(output1+".csv", sep=";",index=False)
 
 
@@ -254,13 +256,13 @@ def advisor_table(ass_std2team, ass_team2std, problem):
         rest["assigned_groups"]=groups
         rest["capacity_left_grps"]=rest["groups_max"]-groups
         rest["assigned_stds"]=stds
-        rest["capacity_left_stds"]=rest["capacity_max"]-groups
+        rest["capacity_left_stds"]=rest["capacity_max"]-stds
 
     advisors_dict = {k: problem.advisors[k] for k in problem.advisors}
     table = pd.DataFrame.from_dict(advisors_dict, orient='index')
     print(table)
-    columns = ["full_name", "groups_min", "groups_max", "capacity_min", "capacity_max", 
-                "assigned_groups", "capacity_left_grps", "assigned_stds", "capacity_left_stds"]
+    columns = ["full_name", "groups_min", "groups_max", "assigned_groups", "capacity_left_grps", 
+                "capacity_min", "capacity_max", "assigned_stds", "capacity_left_stds"]
     table[columns].to_csv(outfile+".csv", sep=";",index=True,index_label="username")#,columns=columns)
     
     raise SystemExit
