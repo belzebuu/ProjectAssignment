@@ -2,8 +2,13 @@
 #DATADIR=../ProjectAssignment_git_imada/data/
 #DATADIR=/home/marco/workspace/git/TT/ProjectAssignment_git_imada/data
 
-#DATADIR=/home/marco/workspace/git/flask/Assignment/Assign/data/
-DATADIR=/Users/march/workspace/git/flask/Assignment/Assign/data/
+HOST=$(shell hostname)
+
+ifeq (${HOST},ADM-131257-Mac)
+	DATADIR=/Users/march/workspace/git/flask/Assignment/Assign/data/
+else
+	DATADIR=/home/marco/workspace/git/flask/Assignment/Assign/data/
+endif
 
 #CASE=2021-zhiru
 #CASE=2019-bachelor
