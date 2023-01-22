@@ -147,7 +147,7 @@ def student_table(ass_std2team, ass_team2std, prob):
     #filehandle.close()
 
 
-def summarize(ass_std2team, ass_team2std, max_p, prob):
+def summarize(ass_std2team, ass_team2std, max_p, prob) -> None:
     # Now summarise
     # in std output
 
@@ -160,7 +160,7 @@ def summarize(ass_std2team, ass_team2std, max_p, prob):
         std_topic = 0
         teams = 0
         for team in prob.teams_per_topic[i]:
-            pID = str(int(i))+team.team_id
+            pID = str(i)+team.team_id
             std_assigned = len(ass_team2std[pID]) if pID in ass_team2std else 0
             if std_assigned > 0:
                 teams += 1
@@ -178,10 +178,10 @@ def summarize(ass_std2team, ass_team2std, max_p, prob):
         if s not in ass_std2team:
             unassigned = unassigned+1
             continue
-        if ass_std2team[s][0] in prob.flatten_list_of_lists(prob.priorities[s]): #functools.reduce(lambda x,y: x+y, prob.priorities[s])):
+        if ass_std2team[s][0] in utils.flatten_list_of_lists(prob.priorities[s]): #functools.reduce(lambda x,y: x+y, prob.priorities[s])):
             for i in range(len(prob.priorities[s])):
                 if ass_std2team[s][0] in prob.priorities[s][i]:
-                    counter[i] += 1
+                    counter[i] += 1 # corresponds to min rank (rank_min)
                     break
         else:
             unprioritized += 1
@@ -266,7 +266,6 @@ def advisor_table(ass_std2team, ass_team2std, problem):
                 "capacity_min", "capacity_max", "assigned_stds", "capacity_left_stds"]
     table[columns].to_csv(outfile+".csv", sep=";",index=True,index_label="username")#,columns=columns)
     
-    raise SystemExit
 
 def main(argv):
     options, dirname = cml_parser.cml_parse()

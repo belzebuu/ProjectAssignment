@@ -37,42 +37,24 @@ The following files are required:
 See `data/2021-example` for an example of this input.
 
 
-Work flow
-=========
-
-To find an assignment:
-```
-python3 src/main.py data/2021-example/ -g post
-```
-This will output a solution in the directory `sln`.
-
-Check the options available:
-```
-python3 src/main.py -h
-```
-
-To produce different types of reporting:
-```
-python3 src/report_sol_new.py -d data/2021-example/ -s sln/sol_001.txt
-```
-
-
 
 Work flow in association with valkyrien.imada.sdu.dk/BADM500 Portal
 ===================================================================
 
-First, update teams on basis of requirements. Careful it overwrites
-projects.csv and eliminates topics if the supervisor has max_groups 0.
-
-```{bash}
-python3 src/update_projects.py  ${DATADIR}/${CASE}
-# or
-make projects
+Solve the assignment problem with `src/main.py` and the needed parameters. For
+an example, see `Makefile` variable `RUN_FLAGS`. 
+Check the options available:
 ```
+python3 src/main.py -h
+```
+In particular the `-e` option is to distinguish between a `projects.csv` file that already contains the teams or not.
+By default the solution is written in `sln`.
 
-then solve the assignment problem with `src/main.py` and the needed parameters. For
-an example, see `Makefile` targets `psy` and `badm`. The solution is
-written in `sln`.
+To execute:
+```
+make run
+```
+The target `yrun` automatizes an yes answer to all questions.
 
 Next, generate the output in different formats in `out` with:
 
@@ -85,12 +67,3 @@ Finally, publish online:
 make publish
 ```
 
-```
-python3 db_tools/update_cap.py Assign/data/2023-badm500/capacities.tsv --commit
-python3 db_tools/extract_from_db_psy.py Assign/data/2023-badm500/Assignment/ --exclude
-python3 src/update_projects.py /home/marco/workspace/git/flask/Assignment/Assign/data/2023-badm500/Assignment/
-python3 src/main.py /home/marco/workspace/git/flask/Assignment/Assign/data/2023-badm500/Assignment/ --Wmethod owa --groups pre --min_preferences 7  | tee /home/marco/workspace/git/flask/Assignment/Assign/data/2023-badm500/Assignment/owa.txt
-python3 src/report_sol_new.py -s sln/sol_001.txt ~/workspace/git/flask/Assignment/Assign/data/2023-badm500/Assignment/
-python3 src/report_sol.py -s sln/sol_001.txt -d ~/workspace/git/flask/Assignment/Assign/data/2023-badm500/Assignment/
-Rscript scripts/make_gtables.R
-```

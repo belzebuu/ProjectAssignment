@@ -2,8 +2,8 @@
 #DATADIR=../ProjectAssignment_git_imada/data/
 #DATADIR=/home/marco/workspace/git/TT/ProjectAssignment_git_imada/data
 
-DATADIR=/home/marco/workspace/git/flask/Assignment/Assign/data/
-#DATADIR=/Users/march/workspace/git/flask/Assignment/Assign/data/
+#DATADIR=/home/marco/workspace/git/flask/Assignment/Assign/data/
+DATADIR=/Users/march/workspace/git/flask/Assignment/Assign/data/
 
 #CASE=2021-zhiru
 #CASE=2019-bachelor
@@ -19,6 +19,11 @@ PROGRAM=python3
 SOLDIR=sln
 OUTPUTDIR=out
 
+RUN_FLAGS=-i --groups post --min_preferences 7 # 2022-
+RUN_FLAGS=-i --Wmethod owa --groups post --min_preferences 7 --cut_off_type stype --cut_off 2 # 2022-psy
+RUN_FLAGS=--Wmethod owa --groups pre --min_preferences 6 # 2022-BADM500
+RUN_FLAGS=-e --Wmethod owa --groups pre --min_preferences 5 # 2023-BADM500
+
 OUTPUT_FLAGS=--allow_unassigned --min_preferences 5
 OUTPUT_FLAGS=--allow_unassigned --prioritize_all --min_preferences 5
 OUTPUT_FLAGS=-e --min_preferences 5
@@ -30,30 +35,38 @@ projects: # careful, read README.md before use
 $(SOLDIR):
 	mkdir -p sln	
 
+$(OUTPUTDIR):
+	mkdir -p sln	
+
+
 
 assignment: | $(SOLDIR)
 	python3 src/main.py ${DATADIR}/${CASE} -g post
 
 
 psy: | $(SOLDIR)
-	${PROGRAM} src/main.py ${DATADIR}/${CASE} -i --Wmethod owa --groups post --min_preferences 7 --cut_off_type stype --cut_off 2 | tee ${DATADIR}/${CASE}/owa.txt
+	${PROGRAM} src/main.py ${DATADIR}/${CASE}  | tee ${DATADIR}/${CASE}/owa.txt
 
 
 
 badm: | $(SOLDIR)
-	${PROGRAM} src/main.py ${DATADIR}/${CASE} --Wmethod owa --groups pre --min_preferences 6  | tee ${DATADIR}/${CASE}/owa.txt
+	${PROGRAM} src/main.py ${DATADIR}/${CASE} | tee ${DATADIR}/${CASE}/owa.txt
 
 
 
+run:
+	python3 src/main.py ${RUN_FLAGS} ${DATADIR}/${CASE}  | tee ${DATADIR}/${CASE}/owa.txt
 
-$(OUTPUTDIR):
-	mkdir -p sln	
 
+yrun:
+	yes | python3 src/main.py ${RUN_FLAGS} ${DATADIR}/${CASE}  | tee ${DATADIR}/${CASE}/owa.txt
+	
 
 output: | $(OUTPUTDIR)
 	yes | python3 src/report_sol_new.py ${OUTPUT_FLAGS} -s ${SOLDIR}/sol_001.txt ${DATADIR}/${CASE} 
 	yes | python3 src/report_sol.py ${OUTPUT_FLAGS} -s ${SOLDIR}/sol_001.txt ${DATADIR}/${CASE}
 	Rscript scripts/make_gtables.R
+
 
 publish: 
 	#/bin/rm -rf /home/marco/public_html/out/
