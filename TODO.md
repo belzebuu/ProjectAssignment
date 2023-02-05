@@ -1,4 +1,8 @@
-- read directly from Excel?
+- update model_ip_lexicogrphic as the others
+
+- introduce balance as a possible constraint after minmax
+
+- read directly from Excel
 
 - restrictions in a format easier to input
 
