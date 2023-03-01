@@ -1,5 +1,5 @@
 import os
-import load_data as ld
+import adsigno.load_data as ld
 from optparse import OptionParser
 import pandas as pd 
 import os

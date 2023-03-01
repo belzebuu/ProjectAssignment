@@ -1,5 +1,5 @@
 import sys
-import utils
+import adsigno.utils as utils
 
 def search_unstable_students(k, sol, problem, members, soldirname="") -> int:
     # returns number of unstable students        

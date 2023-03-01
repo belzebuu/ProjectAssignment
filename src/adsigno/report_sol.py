@@ -15,10 +15,10 @@ import csv
 import pandas as pd
 from collections import defaultdict
 from collections import OrderedDict
-from load_data import Problem
+from adsigno.load_data import Problem
 import functools
-from report_sol_new import count_popularity
-import cml_parser
+from adsigno.report_sol_new import count_popularity
+import adsigno.cml_parser as cml_parser
 
 studieretninger = False
 # global constants:

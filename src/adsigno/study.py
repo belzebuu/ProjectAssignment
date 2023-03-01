@@ -6,20 +6,20 @@ import getopt
 import os
 from time import perf_counter
 import sys
-from load_data import *
-from utils import *
-from models_ip import *
-from models_ip_weighted import *
-from check_sol import *
+from adsigno.load_data import *
+from adsigno.utils import *
+from adsigno.models_ip import *
+from adsigno.models_ip_weighted import *
+from adsigno.check_sol import *
 
 
 from subprocess import *
 
 # sys.path.append("../tags/PA2013/src/")
-from lottery import *
-from models_ip_instability import *
-from models_ip_envyfree import *
-from models_hooker import *
+from adsigno.lottery import *
+from adsigno.models_ip_instability import *
+from adsigno.models_ip_envyfree import *
+from adsigno.models_hooker import *
 
 
 

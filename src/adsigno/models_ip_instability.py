@@ -1,4 +1,4 @@
-from utils import *
+from adsigno.utils import *
 from time import perf_counter
 from gurobipy import *
 

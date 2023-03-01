@@ -1,30 +1,23 @@
 #! /usr/bin/python
 
-#from matrix import *
-#from dfs_example import dfs
-import os
-from time import perf_counter
-import sys
-from load_data import *
-from utils import *
-from models_ip import *
+from adsigno.utils import *
+from adsigno.models_ip import *
 #from models_ip_scip import *
-from models_ip_weighted import *
-from check_sol import *
-import cml_parser
+from adsigno.models_ip_weighted import *
+from adsigno.check_sol import *
+import adsigno.cml_parser
 
 from subprocess import *
 
 # sys.path.append("../tags/PA2013/src/")
-from lottery import *
-from models_ip_instability import *
-from models_ip_envyfree import *
-from models_hooker import *
+from adsigno.lottery import *
+from adsigno.models_ip_instability import *
+from adsigno.models_ip_envyfree import *
+from adsigno.models_hooker import *
 
 
-def main():
-    options, dirname = cml_parser.cml_parse()
-  
+
+def solve(dirname, options):
     problem = Problem(dirname, options)
     max_topic = max(problem.teams_per_topic.keys())
     
@@ -69,4 +62,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    options, dirname = cml_parser.cml_parse()
+    solve(dirname, options)

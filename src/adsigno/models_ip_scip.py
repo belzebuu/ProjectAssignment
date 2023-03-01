@@ -1,8 +1,8 @@
-from utils import *
-from load_data import *
+from adsigno.utils import *
+from adsigno.load_data import *
 from time import perf_counter
 
-from pyscipopt import *
+# from pyscipopt import *
 
 
 from functools import reduce

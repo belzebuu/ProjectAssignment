@@ -11,10 +11,10 @@ import json
 import pandas as pd
 from collections import defaultdict
 from collections import OrderedDict
-from load_data import Problem
+from adsigno.load_data import Problem
 import functools
-import cml_parser
-import utils
+import adsigno.cml_parser as cml_parser
+import adsigno.utils as utils
 
 def read_solution(solfile):
     ass_std2team = {}

@@ -1,5 +1,5 @@
-from utils import *
-from load_data import *
+from adsigno.utils import *
+from adsigno.load_data import *
 import time
 from gurobipy import *
 from functools import reduce

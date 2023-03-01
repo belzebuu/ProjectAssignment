@@ -35,8 +35,8 @@
 ######################################################################
 
 import sys, random, csv
-from utils import *
-from check_sol import *
+from adsigno.utils import *
+from adsigno.check_sol import *
 
 def Rolfs_greedy(dirname,seed):
 	verbose = False

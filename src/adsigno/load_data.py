@@ -9,13 +9,13 @@ import codecs
 import pandas as pd
 from collections import defaultdict
 from collections import OrderedDict
-import utils
+import adsigno.utils as utils
 
 import itertools
 import random
 import numpy
 import pprint
-import update_projects
+import adsigno.update_projects as update_projects
 
 random.seed(3)
 
