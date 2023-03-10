@@ -2,7 +2,7 @@
 # coding=utf-8
 
 import sys
-#import getopt
+# import getopt
 import os
 import codecs
 import string
@@ -16,6 +16,7 @@ import functools
 import adsigno.cml_parser as cml_parser
 import adsigno.utils as utils
 
+
 def read_solution(solfile):
     ass_std2team = {}
     ass_team2std = defaultdict(set)
@@ -24,10 +25,10 @@ def read_solution(solfile):
     for l in lines:
         l = l.replace("\n", "")
         parts = l.split("\t")
-        ass_std2team[parts[0]] = (int(parts[1]), parts[2])
-        ass_team2std[parts[1]+parts[2]].add(parts[0])
+        ass_std2team[parts[0]] = (int(parts[1]), parts[2].strip())
+        ass_team2std[(parts[1]+parts[2]).strip()].add(parts[0])
 
-    print(ass_std2team, ass_team2std)
+    # print(ass_std2team, ass_team2std)
     return ass_std2team, ass_team2std
 
 
@@ -37,7 +38,8 @@ def check_sol(ass_std2team, ass_team2std, prob, max_p):  # tablefile=''):
         if s not in ass_std2team:
             isok = False
             print(s+" not assigned!")
-        elif ass_std2team[s][0] not in utils.flatten_list_of_lists(prob.priorities[s]): # functools.reduce(lambda x,y: x+y, prob.priorities[s])):
+        # functools.reduce(lambda x,y: x+y, prob.priorities[s])):
+        elif ass_std2team[s][0] not in utils.flatten_list_of_lists(prob.priorities[s]):
             isok = False
             print(s+" assigned to smth not in his priorities!")
 
@@ -60,14 +62,14 @@ def project_table(ass_std2team, ass_team2std, popularity, max_p, prob):
 
     # Print per project in std
     # and collect student assigned for later output
-    output1=os.path.join("out","projects")
-    
+    output1 = os.path.join("out", "projects")
+
     filehandle = open(output1+".txt", "w")
     studentassignments = []
     team_details = OrderedDict()
     for i in sorted(prob.teams_per_topic.keys()):
         for team in prob.teams_per_topic[i]:
-            pID = str(int(i))+team.team_id
+            pID = str(int(i))+team.team_id.strip()
             team_details[pID] = prob.team_details[pID]
             team_details[pID]["popularity_tot"] = sum(popularity[i])
             team_details[pID]["popularity_details"] = str(popularity[i])
@@ -88,63 +90,72 @@ def project_table(ass_std2team, ass_team2std, popularity, max_p, prob):
             if (std_assigned > 0):
                 if "teachers" in team_details[pID]:
                     filehandle.write("%s: %s (advisors: %s; contact: %s) \n" %
-                        (#pID,
-                        team_details[pID]["prj_id"],
-                        team_details[pID]["title"],
-                        team_details[pID]["teachers"],
-                        team_details[pID]["email"],
-                        )
-                        )
+                                     (  # pID,
+                                         team_details[pID]["prj_id"],
+                                         team_details[pID]["title"],
+                                         team_details[pID]["teachers"],
+                                         team_details[pID]["email"],
+                                     )
+                                     )
                 else:
                     filehandle.write("%s: %s\n" %
-                        (#pID,
-                        team_details[pID]["prj_id"],
-                        team_details[pID]["title"]
-                        )
-                        )
+                                     (  # pID,
+                                         team_details[pID]["prj_id"],
+                                         team_details[pID]["title"]
+                                     )
+                                     )
                 for sID in sorted(ass_team2std[pID]):
                     team_details[pID]["assigned"].append(sID)
                     filehandle.write("%s, %s, %s\n" %
-                             (prob.student_details[sID]["email"],
-                              # prob.student_details[sID]["Efternavn"],
-                              prob.student_details[sID]["full_name"],
-                              prob.student_details[sID]["priority_list"]))
+                                     (prob.student_details[sID]["email"],
+                                      # prob.student_details[sID]["Efternavn"],
+                                      prob.student_details[sID]["full_name"],
+                                      prob.student_details[sID]["priority_list"]))
                 filehandle.write("\n")
-            team_details[pID]["assigned"] = ", ".join(team_details[pID]["assigned"])
+            team_details[pID]["assigned"] = ", ".join(
+                team_details[pID]["assigned"])
     filehandle.close()
 
     with codecs.open(output1+".json",  "w", "utf-8") as filehandle:
         json.dump(team_details, fp=filehandle, sort_keys=True,
                   indent=4, separators=(',', ': '),  ensure_ascii=False)
     # "prj_id"
-    columns = ["ID","team","title","teachers","email","type","instit","mini","wl","popularity_tot","popularity_details",
-                "min_cap","max_cap","assigned_stds","places_left","team_status","assigned"]
-    table = pd.DataFrame.from_dict(team_details, orient='index', columns=columns)
-    table.to_csv(output1+".csv", sep=";",index=False)
+    columns = ["ID", "team", "title", "teachers", "email", "type", "instit", "mini", "wl", "popularity_tot", "popularity_details",
+               "min_cap", "max_cap", "assigned_stds", "places_left", "team_status", "assigned"]
+    table = pd.DataFrame.from_dict(
+        team_details, orient='index', columns=columns)
+    table.to_csv(output1+".csv", sep=";", index=False)
 
 
 def student_table(ass_std2team, ass_team2std, prob):
     # Now output to a file the info per student
     # output:
     outfile = os.path.join("out", "students")
-  
-    student_details=OrderedDict()
+
+    student_details = OrderedDict()
     for g in prob.groups.keys():
         for s in prob.groups[g]:
-            student_details[s]=(prob.student_details[s]).copy()
-            student_details[s]["topic_assigned"]=ass_std2team[s][0]
-            student_details[s]["team_assigned"]=ass_std2team[s][1] #"".join(map(str, ass_std2team[s]) )            
-            student_details[s]["priority_assigned"]=prob.std_ranks_min[s][ass_std2team[s][0]]
-  
+            student_details[s] = (prob.student_details[s]).copy()
+            student_details[s]["topic_assigned"] = ass_std2team[s][0]
+            # "".join(map(str, ass_std2team[s]) )
+            student_details[s]["team_assigned"] = ass_std2team[s][1]
+            student_details[s]["priority_assigned"] = prob.std_ranks_min[s][ass_std2team[s][0]]
+
     with codecs.open(outfile+".json",  "w", "utf-8") as filehandle:
         json.dump(student_details, fp=filehandle, sort_keys=True,
                   indent=4, separators=(',', ': '),  ensure_ascii=False)
-  
-    table = pd.DataFrame.from_dict(student_details, orient='index')
-    table.to_csv(outfile+".csv", sep=";",index=False,columns=["username","type","stype","grp_id","topic_assigned","team_assigned","priority_assigned","priority_list_wties"])
 
-    #filehandle = open(outfile+".csv", "w")
-    #filehandle.close()
+    table = pd.DataFrame.from_dict(student_details, orient='index')
+    if "stype" in table.columns:
+        cols = ["username", "type", "stype", "grp_id", "topic_assigned",
+                "team_assigned", "priority_assigned", "priority_list_wties"]
+    else:
+        cols = ["username", "type", "grp_id", "topic_assigned",
+                "team_assigned", "priority_assigned", "priority_list_wties"]
+    table.to_csv(outfile+".csv", sep=";", index=False, columns=cols)
+
+    # filehandle = open(outfile+".csv", "w")
+    # filehandle.close()
 
 
 def summarize(ass_std2team, ass_team2std, max_p, prob) -> None:
@@ -160,7 +171,7 @@ def summarize(ass_std2team, ass_team2std, max_p, prob) -> None:
         std_topic = 0
         teams = 0
         for team in prob.teams_per_topic[i]:
-            pID = str(i)+team.team_id
+            pID = str(i)+team.team_id.strip()
             std_assigned = len(ass_team2std[pID]) if pID in ass_team2std else 0
             if std_assigned > 0:
                 teams += 1
@@ -178,16 +189,18 @@ def summarize(ass_std2team, ass_team2std, max_p, prob) -> None:
         if s not in ass_std2team:
             unassigned = unassigned+1
             continue
-        if ass_std2team[s][0] in utils.flatten_list_of_lists(prob.priorities[s]): #functools.reduce(lambda x,y: x+y, prob.priorities[s])):
+        # functools.reduce(lambda x,y: x+y, prob.priorities[s])):
+        if ass_std2team[s][0] in utils.flatten_list_of_lists(prob.priorities[s]):
             for i in range(len(prob.priorities[s])):
                 if ass_std2team[s][0] in prob.priorities[s][i]:
-                    counter[i] += 1 # corresponds to min rank (rank_min)
+                    counter[i] += 1  # corresponds to min rank (rank_min)
                     break
         else:
             unprioritized += 1
 
     s = "\n\nNumb. of students: "+str(len(prob.student_details))
-    s = s+"\nNumb. of active topics/topics offered: "+str(count_prj)+"/"+str(len(prob.teams_per_topic))
+    s = s+"\nNumb. of active topics/topics offered: " + \
+        str(count_prj)+"/"+str(len(prob.teams_per_topic))
     s = s+"\nNumb. of active teams/teams offered: " + \
         str(count_teams)+"/"+str(len(prob.team_details))
     s = s+"\nStudents unassigned: "+str(unassigned)
@@ -207,7 +220,7 @@ def summarize(ass_std2team, ass_team2std, max_p, prob) -> None:
 
 def count_popularity(prob):
     outfile = os.path.join("out", "popularity")
-    
+
     popularity = {}
     max_p = 0
     students = list(prob.student_details.keys())
@@ -220,60 +233,64 @@ def count_popularity(prob):
         for i in range(len(prob.priorities[s])):
             for pId in prob.priorities[s][i]:
                 if pId not in prob.teams_per_topic.keys():
-                    continue  # pId = int(prob.priorities[s][i])            
+                    continue  # pId = int(prob.priorities[s][i])
                 popularity[pId][i] += 1
-    
-    topic_popularity=OrderedDict()
-    for item in sorted(popularity.items(), key = lambda x: x[1][0], reverse=True ):
+
+    topic_popularity = OrderedDict()
+    for item in sorted(popularity.items(), key=lambda x: x[1][0], reverse=True):
         i = item[0]
-        pID = str(i)+prob.teams_per_topic[i][0].team_id
+        pID = str(i)+prob.teams_per_topic[i][0].team_id.strip()
         topic_popularity[i] = (prob.team_details[pID]).copy()
         for j in range(max_p):
-            topic_popularity[i][str(j+1)+". prio."]=popularity[i][j]
-        topic_popularity[i]["tot_popularity"]=sum(popularity[i])
+            topic_popularity[i][str(j+1)+". prio."] = popularity[i][j]
+        topic_popularity[i]["tot_popularity"] = sum(popularity[i])
 
     table = pd.DataFrame.from_dict(topic_popularity, orient='index')
-    columns = ["title","type","instit","tot_popularity"]+[str(j+1)+". prio." for j in range(max_p)]
-    table.to_csv(outfile+".csv", sep=";",index=True,index_label="ID",columns=columns)
+    columns = ["title", "type", "instit", "tot_popularity"] + \
+        [str(j+1)+". prio." for j in range(max_p)]
+    table.to_csv(outfile+".csv", sep=";", index=True,
+                 index_label="ID", columns=columns)
 
     return popularity, max_p
+
 
 def advisor_table(ass_std2team, ass_team2std, problem):
     outfile = os.path.join("out", "advisors")
     print(ass_std2team)
     print(ass_team2std)
-    
+
     for _, rest in problem.advisors.items():
-        groups=0
-        stds=0
+        groups = 0
+        stds = 0
         for topic in rest["topics"]:
             if topic in problem.teams_per_topic:
                 for team in problem.teams_per_topic[topic]:
                     team_id = str(topic)+team.team_id
                     if team_id in ass_team2std:
-                        groups+=1
-                        stds+=len(ass_team2std[team_id])
-        #rest["full_name"]=problem.advisors[rest["username"]]["full_name"] if rest["username"] in problem.advisors else ""
-        rest["assigned_groups"]=groups
-        rest["capacity_left_grps"]=rest["groups_max"]-groups
-        rest["assigned_stds"]=stds
-        rest["capacity_left_stds"]=rest["capacity_max"]-stds
+                        groups += 1
+                        stds += len(ass_team2std[team_id])
+        # rest["full_name"]=problem.advisors[rest["username"]]["full_name"] if rest["username"] in problem.advisors else ""
+        rest["assigned_groups"] = groups
+        rest["capacity_left_grps"] = rest["groups_max"]-groups
+        rest["assigned_stds"] = stds
+        rest["capacity_left_stds"] = rest["capacity_max"]-stds
 
     advisors_dict = {k: problem.advisors[k] for k in problem.advisors}
     table = pd.DataFrame.from_dict(advisors_dict, orient='index')
     print(table)
-    columns = ["full_name", "groups_min", "groups_max", "assigned_groups", "capacity_left_grps", 
-                "capacity_min", "capacity_max", "assigned_stds", "capacity_left_stds"]
-    table[columns].to_csv(outfile+".csv", sep=";",index=True,index_label="username")#,columns=columns)
-    
+    columns = ["full_name", "groups_min", "groups_max", "assigned_groups", "capacity_left_grps",
+               "capacity_min", "capacity_max", "assigned_stds", "capacity_left_stds"]
+    table[columns].to_csv(outfile+".csv", sep=";", index=True,
+                          index_label="username")  # ,columns=columns)
+
 
 def main(argv):
     options, dirname = cml_parser.cml_parse()
-    
-    problem = Problem(dirname,options, True)
-    ass_std2team, ass_team2std = read_solution(options.solution_file)    
+
+    problem = Problem(dirname, options, True)
+    ass_std2team, ass_team2std = read_solution(options.solution_file)
     S = set(ass_team2std.keys()) - set(problem.team_details.keys())
-    
+
     if len(S) > 0:
         if options.allow_unassigned:
             N = max(problem.teams_per_topic.keys())
@@ -283,14 +300,15 @@ def main(argv):
             print(problem.team_details)
         else:
             raise SystemExit("Some team assigned not among those available")
-    
+
     popularity, max_p = count_popularity(problem)
     if not check_sol(ass_std2team, ass_team2std, problem, max_p):
         print("WARNING: Solution infeasible")
     project_table(ass_std2team, ass_team2std, popularity, max_p, problem)
     # institute_wise()
     student_table(ass_std2team, ass_team2std, problem)
-    advisor_table(ass_std2team, ass_team2std, problem)
+    if len(problem.restrictions) > 0:
+        advisor_table(ass_std2team, ass_team2std, problem)
     summarize(ass_std2team, ass_team2std, max_p, problem)
 
 

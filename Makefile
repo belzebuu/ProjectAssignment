@@ -11,7 +11,7 @@ else
 endif
 DATADIR=/home/marco/workspace/git/TT/ProjectAssignment_git_imada/data
 
-DATADIR=/home/marco/Teaching/Bachelor/aaskh20/student_alloc/media
+#DATADIR=/home/marco/Teaching/Bachelor/aaskh20/student_alloc/media
 #CASE=2021-zhiru
 #CASE=2019-bachelor
 #CASE=2021-psy
@@ -22,12 +22,14 @@ DATADIR=/home/marco/Teaching/Bachelor/aaskh20/student_alloc/media
 CASE=2023-badm500/Assignment
 CASE=2022-ff501
 CASE=28022023_133345
+CASE=2023-ff501
 
-PROGRAM=python3
+
 SOLDIR=sln
 OUTPUTDIR=out
 
-ENTRY=src/adsigno/__main__.py
+PROGRAM=python3 src/adsigno/__main__.py
+#PROGRAM=python3 -m adsigno 
 
 RUN_FLAGS=-i --Wmethod owa --groups post --min_preferences 7 --cut_off_type stype --cut_off 2 # 2022-psy
 RUN_FLAGS=--Wmethod owa --groups pre --min_preferences 6 # 2022-BADM500
@@ -37,6 +39,7 @@ RUN_FLAGS=-i --groups post --min_preferences 7 # 2022-
 OUTPUT_FLAGS=--allow_unassigned --min_preferences 5
 OUTPUT_FLAGS=--allow_unassigned --prioritize_all --min_preferences 5
 OUTPUT_FLAGS=-e --min_preferences 7
+OUTPUT_FLAGS=-g post -w owa -i -m 7
 
 projects: # careful, read README.md before use
 	python3 src/update_projects.py  ${DATADIR}/${CASE}
@@ -51,25 +54,28 @@ $(OUTPUTDIR):
 
 
 assignment: | $(SOLDIR)
-	python3 ${ENTRY} ${DATADIR}/${CASE} -g post
+	${PROGRAM} ${DATADIR}/${CASE} -g post
 
 
 psy: | $(SOLDIR)
-	${PROGRAM} ${ENTRY} ${DATADIR}/${CASE}  | tee ${DATADIR}/${CASE}/owa.txt
+	${PROGRAM} ${DATADIR}/${CASE}  | tee ${DATADIR}/${CASE}/log.txt
 
 
 
 badm: | $(SOLDIR)
-	${PROGRAM} ${ENTRY} ${DATADIR}/${CASE} | tee ${DATADIR}/${CASE}/owa.txt
+	${PROGRAM} ${DATADIR}/${CASE} | tee ${DATADIR}/${CASE}/log.txt
 
+
+ff501: $(SOLDIR)
+	${PROGRAM} -g post -w owa -i -m 7 ${DATADIR}/${CASE} | tee ${DATADIR}/${CASE}/log.txt
 
 
 run:
-	python3 ${ENTRY} ${RUN_FLAGS} ${DATADIR}/${CASE}  | tee ${DATADIR}/${CASE}/owa.txt
+	python3 ${ENTRY} ${RUN_FLAGS} ${DATADIR}/${CASE}  | tee ${DATADIR}/${CASE}/log.txt
 
 
 yrun:
-	yes | python3 ${ENTRY} ${RUN_FLAGS} ${DATADIR}/${CASE}  | tee ${DATADIR}/${CASE}/owa.txt
+	yes | python3 ${ENTRY} ${RUN_FLAGS} ${DATADIR}/${CASE}  | tee ${DATADIR}/${CASE}/log.txt
 	
 
 output: | $(OUTPUTDIR)
@@ -83,8 +89,8 @@ publish:
 	#/bin/mkdir -p /home/marco/public_html/out/
 	#/bin/cp -rf out /home/marco/public_html/
 	#cp -f out/* /home/marco/public_html/ff501-2022/
-	cp -f out/* ~/public_html/BADM500/2023/a/
-
+	#cp -f out/* ~/public_html/BADM500/2023/a/
+	cp -f out/* ~/public_html/Teaching/FF501/Ekstern/2023/out
  
 install: #editable install
 	pip3.8 install -e .

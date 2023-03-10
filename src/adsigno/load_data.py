@@ -33,9 +33,11 @@ class Problem:
 
         self.student_details, self.priorities, self.groups, self.std_type = self.read_students(
             dirname)
-        self.restrictions, self.advisors = self.read_restrictions(dirname)
-        self.team_details, self.teams_per_topic = self.read_projects(dirname)
-        self.add_info_advisors_record(self.advisors)
+        self.restrictions = self.read_restrictions(dirname)
+        self.team_details, self.teams_per_topic, self.advisors = self.read_projects(dirname)
+        for k in self.restrictions:
+            self.advisors[k["username"].lower()].update(k)
+        
         #DF = pd.DataFrame.from_dict(self.team_details,orient="index")
         #print(DF)
         #raise SystemError
@@ -51,8 +53,8 @@ class Problem:
             if options.allow_unassigned:
                 self.add_capacity(options.groups == "pre")
             else:
-                print(e.message())
-                raise SystemExit
+                print(e)
+                #raise SystemExit
 
         self.std_values, self.std_ranks_av, self.std_ranks_min = self.calculate_ranks_and_values()
         if not keep_original_priorities:
@@ -80,11 +82,11 @@ class Problem:
         if self.cml_options.expand_topics:
             topic_details = self.read_topics(dirname)
             team_details = update_projects.expand_topics(topic_details, self.restrictions)
-            teams_per_topic = self.arrange_teams_per_topic(team_details)
+            teams_per_topic, advisors = self.arrange_teams_per_topic(team_details)
         else:
             team_details = self.read_teams(dirname)
-            teams_per_topic = self.arrange_teams_per_topic(team_details)
-        return team_details, teams_per_topic
+            teams_per_topic, advisors = self.arrange_teams_per_topic(team_details)
+        return team_details, teams_per_topic, advisors
 
 
 
@@ -101,8 +103,15 @@ class Problem:
         print(project_table)
         project_table.team = project_table.team.fillna('')
         project_table.instit = project_table.instit.fillna('')
-        project_table.email = project_table.email.apply(lambda x: x.lower())
+        if "email" in project_table.columns:
+            project_table.email = project_table.email.apply(lambda x: str(x).lower())
+        else:
+            project_table.email = project_table.ID.apply(lambda x: str(x).lower())
+        if "proj_id" in project_table.columns:
+            project_table.rename(columns={"proj_id":"prj_id"},inplace=True)
+        
         project_table.prj_id = project_table.prj_id.astype(str)
+    
         project_table.ID = project_table.ID.astype(int)
         project_table.index = project_table["ID"].astype(
             str)+project_table["team"].astype(str)  # project_table["prj_id"]
@@ -125,35 +134,48 @@ class Problem:
         # Gruppeplacering=(len(line) > 6 and line[8] or "")
         # Gruppeplacering=(((len(line)>6 and len(line)==12) and line[11]) or (len(line)>6 and line[10]) or "") # to take into account format before 2012
         # )
-
+        
         print(project_table.type.unique())
         return team_details
 
     def arrange_teams_per_topic(self, team_details):
         teams_per_topic_short = defaultdict(list)
         for k, v in team_details.items():
-            teams_per_topic_short[v["ID"]] += list(v["team"]) 
-        #    k: list(v) for k, v in project_table.groupby('ID')['team']}
+            label = v["team"] if len(v["team"])>0 else " "
+            teams_per_topic_short[v["ID"]] += list(label) 
+            #    k: list(v) for k, v in project_table.groupby('ID')['team']}
 
         # full_details_dict = {k: v.to_dict("records") for k, v in project_table.groupby("ID")}
         # print(exam_dict)
         #print(teams_per_topic_short)
         
         teams_per_topic = defaultdict(list)
-
-        for topic in teams_per_topic_short:
+        
+        for topic in teams_per_topic_short.keys():
             for t in teams_per_topic_short[topic]:
-                _id = str(topic)+t
+                _id = str(topic)+t.strip()
                 teams_per_topic[topic].append(utils.Team(t,
                                                          team_details[_id]["min_cap"],
                                                          team_details[_id]["max_cap"],
                                                          team_details[_id]["type"]
                                                          )
                                               )
-        #print(team_details)
-        #print(teams_per_topic)
+        
+        advisors=dict()
+        for _, x in team_details.items(): # doubles should just be overwritten
+            advisor_id = x["email"].split("@")[0].strip()
+            d={"teams_id": [_]}
+            if "teachers" in x:
+                d.update( {"full_name": x["teachers"].split(",")[0]} )
+            if advisor_id not in advisors:
+                advisors[advisor_id] = d
+            else:
+                advisors[advisor_id]["teams_id"]+=[_]
+      
+        #print(team_details.keys())
+        #print(teams_per_topic.keys())
         #raise SystemExit
-        return (dict(teams_per_topic))
+        return dict(teams_per_topic), dict(sorted(advisors.items()))
 
 
     def read_topics(self, dirname):
@@ -175,11 +197,6 @@ class Problem:
         
         return topic_details
 
-
-    def add_info_advisors_record(self, advisors):
-        for _, x in self.team_details.items():
-            advisor_id = x["email"].split("@")[0].strip()
-            advisors[advisor_id].update({"full_name": x["teachers"].split(",")[0]})
         
 
     def read_students(self, dirname):
@@ -359,9 +376,8 @@ class Problem:
             restrictions = json.load(jsonfile)
         for r in restrictions["nteams"]:
             r["username"] = r["username"].lower()
-        #print({x["username"]: x["groups_max"] for x in restrictions["nteams"]})
-        advisors = {k["username"].lower(): k for k in restrictions["nteams"]}
-        return restrictions["nteams"], dict(sorted(advisors.items()))
+        #print({x["username"]: x["groups_max"] for x in restrictions["nteams"]})        
+        return restrictions["nteams"] 
 
     def tighten_restrictions(self):
         # Adjust for topics not available
@@ -387,8 +403,8 @@ class Problem:
         except csv.Error as e:
             sys.exit('file %s, line %d: %s' %
                      ("/restrictions.csv", reader.line_num, e))
-        advisors = {k["username"].lower(): k for k in restrictions}
-        return restrictions, dict(sorted(advisors.items()))
+        
+        return restrictions
 
     def type_compliance(self, dirname):
         """ reads types """
@@ -401,22 +417,24 @@ class Problem:
             sys.exit('file %s, line %d: %s' %
                      ("/types.csv", reader.line_num, e))
             # return {'biologi': ["alle", "natbidat"],"farmaci": ["alle","farmaci"],"natbidat": ["alle","natbidat"]}
-        print(valid_prjtypes)
+        print("In students:", {x for _,x in self.std_type.items()})
+        print("In projects:", {x["type"] for _,x in self.team_details.items()})
+        print("In types:",valid_prjtypes)
 
         # check
         for s in self.std_type:
             t = self.std_type[s]
 
-            valid_prjs = [x for x, item in self.teams_per_topic.items(
-            ) if item[0].type in valid_prjtypes[t]]
-            filtered = list(filter(lambda x: x in utils.flatten_list_of_lists(
-                self.priorities[s]),  valid_prjs))
+            valid_prjs = [x for x, item in self.teams_per_topic.items() if item[0].type in valid_prjtypes[t]]
+            filtered = list(filter(lambda x: x in utils.flatten_list_of_lists(self.priorities[s]),  valid_prjs))
             if (len(filtered) <= 1):
                 # prob.std_ranks_av[prob.groups[g][0]])
-                print(s, valid_prjtypes[t], self.std_type[s], sorted(
-                    self.priorities[s]))
-                print(valid_prjs, filtered, self.priorities)
-                raise SystemExit("type_compliance: degenerate priority list")
+                
+                print(s, self.std_type[s],  valid_prjtypes[t])
+                print(sorted(utils.flatten_list_of_lists(self.priorities[s])), sorted(valid_prjs), filtered) #, self.priorities)
+                print([item[0].type for x, item in self.teams_per_topic.items()])
+                print(self.teams_per_topic.keys())
+                raise SystemError("type_compliance: degenerate priority list")
 
         return valid_prjtypes
 
@@ -489,10 +507,9 @@ class Problem:
         print("-"*70)
 
         if n_stds > n_places:
-            raise utils.MissingCapacity(
-                "Potential places not enough for all students")
+            raise utils.MissingCapacity("After restrictions, potential places not enough for all students. Ignore if restictions not globally set.")
         elif n_groups > n_teams and pre_grouping:
-            raise utils.MissingCapacity("No teams enough to cover all groups")
+            raise utils.MissingCapacity("After restrictions, no teams enough to cover all groups. Ignore if restrictions not globally set.")
 
     def check_tot_capacity(self) -> None:
         capacity = sum([self.team_details[k]["max_cap"]

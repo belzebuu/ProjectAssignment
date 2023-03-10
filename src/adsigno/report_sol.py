@@ -17,8 +17,9 @@ from collections import defaultdict
 from collections import OrderedDict
 from adsigno.load_data import Problem
 import functools
-from adsigno.report_sol_new import count_popularity
+from adsigno.report_sol_new import read_solution, count_popularity
 import adsigno.cml_parser as cml_parser
+
 
 studieretninger = False
 # global constants:
@@ -84,20 +85,6 @@ def scansol(tablefile):
         ass_team2std[maps[parts[0]][1]+maps[parts[0]][2]].add(maps[parts[0]][0])
 
 
-def read_solution(solfile):
-    ass_std2team = {}
-    ass_team2std = defaultdict(set)
-    with open(solfile) as f:
-        lines = f.readlines()
-    for l in lines:
-        l = l.replace("\n", "")
-        parts = l.split("\t")
-        ass_std2team[parts[0]] = [int(parts[1]), parts[2]]
-        ass_team2std[parts[1]+parts[2]].add(parts[0])
-
-    return ass_std2team, ass_team2std
-
-
 def check_sol(ass_std2team, ass_team2std, prob, popularity, max_p):  # tablefile=''):
     # Print per project in std
     # and collect studnet assigned for later output
@@ -106,7 +93,7 @@ def check_sol(ass_std2team, ass_team2std, prob, popularity, max_p):  # tablefile
     studentassignments = []
     for i in sorted(prob.teams_per_topic.keys()):
         for team in prob.teams_per_topic[i]:
-            pID = str(int(i))+team.team_id
+            pID = str(int(i))+team.team_id.strip()
             s = "ProjectID: "+prob.team_details[pID]["prj_id"]+prob.team_details[pID]["team"]+"\n"
             s = s + "Project title: \""+prob.team_details[pID]["title"]+"\""+"\n"
             s = s + "Popularity: (tot. "+str(popularity[i][0])+") " + \
