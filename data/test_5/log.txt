@@ -1,0 +1,241 @@
+!!python/object:optparse.Values
+Wmethod: owa
+allow_unassigned: false
+allsol: false
+cut_off: 10
+cut_off_type: null
+expand_topics: false
+groups: post
+instability: true
+min_preferences: 7
+prioritize_all: false
+solution_file: null
+
+read  /home/cres/Dokumenter/Datalogi/Bachelor/resources/ProjectAssignment-master/data/test_5/students.csv
+          grp_id username  ...                   email         timestamp
+username                   ...                                          
+sojej21        1  sojej21  ...  sojej21@student.sdu.dk  25-02-2022 16:15
+maan321        2  maan321  ...  maan321@student.sdu.dk  25-02-2022 16:21
+magpe21        3  magpe21  ...  magpe21@student.sdu.dk  25-02-2022 16:27
+idmeu21        4  idmeu21  ...  idmeu21@student.sdu.dk  25-02-2022 16:39
+mjess21        5  mjess21  ...  mjess21@student.sdu.dk  25-02-2022 17:01
+...          ...      ...  ...                     ...               ...
+majah21      290  majah21  ...  majah21@student.sdu.dk  04-03-2022 11:37
+mahed21      291  mahed21  ...  mahed21@student.sdu.dk  04-03-2022 11:39
+saduk21      292  saduk21  ...  saduk21@student.sdu.dk  04-03-2022 11:44
+hamar21      293  hamar21  ...  hamar21@student.sdu.dk  04-03-2022 11:51
+shpat21      294  shpat21  ...  shpat21@student.sdu.dk  04-03-2022 12:16
+
+[273 rows x 8 columns]
+read  /home/cres/Dokumenter/Datalogi/Bachelor/resources/ProjectAssignment-master/data/test_5/projects.csv
+    ID team  ...    teachers       email
+0   64    a  ...  no_teacher  no_teacher
+1   50    a  ...  no_teacher  no_teacher
+2   50    b  ...  no_teacher  no_teacher
+3    2    a  ...  no_teacher  no_teacher
+4   48    a  ...  no_teacher  no_teacher
+..  ..  ...  ...         ...         ...
+80  15    b  ...  no_teacher  no_teacher
+81  15    c  ...  no_teacher  no_teacher
+82  62    a  ...  no_teacher  no_teacher
+83  53    a  ...  no_teacher  no_teacher
+84  12    a  ...  no_teacher  no_teacher
+
+[85 rows x 13 columns]
+['Biologi, Biomedicin, BMB og Kemi' 'alle' 'Farmaci']
+In students: {'kemi', 'farmaci', 'bmb', 'biomedicin', 'biologi'}
+In projects: {'Farmaci', 'alle', 'Biologi, Biomedicin, BMB og Kemi'}
+In types: {'farmaci': ['alle', 'Farmaci'], 'bmb': ['alle', 'Biologi, Biomedicin, BMB og Kemi'], 'biologi': ['alle', 'Biologi, Biomedicin, BMB og Kemi'], 'biomedicin': ['alle', 'Biologi, Biomedicin, BMB og Kemi'], 'kemi': ['alle', 'Biologi, Biomedicin, BMB og Kemi']}
+----------------------------------------------------------------------
+Number of students: 273 on number of places available: 26180
+Number of student groups: 273 on number of teams available: 85
+----------------------------------------------------------------------
+Read instance... Done
+{64: [Team(team_id='a', min=3, max=5, type='Biologi, Biomedicin, BMB og Kemi')], 50: [Team(team_id='a', min=3, max=5, type='Biologi, Biomedicin, BMB og Kemi'), Team(team_id='b', min=3, max=5, type='Biologi, Biomedicin, BMB og Kemi')], 2: [Team(team_id='a', min=3, max=5, type='alle')], 48: [Team(team_id='a', min=3, max=5, type='alle'), Team(team_id='b', min=3, max=5, type='alle')], 41: [Team(team_id='a', min=3, max=5, type='Biologi, Biomedicin, BMB og Kemi')], 21: [Team(team_id='a', min=3, max=5, type='alle')], 56: [Team(team_id='a', min=3, max=5, type='alle')], 63: [Team(team_id='a', min=3, max=6, type='Farmaci')], 32: [Team(team_id='a', min=3, max=5, type='alle')], 26: [Team(team_id='a', min=3, max=5, type='Biologi, Biomedicin, BMB og Kemi'), Team(team_id='b', min=3, max=5, type='Biologi, Biomedicin, BMB og Kemi')], 30: [Team(team_id='a', min=3, max=3, type='Biologi, Biomedicin, BMB og Kemi')], 6: [Team(team_id='a', min=3, max=4, type='alle')], 34: [Team(team_id='a', min=3, max=3, type='Biologi, Biomedicin, BMB og Kemi')], 58: [Team(team_id='a', min=3, max=3, type='alle')], 54: [Team(team_id='a', min=3, max=5, type='Biologi, Biomedicin, BMB og Kemi')], 18: [Team(team_id='a', min=3, max=4, type='Biologi, Biomedicin, BMB og Kemi')], 10: [Team(team_id='a', min=3, max=5, type='Biologi, Biomedicin, BMB og Kemi')], 51: [Team(team_id='a', min=3, max=6, type='Farmaci')], 24: [Team(team_id='a', min=3, max=5, type='Farmaci')], 29: [Team(team_id='a', min=3, max=4, type='alle')], 42: [Team(team_id='a', min=3, max=5, type='Farmaci')], 57: [Team(team_id='a', min=3, max=5, type='alle'), Team(team_id='b', min=3, max=5, type='alle')], 35: [Team(team_id='a', min=3, max=5, type='Biologi, Biomedicin, BMB og Kemi')], 7: [Team(team_id='a', min=3, max=6, type='Biologi, Biomedicin, BMB og Kemi')], 49: [Team(team_id='a', min=3, max=5, type='Biologi, Biomedicin, BMB og Kemi')], 44: [Team(team_id='a', min=3, max=4, type='Biologi, Biomedicin, BMB og Kemi')], 31: [Team(team_id='a', min=3, max=4, type='Biologi, Biomedicin, BMB og Kemi')], 52: [Team(team_id='a', min=3, max=4, type='alle')], 8: [Team(team_id='a', min=3, max=5, type='Biologi, Biomedicin, BMB og Kemi'), Team(team_id='b', min=3, max=5, type='Biologi, Biomedicin, BMB og Kemi')], 25: [Team(team_id='a', min=3, max=4, type='Biologi, Biomedicin, BMB og Kemi')], 22: [Team(team_id='a', min=3, max=6, type='Farmaci')], 55: [Team(team_id='a', min=3, max=5, type='Biologi, Biomedicin, BMB og Kemi')], 59: [Team(team_id='a', min=3, max=5, type='alle'), Team(team_id='b', min=3, max=5, type='alle'), Team(team_id='c', min=3, max=5, type='alle')], 61: [Team(team_id='a', min=3, max=5, type='alle')], 28: [Team(team_id='a', min=3, max=5, type='alle'), Team(team_id='b', min=3, max=5, type='alle'), Team(team_id='c', min=3, max=5, type='alle'), Team(team_id='d', min=3, max=5, type='alle'), Team(team_id='e', min=3, max=5, type='alle'), Team(team_id='f', min=3, max=5, type='alle'), Team(team_id='g', min=3, max=5, type='alle'), Team(team_id='h', min=3, max=5, type='alle')], 36: [Team(team_id='a', min=3, max=5, type='Biologi, Biomedicin, BMB og Kemi')], 13: [Team(team_id='a', min=3, max=4, type='alle'), Team(team_id='b', min=3, max=4, type='alle')], 20: [Team(team_id='a', min=3, max=5, type='alle')], 47: [Team(team_id='a', min=3, max=4, type='Biologi, Biomedicin, BMB og Kemi')], 40: [Team(team_id='a', min=3, max=4, type='Biologi, Biomedicin, BMB og Kemi')], 38: [Team(team_id='a', min=3, max=5, type='Biologi, Biomedicin, BMB og Kemi')], 5: [Team(team_id='a', min=3, max=6, type='alle')], 14: [Team(team_id='a', min=3, max=4, type='alle')], 27: [Team(team_id='a', min=3, max=5, type='alle'), Team(team_id='b', min=3, max=5, type='alle')], 17: [Team(team_id='a', min=3, max=5, type='Biologi, Biomedicin, BMB og Kemi')], 23: [Team(team_id='a', min=3, max=6, type='Farmaci')], 16: [Team(team_id='a', min=3, max=5, type='Farmaci')], 46: [Team(team_id='a', min=3, max=5, type='Biologi, Biomedicin, BMB og Kemi'), Team(team_id='b', min=3, max=5, type='Biologi, Biomedicin, BMB og Kemi')], 9: [Team(team_id='a', min=3, max=4, type='Biologi, Biomedicin, BMB og Kemi')], 3: [Team(team_id='a', min=3, max=4, type='alle')], 37: [Team(team_id='a', min=3, max=5, type='alle'), Team(team_id='b', min=3, max=5, type='alle'), Team(team_id='c', min=3, max=5, type='alle')], 1: [Team(team_id='a', min=3, max=4, type='alle')], 33: [Team(team_id='a', min=3, max=4, type='Biologi, Biomedicin, BMB og Kemi')], 19: [Team(team_id='a', min=3, max=5, type='Biologi, Biomedicin, BMB og Kemi')], 39: [Team(team_id='a', min=3, max=5, type='Farmaci')], 11: [Team(team_id='a', min=3, max=5, type='Biologi, Biomedicin, BMB og Kemi')], 60: [Team(team_id='a', min=3, max=6, type='Biologi, Biomedicin, BMB og Kemi')], 4: [Team(team_id='a', min=3, max=6, type='Farmaci')], 43: [Team(team_id='a', min=3, max=6, type='Farmaci')], 45: [Team(team_id='a', min=3, max=4, type='Biologi, Biomedicin, BMB og Kemi')], 15: [Team(team_id='a', min=3, max=5, type='alle'), Team(team_id='b', min=3, max=5, type='alle'), Team(team_id='c', min=3, max=5, type='alle')], 62: [Team(team_id='a', min=5, max=5, type='alle')], 53: [Team(team_id='a', min=3, max=6, type='Farmaci')], 12: [Team(team_id='a', min=3, max=5, type='alle')]}
+Set parameter Username
+Academic license - for non-commercial use only - expires 2024-02-23
+Warning: linear constraint 2 and linear constraint 3 have the same name "not_ranked_1_50"
+Gurobi Optimizer version 10.0.1 build v10.0.1rc0 (linux64)
+
+CPU model: AMD Ryzen 7 4700U with Radeon Graphics, instruction set [SSE2|AVX|AVX2]
+Thread count: 8 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 26360 rows, 23564 columns and 151855 nonzeros
+Model fingerprint: 0x70173d1c
+Variable types: 0 continuous, 23564 integer (23290 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 2e+01]
+  Objective range  [1e+00, 1e+00]
+  Bounds range     [1e+00, 2e+01]
+  RHS range        [1e+00, 3e+04]
+Presolve removed 25819 rows and 21214 columns
+Presolve time: 0.05s
+Presolved: 541 rows, 2350 columns, 6316 nonzeros
+Variable types: 0 continuous, 2350 integer (2325 binary)
+
+Root relaxation: objective 7.000000e+00, 648 iterations, 0.00 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0    7.00000    0    9          -    7.00000      -     -    0s
+H    0     0                       7.0000000    7.00000  0.00%     -    0s
+
+Explored 1 nodes (648 simplex iterations) in 0.08 seconds (0.07 work units)
+Thread count was 8 (of 8 available processors)
+
+Solution count 1: 7 
+
+Optimal solution found (tolerance 1.00e-04)
+Best objective 7.000000000000e+00, best bound 7.000000000000e+00, gap 0.0000%
+Number of solutions:  1
+feasible solution
+Numb. of students: 273
+Numb. of groups: 273
+Numb. of topics: 64
+
+Numb. of unassigned students: 0
+Numb. of underfull teams: 0
+Students assigned outside of their area:  97
+
+Numb. of unstable: 47
+Tot. util: 1204
+Tot. envy: 820
+
+1. prioritet: 21
+2. prioritet: 42
+3. prioritet: 32
+4. prioritet: 35
+5. prioritet: 46
+6. prioritet: 46
+7. prioritet: 51
+8. prioritet: 0
+9. prioritet: 0
+10. prioritet: 0
+11. prioritet: 0
+12. prioritet: 0
+13. prioritet: 0
+14. prioritet: 0
+15. prioritet: 0
+16. prioritet: 0
+17. prioritet: 0
+18. prioritet: 0
+
+x minimax 0.5895854339978541 test_5 273 85 64 0 0 47 1204 820 21 42 32 35 46 46 51 0 0 0 0 0 0 0 0 0 0 0 0.5895854339978541
+------------------------------------------------------------
+Solving model_ip_weighted
+Topics available (64): [64, 50, 2, 48, 41, 21, 56, 63, 32, 26, 30, 6, 34, 58, 54, 18, 10, 51, 24, 29, 42, 57, 35, 7, 49, 44, 31, 52, 8, 25, 22, 55, 59, 61, 28, 36, 13, 20, 47, 40, 38, 5, 14, 27, 17, 23, 16, 46, 9, 3, 37, 1, 33, 19, 39, 11, 60, 4, 43, 45, 15, 62, 53, 12]
+Number of prioritized projects between 7 and 17
+Weights (18): array([           nan, 1.82284452e-06, 6.30485390e-05, 1.73011477e-03,
+       4.22009547e-02, 9.65030223e-01, 2.11851131e+01, 4.52153819e+02,
+       9.45437263e+03, 9.45437263e+03, 9.45437263e+03, 9.45437263e+03,
+       9.45437263e+03, 9.45437263e+03, 9.45437263e+03, 9.45437263e+03,
+       9.45437263e+03, 9.45437263e+03])
+Post instability constraints
+Set parameter MIPGap to value 0
+Set parameter MIPGapAbs to value 0
+Set parameter OptimalityTol to value 1e-09
+Set parameter Threads to value 1
+Set parameter Method to value 4
+Set parameter TimeLimit to value 3600
+Warning: linear constraint 1 and linear constraint 2 have the same name "not_ranked_1"
+Gurobi Optimizer version 10.0.1 build v10.0.1rc0 (linux64)
+
+CPU model: AMD Ryzen 7 4700U with Radeon Graphics, instruction set [SSE2|AVX|AVX2]
+Thread count: 8 physical cores, 8 logical processors, using up to 1 threads
+
+Optimize a model with 86965 rows, 70061 columns and 313495 nonzeros
+Model fingerprint: 0x5b578482
+Variable types: 23293 continuous, 46768 integer (46495 binary)
+Coefficient statistics:
+  Matrix range     [2e-06, 2e+01]
+  Objective range  [1e+00, 1e+00]
+  Bounds range     [1e+00, 5e+03]
+  RHS range        [1e+00, 3e+04]
+Presolve removed 85299 rows and 67935 columns
+Presolve time: 0.16s
+Presolved: 1666 rows, 2126 columns, 10575 nonzeros
+Variable types: 0 continuous, 2126 integer (2064 binary)
+
+Root relaxation: objective 1.257938e-03, 657 iterations, 0.01 seconds (0.00 work units)
+
+    Nodes    |    Current Node    |     Objective Bounds      |     Work
+ Expl Unexpl |  Obj  Depth IntInf | Incumbent    BestBd   Gap | It/Node Time
+
+     0     0    0.00126    0    8          -    0.00126      -     -    0s
+     0     0    0.00127    0   89          -    0.00127      -     -    0s
+     0     0    0.00127    0   61          -    0.00127      -     -    0s
+     0     0    0.00128    0   82          -    0.00128      -     -    0s
+     0     0    0.00128    0   76          -    0.00128      -     -    0s
+     0     0    0.00128    0   28          -    0.00128      -     -    0s
+     0     0    0.00128    0   37          -    0.00128      -     -    0s
+     0     0    0.00128    0    7          -    0.00128      -     -    0s
+     0     0    0.00128    0   29          -    0.00128      -     -    0s
+     0     0    0.00128    0    1          -    0.00128      -     -    0s
+H    0     0                       0.0013493    0.00128  5.49%     -    0s
+H    0     0                       0.0012941    0.00128  1.46%     -    0s
+     0     0    0.00128    0    9    0.00129    0.00128  1.46%     -    0s
+     0     0    0.00128    0    1    0.00129    0.00128  1.46%     -    0s
+H    0     0                       0.0012907    0.00128  1.20%     -    0s
+     0     0    0.00128    0    5    0.00129    0.00128  1.20%     -    0s
+     0     0    0.00128    0    1    0.00129    0.00128  1.20%     -    0s
+     0     0    0.00128    0    5    0.00129    0.00128  1.20%     -    0s
+     0     0    0.00128    0    2    0.00129    0.00128  1.20%     -    0s
+     0     0    0.00128    0    2    0.00129    0.00128  1.20%     -    0s
+     0     2    0.00128    0    2    0.00129    0.00128  1.20%     -    0s
+*   16    12              11       0.0012890    0.00128  0.80%  17.2    0s
+H   27     2                       0.0012821    0.00128  0.00%  13.6    0s
+
+Cutting planes:
+  Gomory: 6
+  Cover: 22
+  Clique: 16
+  MIR: 2
+  StrongCG: 3
+  Flow cover: 2
+  Mod-K: 1
+  RLT: 2
+
+Explored 28 nodes (3126 simplex iterations) in 0.50 seconds (0.42 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 5: 0.00128206 0.00128896 0.00129068 ... 0.00134927
+
+Optimal solution found (tolerance 0.00e+00)
+Best objective 1.282062922566e-03, best bound 1.282062922566e-03, gap 0.0000%
+solution 1 found
+
+Number of solutions:  1
+feasible solution
+Numb. of students: 273
+Numb. of groups: 273
+Numb. of topics: 64
+
+Numb. of unassigned students: 0
+Numb. of underfull teams: 0
+Students assigned outside of their area:  99
+
+Numb. of unstable: 0
+Tot. util: 744
+Tot. envy: 370
+
+1. prioritet: 87
+2. prioritet: 69
+3. prioritet: 44
+4. prioritet: 21
+5. prioritet: 21
+6. prioritet: 19
+7. prioritet: 12
+8. prioritet: 0
+9. prioritet: 0
+10. prioritet: 0
+11. prioritet: 0
+12. prioritet: 0
+13. prioritet: 0
+14. prioritet: 0
+15. prioritet: 0
+16. prioritet: 0
+17. prioritet: 0
+18. prioritet: 0
+
+x minimax_instab_weighted-owa 2.2448852909983543 test_5 273 85 64 0 0 0 744 370 87 69 44 21 21 19 12 0 0 0 0 0 0 0 0 0 0 0 2.2079697939989273

@@ -1,0 +1,45 @@
+!!python/object:optparse.Values
+Wmethod: owa
+allow_unassigned: false
+allsol: false
+cut_off: 10
+cut_off_type: null
+expand_topics: false
+groups: post
+instability: true
+min_preferences: 7
+prioritize_all: false
+solution_file: null
+
+read  /home/cres/Dokumenter/Datalogi/Bachelor/resources/ProjectAssignment-master/data/2022-ff501/students.csv
+          grp_id username  ...         timestamp stype
+username                   ...                        
+sojej21        1  sojej21  ...  25-02-2022 16:15   NaN
+maan321        2  maan321  ...  25-02-2022 16:21   NaN
+magpe21        3  magpe21  ...  25-02-2022 16:27   NaN
+idmeu21        4  idmeu21  ...  25-02-2022 16:39   NaN
+mjess21        5  mjess21  ...  25-02-2022 17:01   NaN
+...          ...      ...  ...               ...   ...
+majah21      290  majah21  ...  04-03-2022 11:37   NaN
+mahed21      291  mahed21  ...  04-03-2022 11:39   NaN
+saduk21      292  saduk21  ...  04-03-2022 11:44   NaN
+hamar21      293  hamar21  ...  04-03-2022 11:51   NaN
+shpat21      294  shpat21  ...  04-03-2022 12:16   NaN
+
+[273 rows x 8 columns]
+read  /home/cres/Dokumenter/Datalogi/Bachelor/resources/ProjectAssignment-master/data/2022-ff501/projects.csv
+    ID team  ...                mini                                   wl
+0    1    a  ...  Posterfremstilling  Nordcee labs, Department of Biology
+1    1    b  ...  Posterfremstilling  Nordcee labs, Department of Biology
+2    2  NaN  ...  Posterfremstilling                             Biblotek
+3    3    a  ...  Posterfremstilling                             Institut
+4    3    b  ...  Posterfremstilling                             Institut
+..  ..  ...  ...                 ...                                  ...
+82  60    a  ...  Posterfremstilling                               Campus
+83  60    b  ...  Posterfremstilling                               Campus
+84  60    c  ...  Posterfremstilling                               Campus
+85  61  NaN  ...  Posterfremstilling                                   BI
+86  62  NaN  ...  Posterfremstilling                               Campus
+
+[87 rows x 11 columns]
+['Biologi, Biomedicin, BMB og Kemi' 'alle' 'Farmaci']

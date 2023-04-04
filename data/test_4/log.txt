@@ -1,0 +1,641 @@
+!!python/object:optparse.Values
+Wmethod: owa
+allow_unassigned: false
+allsol: false
+cut_off: 10
+cut_off_type: null
+expand_topics: false
+groups: post
+instability: true
+min_preferences: 7
+prioritize_all: false
+solution_file: null
+
+read  /home/cres/Dokumenter/Datalogi/Bachelor/resources/ProjectAssignment-master/data/test_4/students.csv
+          grp_id username  ...                   email         timestamp
+username                   ...                                          
+maan321        2  maan321  ...  maan321@student.sdu.dk  27-02-2023 14:46
+magpe21        3  magpe21  ...  magpe21@student.sdu.dk  27-02-2023 14:46
+idmeu21        4  idmeu21  ...  idmeu21@student.sdu.dk  27-02-2023 14:46
+mjess21        5  mjess21  ...  mjess21@student.sdu.dk  27-02-2023 14:46
+sotzi20        7  sotzi20  ...  sotzi20@student.sdu.dk  27-02-2023 14:46
+...          ...      ...  ...                     ...               ...
+majah21      290  majah21  ...  majah21@student.sdu.dk  27-02-2023 14:47
+mahed21      291  mahed21  ...  mahed21@student.sdu.dk  27-02-2023 14:47
+saduk21      292  saduk21  ...  saduk21@student.sdu.dk  27-02-2023 14:47
+hamar21      293  hamar21  ...  hamar21@student.sdu.dk  27-02-2023 14:47
+shpat21      294  shpat21  ...  shpat21@student.sdu.dk  27-02-2023 14:47
+
+[272 rows x 8 columns]
+read  /home/cres/Dokumenter/Datalogi/Bachelor/resources/ProjectAssignment-master/data/test_4/projects.csv
+    ID team  ... teachers  email
+0   56    a  ...       db     db
+1   57    a  ...       eb     eb
+2   57    b  ...       eb     eb
+3    9    a  ...        i      i
+4   46    a  ...       ta     ta
+..  ..  ...  ...      ...    ...
+80  23    a  ...        w      w
+81  62    a  ...       jb     jb
+82  20    a  ...        t      t
+83  30    a  ...       da     da
+84   5    a  ...        e      e
+
+[85 rows x 13 columns]
+['alle' 'biologi,biomedicin,bmb,kemi' 'farmaci']
+In students: {'bmb', 'biomedicin', 'biologi', 'kemi', 'farmaci'}
+In projects: {'farmaci', 'biologi,biomedicin,bmb,kemi', 'alle'}
+In types: {'farmaci': ['alle', 'farmaci'], 'biologi': ['biomedicin', 'bmb', 'kemi', 'alle', 'biologi'], 'biomedicin': ['biologi', 'bmb', 'kemi', 'alle', 'biomedicin'], 'bmb': ['biologi', 'biomedicin', 'kemi', 'alle', 'bmb'], 'kemi': ['biologi', 'biomedicin', 'bmb', 'alle', 'kemi']}
+----------------------------------------------------------------------
+Number of students: 272 on number of places available: 412
+Number of student groups: 272 on number of teams available: 85
+----------------------------------------------------------------------
+Read instance... Done
+{56: [Team(team_id='a', min=3, max=5, type='alle')], 57: [Team(team_id='a', min=3, max=5, type='alle'), Team(team_id='b', min=3, max=5, type='alle')], 9: [Team(team_id='a', min=3, max=4, type='biologi,biomedicin,bmb,kemi')], 46: [Team(team_id='a', min=3, max=5, type='biologi,biomedicin,bmb,kemi'), Team(team_id='b', min=3, max=5, type='biologi,biomedicin,bmb,kemi')], 59: [Team(team_id='a', min=3, max=5, type='alle'), Team(team_id='b', min=3, max=5, type='alle'), Team(team_id='c', min=3, max=5, type='alle')], 8: [Team(team_id='a', min=3, max=5, type='biologi,biomedicin,bmb,kemi'), Team(team_id='b', min=3, max=5, type='biologi,biomedicin,bmb,kemi')], 19: [Team(team_id='a', min=3, max=5, type='biologi,biomedicin,bmb,kemi')], 35: [Team(team_id='a', min=3, max=5, type='biologi,biomedicin,bmb,kemi')], 54: [Team(team_id='a', min=3, max=5, type='biologi,biomedicin,bmb,kemi')], 14: [Team(team_id='a', min=3, max=4, type='alle')], 41: [Team(team_id='a', min=3, max=5, type='biologi,biomedicin,bmb,kemi')], 45: [Team(team_id='a', min=3, max=4, type='biologi,biomedicin,bmb,kemi')], 17: [Team(team_id='a', min=3, max=5, type='biologi,biomedicin,bmb,kemi')], 44: [Team(team_id='a', min=3, max=4, type='biologi,biomedicin,bmb,kemi')], 25: [Team(team_id='a', min=3, max=4, type='biologi,biomedicin,bmb,kemi')], 53: [Team(team_id='a', min=3, max=6, type='farmaci')], 31: [Team(team_id='a', min=3, max=4, type='biologi,biomedicin,bmb,kemi')], 38: [Team(team_id='a', min=3, max=5, type='biologi,biomedicin,bmb,kemi')], 10: [Team(team_id='a', min=3, max=5, type='biologi,biomedicin,bmb,kemi')], 49: [Team(team_id='a', min=3, max=5, type='biologi,biomedicin,bmb,kemi')], 6: [Team(team_id='a', min=3, max=4, type='alle')], 12: [Team(team_id='a', min=3, max=5, type='alle')], 64: [Team(team_id='a', min=3, max=5, type='biologi,biomedicin,bmb,kemi')], 26: [Team(team_id='a', min=3, max=5, type='biologi,biomedicin,bmb,kemi'), Team(team_id='b', min=3, max=5, type='biologi,biomedicin,bmb,kemi')], 28: [Team(team_id='a', min=3, max=5, type='alle'), Team(team_id='b', min=3, max=5, type='alle'), Team(team_id='c', min=3, max=5, type='alle'), Team(team_id='d', min=3, max=5, type='alle'), Team(team_id='e', min=3, max=5, type='alle'), Team(team_id='f', min=3, max=5, type='alle'), Team(team_id='g', min=3, max=5, type='alle'), Team(team_id='h', min=3, max=5, type='alle')], 58: [Team(team_id='a', min=3, max=3, type='alle')], 24: [Team(team_id='a', min=3, max=5, type='farmaci')], 60: [Team(team_id='a', min=3, max=6, type='biologi,biomedicin,bmb,kemi')], 34: [Team(team_id='a', min=3, max=3, type='biologi,biomedicin,bmb,kemi')], 4: [Team(team_id='a', min=3, max=6, type='farmaci')], 33: [Team(team_id='a', min=3, max=4, type='biologi,biomedicin,bmb,kemi')], 42: [Team(team_id='a', min=3, max=5, type='farmaci')], 50: [Team(team_id='a', min=3, max=5, type='biologi,biomedicin,bmb,kemi'), Team(team_id='b', min=3, max=5, type='biologi,biomedicin,bmb,kemi')], 52: [Team(team_id='a', min=3, max=4, type='alle')], 51: [Team(team_id='a', min=3, max=6, type='farmaci')], 22: [Team(team_id='a', min=3, max=6, type='farmaci')], 40: [Team(team_id='a', min=3, max=4, type='biologi,biomedicin,bmb,kemi')], 43: [Team(team_id='a', min=3, max=6, type='farmaci')], 55: [Team(team_id='a', min=3, max=5, type='biologi,biomedicin,bmb,kemi')], 16: [Team(team_id='a', min=3, max=5, type='farmaci')], 29: [Team(team_id='a', min=3, max=4, type='alle')], 27: [Team(team_id='a', min=3, max=5, type='alle'), Team(team_id='b', min=3, max=5, type='alle')], 39: [Team(team_id='a', min=3, max=5, type='farmaci')], 37: [Team(team_id='a', min=3, max=5, type='alle'), Team(team_id='b', min=3, max=5, type='alle'), Team(team_id='c', min=3, max=5, type='alle')], 21: [Team(team_id='a', min=3, max=5, type='alle')], 2: [Team(team_id='a', min=3, max=5, type='alle')], 48: [Team(team_id='a', min=3, max=5, type='alle'), Team(team_id='b', min=3, max=5, type='alle')], 47: [Team(team_id='a', min=3, max=4, type='biologi,biomedicin,bmb,kemi')], 1: [Team(team_id='a', min=3, max=4, type='alle')], 13: [Team(team_id='a', min=3, max=4, type='alle'), Team(team_id='b', min=3, max=4, type='alle')], 61: [Team(team_id='a', min=3, max=5, type='alle')], 32: [Team(team_id='a', min=3, max=5, type='alle')], 63: [Team(team_id='a', min=3, max=6, type='farmaci')], 11: [Team(team_id='a', min=3, max=5, type='biologi,biomedicin,bmb,kemi')], 36: [Team(team_id='a', min=3, max=5, type='biologi,biomedicin,bmb,kemi')], 15: [Team(team_id='a', min=3, max=5, type='alle'), Team(team_id='b', min=3, max=5, type='alle'), Team(team_id='c', min=3, max=5, type='alle')], 18: [Team(team_id='a', min=3, max=4, type='biologi,biomedicin,bmb,kemi')], 7: [Team(team_id='a', min=3, max=6, type='biologi,biomedicin,bmb,kemi')], 3: [Team(team_id='a', min=3, max=4, type='alle')], 23: [Team(team_id='a', min=3, max=6, type='farmaci')], 62: [Team(team_id='a', min=5, max=5, type='alle')], 20: [Team(team_id='a', min=3, max=5, type='alle')], 30: [Team(team_id='a', min=3, max=3, type='biologi,biomedicin,bmb,kemi')], 5: [Team(team_id='a', min=3, max=6, type='alle')]}
+Set parameter Username
+Academic license - for non-commercial use only - expires 2024-02-23
+Warning: linear constraint 2 and linear constraint 3 have the same name "not_ranked_2_57"
+Gurobi Optimizer version 10.0.1 build v10.0.1rc0 (linux64)
+
+CPU model: AMD Ryzen 7 4700U with Radeon Graphics, instruction set [SSE2|AVX|AVX2]
+Thread count: 8 physical cores, 8 logical processors, using up to 8 threads
+
+Optimize a model with 32274 rows, 23478 columns and 151300 nonzeros
+Model fingerprint: 0x2c1c117a
+Variable types: 0 continuous, 23478 integer (23205 binary)
+Coefficient statistics:
+  Matrix range     [1e+00, 2e+01]
+  Objective range  [1e+00, 1e+00]
+  Bounds range     [1e+00, 2e+01]
+  RHS range        [1e+00, 4e+01]
+Presolve removed 128 rows and 0 columns
+Presolve time: 0.01s
+
+Explored 0 nodes (0 simplex iterations) in 0.03 seconds (0.03 work units)
+Thread count was 1 (of 8 available processors)
+
+Solution count 0
+
+Model is infeasible
+Best objective -, best bound -, gap -
+The model is infeasible; computing IIS
+
+Computing Irreducible Inconsistent Subsystem (IIS)...
+
+           Constraints          |            Bounds           |  Runtime
+      Min       Max     Guess   |   Min       Max     Guess   |
+--------------------------------------------------------------------------
+        0     32067         -         0       546         -           0s
+      272       272       272         0         0         0           2s
+
+IIS computed: 272 constraints, 0 bounds
+IIS runtime: 1.83 seconds (0.26 work units)
+
+The following constraint(s) cannot be satisfied:
+not_valid_2_11
+x_2_11_0 = 0.0
+not_valid_3_11
+x_3_11_0 = 0.0
+not_valid_4_11
+x_4_11_0 = 0.0
+not_valid_5_11
+x_5_11_0 = 0.0
+not_valid_7_11
+x_7_11_0 = 0.0
+not_valid_8_11
+x_8_11_0 = 0.0
+not_valid_9_11
+x_9_11_0 = 0.0
+not_valid_10_11
+x_10_11_0 = 0.0
+not_valid_11_11
+x_11_11_0 = 0.0
+not_valid_12_11
+x_12_11_0 = 0.0
+not_valid_13_11
+x_13_11_0 = 0.0
+not_valid_14_11
+x_14_11_0 = 0.0
+not_valid_15_11
+x_15_11_0 = 0.0
+not_valid_16_11
+x_16_11_0 = 0.0
+not_valid_17_11
+x_17_11_0 = 0.0
+not_valid_18_11
+x_18_11_0 = 0.0
+not_valid_19_11
+x_19_11_0 = 0.0
+not_valid_20_11
+x_20_11_0 = 0.0
+not_valid_21_11
+x_21_11_0 = 0.0
+not_valid_22_11
+x_22_11_0 = 0.0
+not_valid_23_11
+x_23_11_0 = 0.0
+not_valid_24_11
+x_24_11_0 = 0.0
+not_valid_25_11
+x_25_11_0 = 0.0
+not_valid_28_11
+x_28_11_0 = 0.0
+not_valid_29_11
+x_29_11_0 = 0.0
+not_valid_30_11
+x_30_11_0 = 0.0
+not_valid_31_11
+x_31_11_0 = 0.0
+not_valid_32_11
+x_32_11_0 = 0.0
+not_valid_33_11
+x_33_11_0 = 0.0
+not_valid_34_11
+x_34_11_0 = 0.0
+not_valid_35_11
+x_35_11_0 = 0.0
+not_valid_36_11
+x_36_11_0 = 0.0
+not_valid_37_11
+x_37_11_0 = 0.0
+not_valid_39_11
+x_39_11_0 = 0.0
+not_valid_40_11
+x_40_11_0 = 0.0
+not_valid_41_11
+x_41_11_0 = 0.0
+not_valid_42_11
+x_42_11_0 = 0.0
+not_valid_43_11
+x_43_11_0 = 0.0
+not_valid_44_11
+x_44_11_0 = 0.0
+not_valid_45_11
+x_45_11_0 = 0.0
+not_valid_46_11
+x_46_11_0 = 0.0
+not_valid_47_11
+x_47_11_0 = 0.0
+not_valid_48_11
+x_48_11_0 = 0.0
+not_valid_49_11
+x_49_11_0 = 0.0
+not_valid_50_11
+x_50_11_0 = 0.0
+not_valid_51_11
+x_51_11_0 = 0.0
+not_valid_52_11
+x_52_11_0 = 0.0
+not_valid_53_11
+x_53_11_0 = 0.0
+not_valid_54_11
+x_54_11_0 = 0.0
+not_valid_55_11
+x_55_11_0 = 0.0
+not_valid_56_11
+x_56_11_0 = 0.0
+not_valid_57_11
+x_57_11_0 = 0.0
+not_valid_58_11
+x_58_11_0 = 0.0
+not_valid_59_11
+x_59_11_0 = 0.0
+not_valid_60_11
+x_60_11_0 = 0.0
+not_valid_61_11
+x_61_11_0 = 0.0
+not_valid_62_11
+x_62_11_0 = 0.0
+not_valid_63_11
+x_63_11_0 = 0.0
+not_valid_64_11
+x_64_11_0 = 0.0
+not_valid_65_11
+x_65_11_0 = 0.0
+not_valid_66_11
+x_66_11_0 = 0.0
+not_valid_67_11
+x_67_11_0 = 0.0
+not_valid_68_11
+x_68_11_0 = 0.0
+not_valid_69_11
+x_69_11_0 = 0.0
+not_valid_70_11
+x_70_11_0 = 0.0
+not_valid_71_11
+x_71_11_0 = 0.0
+not_valid_72_11
+x_72_11_0 = 0.0
+not_valid_73_11
+x_73_11_0 = 0.0
+not_valid_75_11
+x_75_11_0 = 0.0
+not_valid_76_11
+x_76_11_0 = 0.0
+not_valid_77_11
+x_77_11_0 = 0.0
+not_valid_78_11
+x_78_11_0 = 0.0
+not_valid_79_11
+x_79_11_0 = 0.0
+not_valid_80_11
+x_80_11_0 = 0.0
+not_valid_81_11
+x_81_11_0 = 0.0
+not_valid_82_11
+x_82_11_0 = 0.0
+not_valid_83_11
+x_83_11_0 = 0.0
+not_valid_84_11
+x_84_11_0 = 0.0
+not_valid_85_11
+x_85_11_0 = 0.0
+not_valid_87_11
+x_87_11_0 = 0.0
+not_valid_89_11
+x_89_11_0 = 0.0
+not_valid_90_11
+x_90_11_0 = 0.0
+not_valid_91_11
+x_91_11_0 = 0.0
+not_valid_92_11
+x_92_11_0 = 0.0
+not_valid_93_11
+x_93_11_0 = 0.0
+not_valid_94_11
+x_94_11_0 = 0.0
+not_valid_95_11
+x_95_11_0 = 0.0
+not_valid_96_11
+x_96_11_0 = 0.0
+not_valid_97_11
+x_97_11_0 = 0.0
+not_valid_98_11
+x_98_11_0 = 0.0
+not_valid_99_11
+x_99_11_0 = 0.0
+not_valid_100_11
+x_100_11_0 = 0.0
+not_valid_102_11
+x_102_11_0 = 0.0
+not_valid_104_11
+x_104_11_0 = 0.0
+not_valid_105_11
+x_105_11_0 = 0.0
+not_valid_106_11
+x_106_11_0 = 0.0
+not_valid_107_11
+x_107_11_0 = 0.0
+not_valid_108_11
+x_108_11_0 = 0.0
+not_valid_109_11
+x_109_11_0 = 0.0
+not_valid_111_11
+x_111_11_0 = 0.0
+not_valid_112_11
+x_112_11_0 = 0.0
+not_valid_113_11
+x_113_11_0 = 0.0
+not_valid_114_11
+x_114_11_0 = 0.0
+not_valid_115_11
+x_115_11_0 = 0.0
+not_valid_116_11
+x_116_11_0 = 0.0
+not_valid_117_11
+x_117_11_0 = 0.0
+not_valid_118_11
+x_118_11_0 = 0.0
+not_valid_119_11
+x_119_11_0 = 0.0
+not_valid_120_11
+x_120_11_0 = 0.0
+not_valid_121_11
+x_121_11_0 = 0.0
+not_valid_122_11
+x_122_11_0 = 0.0
+not_valid_123_11
+x_123_11_0 = 0.0
+not_valid_124_11
+x_124_11_0 = 0.0
+not_valid_125_11
+x_125_11_0 = 0.0
+not_valid_126_11
+x_126_11_0 = 0.0
+not_valid_127_11
+x_127_11_0 = 0.0
+not_valid_128_11
+x_128_11_0 = 0.0
+not_valid_129_11
+x_129_11_0 = 0.0
+not_valid_130_11
+x_130_11_0 = 0.0
+not_valid_131_11
+x_131_11_0 = 0.0
+not_valid_132_11
+x_132_11_0 = 0.0
+not_valid_133_11
+x_133_11_0 = 0.0
+not_valid_134_11
+x_134_11_0 = 0.0
+not_valid_135_11
+x_135_11_0 = 0.0
+not_valid_136_11
+x_136_11_0 = 0.0
+not_valid_137_11
+x_137_11_0 = 0.0
+not_valid_138_11
+x_138_11_0 = 0.0
+not_valid_139_11
+x_139_11_0 = 0.0
+not_valid_140_11
+x_140_11_0 = 0.0
+not_valid_141_11
+x_141_11_0 = 0.0
+not_valid_142_11
+x_142_11_0 = 0.0
+not_valid_143_11
+x_143_11_0 = 0.0
+not_valid_144_11
+x_144_11_0 = 0.0
+not_valid_145_11
+x_145_11_0 = 0.0
+not_valid_146_11
+x_146_11_0 = 0.0
+not_valid_147_11
+x_147_11_0 = 0.0
+not_valid_148_11
+x_148_11_0 = 0.0
+not_valid_149_11
+x_149_11_0 = 0.0
+not_valid_150_11
+x_150_11_0 = 0.0
+not_valid_151_11
+x_151_11_0 = 0.0
+not_valid_152_11
+x_152_11_0 = 0.0
+not_valid_153_11
+x_153_11_0 = 0.0
+not_valid_154_11
+x_154_11_0 = 0.0
+not_valid_155_11
+x_155_11_0 = 0.0
+not_valid_156_11
+x_156_11_0 = 0.0
+not_valid_157_11
+x_157_11_0 = 0.0
+not_valid_158_11
+x_158_11_0 = 0.0
+not_valid_159_11
+x_159_11_0 = 0.0
+not_valid_161_11
+x_161_11_0 = 0.0
+not_valid_162_11
+x_162_11_0 = 0.0
+not_valid_163_11
+x_163_11_0 = 0.0
+not_valid_164_11
+x_164_11_0 = 0.0
+not_valid_165_11
+x_165_11_0 = 0.0
+not_valid_167_11
+x_167_11_0 = 0.0
+not_valid_170_11
+x_170_11_0 = 0.0
+not_valid_171_11
+x_171_11_0 = 0.0
+not_valid_172_11
+x_172_11_0 = 0.0
+not_valid_173_11
+x_173_11_0 = 0.0
+not_valid_174_11
+x_174_11_0 = 0.0
+not_valid_175_11
+x_175_11_0 = 0.0
+not_valid_176_11
+x_176_11_0 = 0.0
+not_valid_177_11
+x_177_11_0 = 0.0
+not_valid_179_11
+x_179_11_0 = 0.0
+not_valid_180_11
+x_180_11_0 = 0.0
+not_valid_181_11
+x_181_11_0 = 0.0
+not_valid_182_11
+x_182_11_0 = 0.0
+not_valid_183_11
+x_183_11_0 = 0.0
+not_valid_184_11
+x_184_11_0 = 0.0
+not_valid_185_11
+x_185_11_0 = 0.0
+not_valid_186_11
+x_186_11_0 = 0.0
+not_valid_187_11
+x_187_11_0 = 0.0
+not_valid_188_11
+x_188_11_0 = 0.0
+not_valid_189_11
+x_189_11_0 = 0.0
+not_valid_190_11
+x_190_11_0 = 0.0
+not_valid_191_11
+x_191_11_0 = 0.0
+not_valid_192_11
+x_192_11_0 = 0.0
+not_valid_193_11
+x_193_11_0 = 0.0
+not_valid_194_11
+x_194_11_0 = 0.0
+not_valid_195_11
+x_195_11_0 = 0.0
+not_valid_196_11
+x_196_11_0 = 0.0
+not_valid_197_11
+x_197_11_0 = 0.0
+not_valid_198_11
+x_198_11_0 = 0.0
+not_valid_199_11
+x_199_11_0 = 0.0
+not_valid_200_11
+x_200_11_0 = 0.0
+not_valid_201_11
+x_201_11_0 = 0.0
+not_valid_202_11
+x_202_11_0 = 0.0
+not_valid_203_11
+x_203_11_0 = 0.0
+not_valid_204_11
+x_204_11_0 = 0.0
+not_valid_205_11
+x_205_11_0 = 0.0
+not_valid_207_11
+x_207_11_0 = 0.0
+not_valid_208_11
+x_208_11_0 = 0.0
+not_valid_209_11
+x_209_11_0 = 0.0
+not_valid_210_11
+x_210_11_0 = 0.0
+not_valid_212_11
+x_212_11_0 = 0.0
+not_valid_213_11
+x_213_11_0 = 0.0
+not_valid_214_11
+x_214_11_0 = 0.0
+not_valid_215_11
+x_215_11_0 = 0.0
+not_valid_216_11
+x_216_11_0 = 0.0
+not_valid_217_11
+x_217_11_0 = 0.0
+not_valid_218_11
+x_218_11_0 = 0.0
+not_valid_219_11
+x_219_11_0 = 0.0
+not_valid_220_11
+x_220_11_0 = 0.0
+not_valid_221_11
+x_221_11_0 = 0.0
+not_valid_222_11
+x_222_11_0 = 0.0
+not_valid_223_11
+x_223_11_0 = 0.0
+not_valid_224_11
+x_224_11_0 = 0.0
+not_valid_225_11
+x_225_11_0 = 0.0
+not_valid_226_11
+x_226_11_0 = 0.0
+not_valid_227_11
+x_227_11_0 = 0.0
+not_valid_228_11
+x_228_11_0 = 0.0
+not_valid_230_11
+x_230_11_0 = 0.0
+not_valid_231_11
+x_231_11_0 = 0.0
+not_valid_232_11
+x_232_11_0 = 0.0
+not_valid_234_11
+x_234_11_0 = 0.0
+not_valid_235_11
+x_235_11_0 = 0.0
+not_valid_236_11
+x_236_11_0 = 0.0
+not_valid_237_11
+x_237_11_0 = 0.0
+not_valid_238_11
+x_238_11_0 = 0.0
+not_valid_239_11
+x_239_11_0 = 0.0
+not_valid_240_11
+x_240_11_0 = 0.0
+not_valid_241_11
+x_241_11_0 = 0.0
+not_valid_242_11
+x_242_11_0 = 0.0
+not_valid_243_11
+x_243_11_0 = 0.0
+not_valid_244_11
+x_244_11_0 = 0.0
+not_valid_245_11
+x_245_11_0 = 0.0
+not_valid_246_11
+x_246_11_0 = 0.0
+not_valid_247_11
+x_247_11_0 = 0.0
+not_valid_248_11
+x_248_11_0 = 0.0
+not_valid_249_11
+x_249_11_0 = 0.0
+not_valid_250_11
+x_250_11_0 = 0.0
+not_valid_251_11
+x_251_11_0 = 0.0
+not_valid_252_11
+x_252_11_0 = 0.0
+not_valid_253_11
+x_253_11_0 = 0.0
+not_valid_254_11
+x_254_11_0 = 0.0
+not_valid_255_11
+x_255_11_0 = 0.0
+not_valid_257_11
+x_257_11_0 = 0.0
+not_valid_258_11
+x_258_11_0 = 0.0
+not_valid_259_11
+x_259_11_0 = 0.0
+not_valid_260_11
+x_260_11_0 = 0.0
+not_valid_261_11
+x_261_11_0 = 0.0
+not_valid_262_11
+x_262_11_0 = 0.0
+not_valid_263_11
+x_263_11_0 = 0.0
+not_valid_264_11
+x_264_11_0 = 0.0
+not_valid_265_11
+x_265_11_0 = 0.0
+not_valid_266_11
+x_266_11_0 = 0.0
+not_valid_267_11
+x_267_11_0 = 0.0
+not_valid_268_11
+x_268_11_0 = 0.0
+not_valid_269_11
+x_269_11_0 = 0.0
+not_valid_271_11
+x_271_11_0 = 0.0
+not_valid_272_11
+x_272_11_0 = 0.0
+not_valid_274_11
+x_274_11_0 = 0.0
+not_valid_275_11
+x_275_11_0 = 0.0
+not_valid_276_11
+x_276_11_0 = 0.0
+not_valid_277_11
+x_277_11_0 = 0.0
+not_valid_278_11
+x_278_11_0 = 0.0
+not_valid_279_11
+x_279_11_0 = 0.0
+not_valid_280_11
+x_280_11_0 = 0.0
+not_valid_281_11
+x_281_11_0 = 0.0
+not_valid_283_11
+x_283_11_0 = 0.0
+not_valid_284_11
+x_284_11_0 = 0.0
+not_valid_285_11
+x_285_11_0 = 0.0
+not_valid_286_11
+x_286_11_0 = 0.0
+not_valid_287_11
+x_287_11_0 = 0.0
+not_valid_288_11
+x_288_11_0 = 0.0
+not_valid_289_11
+x_289_11_0 = 0.0
+not_valid_290_11
+x_290_11_0 = 0.0
+not_valid_291_11
+x_291_11_0 = 0.0
+not_valid_292_11
+x_292_11_0 = 0.0
+not_ranked_293_11
+x_293_11_0 = 0.0
+not_ranked_294_11
+x_294_11_0 = 0.0
+lb_11_0
+x_2_11_0 + x_3_11_0 + x_4_11_0 + x_5_11_0 + x_7_11_0 + x_8_11_0 + x_9_11_0 + x_10_11_0 + x_11_11_0 + x_12_11_0 + x_13_11_0 + x_14_11_0 + x_15_11_0 + x_16_11_0 + x_17_11_0 + x_18_11_0 + x_19_11_0 + x_20_11_0 + x_21_11_0 + x_22_11_0 + x_23_11_0 + x_24_11_0 + x_25_11_0 + x_27_11_0 + x_28_11_0 + x_29_11_0 + x_30_11_0 + x_31_11_0 + x_32_11_0 + x_33_11_0 + x_34_11_0 + x_35_11_0 + x_36_11_0 + x_37_11_0 + x_38_11_0 + x_39_11_0 + x_40_11_0 + x_41_11_0 + x_42_11_0 + x_43_11_0 + x_44_11_0 + x_45_11_0 + x_46_11_0 + x_47_11_0 + x_48_11_0 + x_49_11_0 + x_50_11_0 + x_51_11_0 + x_52_11_0 + x_53_11_0 + x_54_11_0 + x_55_11_0 + x_56_11_0 + x_57_11_0 + x_58_11_0 + x_59_11_0 + x_60_11_0 + x_61_11_0 + x_62_11_0 + x_63_11_0 + x_64_11_0 + x_65_11_0 + x_66_11_0 + x_67_11_0 + x_68_11_0 + x_69_11_0 + x_70_11_0 + x_71_11_0 + x_72_11_0 + x_73_11_0 + x_75_11_0 + x_76_11_0 + x_77_11_0 + x_78_11_0 + x_79_11_0 + x_80_11_0 + x_81_11_0 + x_82_11_0 + x_83_11_0 + x_84_11_0 + x_85_11_0 + x_87_11_0 + x_89_11_0 + x_90_11_0 + x_91_11_0 + x_92_11_0 + x_93_11_0 + x_94_11_0 + x_95_11_0 + x_96_11_0 + x_97_11_0 + x_98_11_0 + x_99_11_0 + x_100_11_0 + x_102_11_0 + x_104_11_0 + x_105_11_0 + x_106_11_0 + x_107_11_0 + x_108_11_0 + x_109_11_0 + x_111_11_0 + x_112_11_0 + x_113_11_0 + x_114_11_0 + x_115_11_0 + x_116_11_0 + x_117_11_0 + x_118_11_0 + x_119_11_0 + x_120_11_0 + x_121_11_0 + x_122_11_0 + x_123_11_0 + x_124_11_0 + x_125_11_0 + x_126_11_0 + x_127_11_0 + x_128_11_0 + x_129_11_0 + x_130_11_0 + x_131_11_0 + x_132_11_0 + x_133_11_0 + x_134_11_0 + x_135_11_0 + x_136_11_0 + x_137_11_0 + x_138_11_0 + x_139_11_0 + x_140_11_0 + x_141_11_0 + x_142_11_0 + x_143_11_0 + x_144_11_0 + x_145_11_0 + x_146_11_0 + x_147_11_0 + x_148_11_0 + x_149_11_0 + x_150_11_0 + x_151_11_0 + x_152_11_0 + x_153_11_0 + x_154_11_0 + x_155_11_0 + x_156_11_0 + x_157_11_0 + x_158_11_0 + x_159_11_0 + x_161_11_0 + x_162_11_0 + x_163_11_0 + x_164_11_0 + x_165_11_0 + x_167_11_0 + x_170_11_0 + x_171_11_0 + x_172_11_0 + x_173_11_0 + x_174_11_0 + x_175_11_0 + x_176_11_0 + x_177_11_0 + x_179_11_0 + x_180_11_0 + x_181_11_0 + x_182_11_0 + x_183_11_0 + x_184_11_0 + x_185_11_0 + x_186_11_0 + x_187_11_0 + x_188_11_0 + x_189_11_0 + x_190_11_0 + x_191_11_0 + x_192_11_0 + x_193_11_0 + x_194_11_0 + x_195_11_0 + x_196_11_0 + x_197_11_0 + x_198_11_0 + x_199_11_0 + x_200_11_0 + x_201_11_0 + x_202_11_0 + x_203_11_0 + x_204_11_0 + x_205_11_0 + x_207_11_0 + x_208_11_0 + x_209_11_0 + x_210_11_0 + x_212_11_0 + x_213_11_0 + x_214_11_0 + x_215_11_0 + x_216_11_0 + x_217_11_0 + x_218_11_0 + x_219_11_0 + x_220_11_0 + x_221_11_0 + x_222_11_0 + x_223_11_0 + x_224_11_0 + x_225_11_0 + x_226_11_0 + x_227_11_0 + x_228_11_0 + x_230_11_0 + x_231_11_0 + x_232_11_0 + x_234_11_0 + x_235_11_0 + x_236_11_0 + x_237_11_0 + x_238_11_0 + x_239_11_0 + x_240_11_0 + x_241_11_0 + x_242_11_0 + x_243_11_0 + x_244_11_0 + x_245_11_0 + x_246_11_0 + x_247_11_0 + x_248_11_0 + x_249_11_0 + x_250_11_0 + x_251_11_0 + x_252_11_0 + x_253_11_0 + x_254_11_0 + x_255_11_0 + x_257_11_0 + x_258_11_0 + x_259_11_0 + x_260_11_0 + x_261_11_0 + x_262_11_0 + x_263_11_0 + x_264_11_0 + x_265_11_0 + x_266_11_0 + x_267_11_0 + x_268_11_0 + x_269_11_0 + x_271_11_0 + x_272_11_0 + x_274_11_0 + x_275_11_0 + x_276_11_0 + x_277_11_0 + x_278_11_0 + x_279_11_0 + x_280_11_0 + x_281_11_0 + x_283_11_0 + x_284_11_0 + x_285_11_0 + x_286_11_0 + x_287_11_0 + x_288_11_0 + x_289_11_0 + x_290_11_0 + x_291_11_0 + x_292_11_0 + x_293_11_0 + x_294_11_0 + -3.0 y_11_0 > 0.0
+rstr_min_k
+y_11_0 > 1.0
+
+See optexam_IIS.ilp for explicit constraints.
+

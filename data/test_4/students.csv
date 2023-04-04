@@ -1,0 +1,273 @@
+grp_id;username;type;priority_list;student_id;full_name;email;timestamp
+2;maan321;biologi;45,29,14,54,34,27,20;1743;Maria Havemann Andersen;maan321@student.sdu.dk;27-02-2023 14:46
+3;magpe21;farmaci;33,35,53,12,16,17,24;1744;Magnus Ipsen Pedersen;magpe21@student.sdu.dk;27-02-2023 14:46
+4;idmeu21;biologi;20,61,25,36,54,45,5;1745;Ida Marie Meulengracht;idmeu21@student.sdu.dk;27-02-2023 14:46
+5;mjess21;biomedicin;34,47,15,11,26,43,62,49;1746;Maja Lindskov Jessen;mjess21@student.sdu.dk;27-02-2023 14:46
+7;sotzi20;biomedicin;6,23,8,31,4,7,30,56,57,59;1747;Sofia Tziraki;sotzi20@student.sdu.dk;27-02-2023 14:46
+8;serot21;biologi;6,13,29,20,14,5,54,61,45;1748;Sebastian Rotenberg;serot21@student.sdu.dk;27-02-2023 14:46
+9;camih21;biologi;1,5,22,20,14,45,54;1749;Camilla Maja Lehmann Hansen;camih21@student.sdu.dk;27-02-2023 14:46
+10;mettp21;biomedicin;4,13,62,34,30,3,11,27,21,43;1750;Mette Brahe Pedersen;mettp21@student.sdu.dk;27-02-2023 14:46
+11;lanla21;farmaci;10,24,28,59,31,60,52,41,46;1751;Lance Sloth Larsen;lanla21@student.sdu.dk;27-02-2023 14:46
+12;margh21;biomedicin;34,39,37,23,4,11,30,56,57,59;1752;Maria Gaard Hansen;margh21@student.sdu.dk;27-02-2023 14:46
+13;frman19;biologi;20,61,54,45,36,14,5;1753;Freja-Maria Olivia Mandrup-Paulsen;frman19@student.sdu.dk;27-02-2023 14:46
+14;tobui21;kemi;40,8,41,51,61,20,44,2;1754;Tony Bui;tobui21@student.sdu.dk;27-02-2023 14:46
+15;ajoen21;biologi;54,45,29,61,5,34,44,25;1755;Andy Reimers Joensen;ajoen21@student.sdu.dk;27-02-2023 14:46
+16;ebrom21;biomedicin;4,13,34,18,7,37,1,3,50,27;1756;Emma Erdrup Brommann;ebrom21@student.sdu.dk;27-02-2023 14:46
+17;hualb21;farmaci;53,10,35,33,28,12,24;1757;Huda Saleh Al Badri;hualb21@student.sdu.dk;27-02-2023 14:46
+18;thmai19;biomedicin;34,4,27,30,49,5,15;1758;Thi Kim Nhung Mai;thmai19@student.sdu.dk;27-02-2023 14:46
+19;kllin21;biomedicin;32,39,34,62,18,37,57,21;1759;Klara Vallebo Lindhardt;kllin21@student.sdu.dk;27-02-2023 14:46
+20;cagor21;bmb;39,4,34,18,7,27,37;1760;Caroline Friis Gormsen;cagor21@student.sdu.dk;27-02-2023 14:46
+21;embar21;biomedicin;4,34,30,49,3,62,27,23,18,47;1761;Emil Mouhoubi Bargfeldt;embar21@student.sdu.dk;27-02-2023 14:46
+22;malet21;biomedicin;23,11,21,6,3,7,18,34;1762;Malthe Letting;malet21@student.sdu.dk;27-02-2023 14:46
+23;sopje21;farmaci;10,59,60,17,9,11,2,46;1763;Sophie Rosenfeldt Ravnholt Jensen;sopje21@student.sdu.dk;27-02-2023 14:46
+24;emmth21;bmb;34,3,49,37,21,13,7,62;1764;Emma Sarija Thomsen;emmth21@student.sdu.dk;27-02-2023 14:46
+25;Sabdu21;farmaci;17,10,46,60,59,52,35;1765;Safiya Ayman Abdulkarim;sabdu21@student.sdu.dk;27-02-2023 14:46
+27;Lisan21;farmaci;17,33,12,35,24,25,59;1766;Liv Lyhne Sandholt;lisan21@student.sdu.dk;27-02-2023 14:46
+28;havra21;farmaci;17,33,12,35,24,25,59;1767;Hakan Vragovic;havra21@student.sdu.dk;27-02-2023 14:46
+29;sagar19;farmaci;24,33,53,10,59,52,28;1768;Sarita Dextre Garcia;sagar19@student.sdu.dk;27-02-2023 14:46
+30;madsj21;biologi;36,14,16,44,20,5,25;1769;Mads Rabech Jensen;madsj21@student.sdu.dk;27-02-2023 14:46
+31;somoe21;bmb;29,47,42,14,5,19,27,1,20,34;1770;Sofie Lehmkuhl Møbes;somoe21@student.sdu.dk;27-02-2023 14:46
+32;kjako21;biomedicin;4,3,34,62,13,27,49;1771;Katrine Thalund Jakobsen;kjako21@student.sdu.dk;27-02-2023 14:46
+33;jenni21;biomedicin;15,26,23,39,21,62,18,45,3,29;1772;Jens Hieronymus Nielsen;jenni21@student.sdu.dk;27-02-2023 14:46
+34;jgrot21;biologi;61,5,54,29,20,22,36;1773;Julia Groth;jgrot21@student.sdu.dk;27-02-2023 14:46
+35;sihun21;bmb;43,39,27,11,4,26,15,34,57;1774;Signe Heegaard Hundborg;sihun21@student.sdu.dk;27-02-2023 14:46
+36;naaar21;biologi;54,61,45,14,5,56,20;1775;Nanna Ry Aarenstrup;naaar21@student.sdu.dk;27-02-2023 14:46
+37;chrjo21;biologi;29,34,5,20,47,27,50,22;1776;Christoffer Lindstrøm Jørgensen;chrjo21@student.sdu.dk;27-02-2023 14:46
+38;krima17;biologi;34,42,13,37,32,18,11;1777; Kristian Møller Madsen;krima17@student.sdu.dk;27-02-2023 14:46
+39;idhan21;biologi;20,5,54,36,61,45,29;1778;Ida Ganderup Hansen;idhan21@student.sdu.dk;27-02-2023 14:46
+40;amsaa21;farmaci;10,59,60,17,33,35,11,25,56,57,59;1779;Amenah Mohammad Saad;amsaa21@student.sdu.dk;27-02-2023 14:46
+41;sofla21;biomedicin;34,30,27,37,39,57,49;1780;Sofie Ditz Larsen;sofla21@student.sdu.dk;27-02-2023 14:46
+42;ishof21;biomedicin;34,37,30,27,18,21,62,13,39,43,23,32,38,42,49,57,26;1781;Isabell Pauli Hoffmann;ishof21@student.sdu.dk;27-02-2023 14:46
+43;kagal21;biologi;22,47,5,15,36,29,56,14,16;1782;Karin Gallon;kagal21@student.sdu.dk;27-02-2023 14:46
+44;narei21;biomedicin;62,03,21,18,19,57,04,30,29;1783;Naja Reinholt;narei21@student.sdu.dk;27-02-2023 14:46
+45;caasm21;bmb;47,43,26,15,29,42,1,27,44,5;1784;Catharina Nørgaard Asmussen;caasm21@student.sdu.dk;27-02-2023 14:46
+46;tobje21;biomedicin;37,30,13,34,4,26,27,49,43,39,57;1785;Tobias Jensen;tobje21@student.sdu.dk;27-02-2023 14:46
+47;annaa21;biomedicin;3,11,21,19,39,30,23;1786;Anna Andersen;annaa21@student.sdu.dk;27-02-2023 14:46
+48;Siben21;biologi;54,45,61,20,14,5,29,36,56,22;1787;Silje Juhl Bengtsson;siben21@student.sdu.dk;27-02-2023 14:46
+49;anert21;biomedicin;4,62,19,21,37,3,34,18,32;1788;Antonia Ertzinger;anert21@student.sdu.dk;27-02-2023 14:46
+50;micmo21;biologi;54,44,14,20,61,45,6;1789;Micki Borgen Morell;micmo21@student.sdu.dk;27-02-2023 14:46
+51;mskoe21;bmb;49,11,39,43,27,4,42,56,57,59;1790;Marie Augusta Lunderup Skøtt;mskoe21@student.sdu.dk;27-02-2023 14:46
+52;shkul21;biomedicin;37,18,11,32,62,3,4,19;1791;Sharuya Kulatheivam;shkul21@student.sdu.dk;27-02-2023 14:46
+53;albni21;biomedicin;7,3,32,21,62,18,19,34;1792;Alberte Dagmar Nielsen;albni21@student.sdu.dk;27-02-2023 14:46
+54;emilk20;biologi;20,45,61,54,5,14,29,44,56,25,36,26;1793;Emil Kjær Søndergaard Larsen;emilk20@student.sdu.dk;27-02-2023 14:46
+55;louih21;biomedicin;3,21,32,19,62,4,37;1794;Louise Søgaard Møller Hansen;louih21@student.sdu.dk;27-02-2023 14:46
+56;sarap21;biomedicin;34,39,27,7,57,37,11;1795;Sarah Yasmin Lykke Pedersen;sarap21@student.sdu.dk;27-02-2023 14:46
+57;Celra21;biomedicin;6,7,3,39,11,62,29;1796;Celine Vie Rasmussen;celra21@student.sdu.dk;27-02-2023 14:46
+58;minym21;biomedicin;34,11,13,30,27,39,57;1797;Mia Vinther Nymark;minym21@student.sdu.dk;27-02-2023 14:46
+59;vilar21;bmb;23,7,49,18,34,19,6,4,11,1;1798;Viktor Manuel Grunddal Larsen;vilar21@student.sdu.dk;27-02-2023 14:46
+60;katla21;biomedicin;43,26,15,13,27,18,49,32,1,62;1799;Katrine Secher Ingsø Laursen;katla21@student.sdu.dk;27-02-2023 14:46
+61;magan21;biomedicin;37,15,26,13,34,43,21,30;1800;Matthias Gandrup;magan21@student.sdu.dk;27-02-2023 14:46
+62;lkris21;farmaci;26,17,33,10,53,59,60;1801;Louise Ulrich Kristensen;lkris21@student.sdu.dk;27-02-2023 14:46
+63;nalun21;farmaci;26,17,33,10,16,24,53,2;1802;Nanna Einshøj Lund;nalun21@student.sdu.dk;27-02-2023 14:46
+64;lodo21;biomedicin;29,7,6,43,1,5,23,42;1803;Louise Do;lodo21@student.sdu.dk;27-02-2023 14:46
+65;freje21;biologi;61,44,54,20,14,45,5,3;1804;Frederik Damgaard Jensen;freje21@student.sdu.dk;27-02-2023 14:46
+66;frech21;biologi;54,7,25,14,4,18,15,16;1805;Freja Gai Christiansen;frech21@student.sdu.dk;27-02-2023 14:46
+67;camch21;farmaci;60,17,46,59,10,9,2,11;1806;Camilla Lindholm Christiansen;camch21@student.sdu.dk;27-02-2023 14:46
+68;rebun21;farmaci;60,59,17,10,46,9,2;1807;Rebekka Bundgaard;rebun21@student.sdu.dk;27-02-2023 14:46
+69;grnie21;biomedicin;4,27,34,43,18,37,32;1808;Gry Karen Leegaard Nielsen;grnie21@student.sdu.dk;27-02-2023 14:46
+70;thtie21;bmb;7,37,34,18,39,13,4;1809;Thea Kristine Tiegel;thtie21@student.sdu.dk;27-02-2023 14:46
+71;fakha21;biomedicin;36,4,39,18,23,27,30,56,57,59;1810;Fatima Khassouk;fakha21@student.sdu.dk;27-02-2023 14:46
+72;navin21;biologi;5,14,20,36,45,22,54,56;1811;Natacha Kronholm Vinberg;navin21@student.sdu.dk;27-02-2023 14:46
+73;emipe21;farmaci;24,35,17,33,15,26,28;1812;Emilie Fjeldsted Pedersen;emipe21@student.sdu.dk;27-02-2023 14:46
+75;kaves21;biomedicin;39,37,7,34,18,32,50,62;1813;Kathrine Ladefoged Vestkær;kaves21@student.sdu.dk;27-02-2023 14:46
+76;gapal21;farmaci;53,9,11,26,58,35,48,8,33;1814;Gabriela Diana Palkowska;gapal21@student.sdu.dk;27-02-2023 14:46
+77;zokin20;biologi;61,45,54,20,5,29,14;1815;Zoe Celin Kinzella;zokin20@student.sdu.dk;27-02-2023 14:46
+78;samad21;biomedicin;34,13,18,11,37,49,15;1816;Sandra Søegaard Madsen;samad21@student.sdu.dk;27-02-2023 14:46
+79;josko21;bmb;34,39,49,6,4,47,57,30;1817;Joan Falandysz Skøtt;josko21@student.sdu.dk;27-02-2023 14:46
+80;juhan21;kemi;8,34,40,41,23,27,58;1818;Julie Lærke Hansen;juhan21@student.sdu.dk;27-02-2023 14:46
+81;mwies21;bmb;40,39,37,29,50,42,8,30,27,47;1819;Maja Rui Himmelstrup Wiese;mwies21@student.sdu.dk;27-02-2023 14:46
+82;mbund21;bmb;32,3,19,39,15,4,50,34;1820;Marie-Louise Bundgaard;mbund21@student.sdu.dk;27-02-2023 14:46
+83;niban21;biologi;54,45,61,20,14,5,56,1,22,51,36,25,44;1821;Nicolas Jack Bang;niban21@student.sdu.dk;27-02-2023 14:46
+84;alalt21;farmaci;25,17,26,24,33,48,16;1822;Ali Aziz Al-Tamimi;alalt21@student.sdu.dk;27-02-2023 14:46
+85;Saalw21;farmaci;25,17,26,24,33,48,16;1823;Sarmad Al-Wakeel;saalw21@student.sdu.dk;27-02-2023 14:46
+87;fesar21;farmaci;25,17,26,24,33,48,16;1824;Fezan Imran Sarwar;fesar21@student.sdu.dk;27-02-2023 14:46
+89;marbj21;bmb;7,37,27,62,18,6,47;1825;Maria Bjerregaard;marbj21@student.sdu.dk;27-02-2023 14:46
+90;phjak21;biologi;14,20,61,54,45,5,22;1826;Phillip Riddersholm Jakobsen;phjak21@student.sdu.dk;27-02-2023 14:46
+91;saskj21;biomedicin;11,18,4,15,50,26,39,32,43,34;1827;Sabine Lykke Skjøtt;saskj21@student.sdu.dk;27-02-2023 14:46
+92;mehyb21;kemi;40,25,27,4,3,39,41;1828;Mellanie Sølvberg Hybel;mehyb21@student.sdu.dk;27-02-2023 14:46
+93;nacla21;biologi;14,54,61,29,45,20,5,36;1829;Naia Clausen;nacla21@student.sdu.dk;27-02-2023 14:47
+94;majch21;farmaci;53,33,12,35,31,24,52;1830;Maja Samantha Ama Christensen;majch21@student.sdu.dk;27-02-2023 14:47
+95;ckris21;farmaci;17,59,10,60,12,25,35,53;1831;Camilla Bro Kristensen;ckris21@student.sdu.dk;27-02-2023 14:47
+96;pelar21;biologi;45,54,14,61,5,34,29;1832;Petrine Agnethe Heiner Larsen;pelar21@student.sdu.dk;27-02-2023 14:47
+97;nicon21;farmaci;35,33,53,12,17,31,26,24;1833;Nicoline Alberte Nielsen;nicon21@student.sdu.dk;27-02-2023 14:47
+98;phsve21;biologi;5,29,45,54,47,22,61,44;1834;Philip Møldrup Svensson;phsve21@student.sdu.dk;27-02-2023 14:47
+99;brdex21;farmaci;11,12,46,24,35,28,60;1835;Bridie Dexter;brdex21@student.sdu.dk;27-02-2023 14:47
+100;andek21;farmaci;24,52,53,16,33,35,28,11,9;1836;Anders Nørgaard Kristensen;andek21@student.sdu.dk;27-02-2023 14:47
+102;sacar21;biomedicin;4,18,13,27,19,37,39,42,62;1837;Sati Carkaci;sacar21@student.sdu.dk;27-02-2023 14:47
+104;hahan21;biomedicin;4,34,27,13,30,32,15;1838;Hannah Vest Nøhr Hansen;hahan21@student.sdu.dk;27-02-2023 14:47
+105;jknud19;biologi;54,61,20,14,45,36,5;1839;Jonathan Ladager Bjørnskov Knudsen;jknud19@student.sdu.dk;27-02-2023 14:47
+106;MESAR21;farmaci;52,24,28,33,12,35,9;1840;Melisa Fulya Sari;mesar21@student.sdu.dk;27-02-2023 14:47
+107;anibr21;farmaci;52,24,28,33,12,35,9;1841;Anahita Ibrahim;anibr21@student.sdu.dk;27-02-2023 14:47
+108;ezsaf21;farmaci;52,24,28,33,12,35,9;1842;Ezgi Esma Saföz;ezsaf21@student.sdu.dk;27-02-2023 14:47
+109;sijoe21;biomedicin;39,57,18,49,43,13,34,21,30;1843;Simon Kiel Jørgensen;sijoe21@student.sdu.dk;27-02-2023 14:47
+111;istho21;biomedicin;62,27,39,18,15,26,11;1844;Isabella Thorud;istho21@student.sdu.dk;27-02-2023 14:47
+112;Apoul20;biomedicin;13,18,27,3,4,29,11,21,37,34,43;1845;Anders Raabjerg Poulsen;apoul20@student.sdu.dk;27-02-2023 14:47
+113;Jevuo21;biomedicin;34,16,15,25,26,11,18,56,57,59;1846;Jennifer Vuong;jevuo21@student.sdu.dk;27-02-2023 14:47
+114;katth21;biomedicin;34,37,4,18,32,27,43;1847;Katrine Danskov Thomsen;katth21@student.sdu.dk;27-02-2023 14:47
+115;Lahoc21;biologi;54,14,20,29,5,22,61,45,56;1848;Lasse Höcker;lahoc21@student.sdu.dk;27-02-2023 14:47
+116;angad21;biomedicin;34,15,43,49,3,30,4,18,11,21,26;1849;Andrea Emilie Gadgaard;angad21@student.sdu.dk;27-02-2023 14:47
+117;lamor21;biomedicin;34,15,43,49,3,30,4,18,11,21,26;1850;Laura Gaarden Mortensen;lamor21@student.sdu.dk;27-02-2023 14:47
+118;joeef21;biomedicin;34,4,43,27,18,15,19,32,21,30;1851;Josephine Mollerup Eefsen;joeef21@student.sdu.dk;27-02-2023 14:47
+119;motts21;biomedicin;26,15,37,39,21,7,62,47,18;1852;Mads Mildam Ottsen;motts21@student.sdu.dk;27-02-2023 14:47
+120;jodav21;farmaci;33,35,24,59,52,28,17,60,25;1853;Jonas Janum Davidsen;jodav21@student.sdu.dk;27-02-2023 14:47
+121;linla21;farmaci;33,35,24,52,28,12,25,17;1854;Lin Holm Larsen;linla21@student.sdu.dk;27-02-2023 14:47
+122;matim21;farmaci;33,35,24,52,28,12,25,17;1855;Matilde Gantzhorn Magni;matim21@student.sdu.dk;27-02-2023 14:47
+123;sabed21;biomedicin;37,4,18,34,50,39,57;1856;Sarah Berg Bedford;sabed21@student.sdu.dk;27-02-2023 14:47
+124;olsen21;biomedicin;11,18,4,3,43,34,23,27,15,30;1857;Sara Alstrup Hjorth Olsen;olsen21@student.sdu.dk;27-02-2023 14:47
+125;olsha21;bmb;49,34,7,18,3,37,4,23,13,11;1858;Oliver Lucas Shackleton;olsha21@student.sdu.dk;27-02-2023 14:47
+126;sifel21;bmb;39,35,3,13,17,30,34,49;1859;Simon Feldstedt;sifel21@student.sdu.dk;27-02-2023 14:47
+127;annri21;biomedicin;34,18,32,19,3,62,21;1860;Anne Sofie Riis;annri21@student.sdu.dk;27-02-2023 14:47
+128;jualb21;biologi;45,54,61,39,15,4,25,29;1861;Julie Amalie Wilhelmsen Albrektsen;jualb21@student.sdu.dk;27-02-2023 14:47
+129;tlind21;biologi;14,22,44,5,45,29,47;1862;Thea Sanddal Lindholt;tlind21@student.sdu.dk;27-02-2023 14:47
+130;chlau21;biologi;54,14,36,44,25,20,61,45;1863;Christian Skovby Lauridsen;chlau21@student.sdu.dk;27-02-2023 14:47
+131;kusha21;biomedicin;37,11,18,27,34,23,19,7,15;1864;Kushtrim Shaljani;kusha21@student.sdu.dk;27-02-2023 14:47
+132;mthas21;biologi;54,14,45,29,61,25,5;1865;Mathilde Sofie Fuglsang Thastum;mthas21@student.sdu.dk;27-02-2023 14:47
+133;matkr21;biologi;5,54,20,45,61,29,14;1866;Mathilde Sofie Strøger Kristensen;matkr21@student.sdu.dk;27-02-2023 14:47
+134;Sigpe21;biomedicin;27,4,11,18,7,15,19,34;1867;Signe Lund Petersen;sigpe21@student.sdu.dk;27-02-2023 14:47
+135;anhof21;farmaci;11,12,23,26,53,60,52,42,24;1868;Angela Hedinsdóttir Hofgaard;anhof21@student.sdu.dk;27-02-2023 14:47
+136;emert21;biomedicin;4,27,30,39,42,43,19,18,3,57,21,62;1869;Emma Vendelboe Ertner;emert21@student.sdu.dk;27-02-2023 14:47
+137;Jomar21;biomedicin;34,49,30,11,18,37,13;1870;Josefine Marzec;jomar21@student.sdu.dk;27-02-2023 14:47
+138;lasto21;farmaci;9,11,58,56,52,17,42,24,2;1871;Lau Marold Stolborg;lasto21@student.sdu.dk;27-02-2023 14:47
+139;naada21;biomedicin;34,7,18,27,19,43,3,4,21,32,11;1872;Najma Adan;naada21@student.sdu.dk;27-02-2023 14:47
+140;Siljo21;biomedicin;43,27,37,32,39,25,21,4;1873;Silke Emilie Johansen;siljo21@student.sdu.dk;27-02-2023 14:47
+141;cecra21;bmb;39,4,34,37,11,3,27;1874;Cecilie Skov Rasmussen;cecra21@student.sdu.dk;27-02-2023 14:47
+142;majje21;biomedicin;34,18,4,43,11,32,27;1875;Maja Hvid Jensen;majje21@student.sdu.dk;27-02-2023 14:47
+143;jesha21;biologi;54,20,61,45,14,5,22;1876;Jessie Grell Hansen;jesha21@student.sdu.dk;27-02-2023 14:47
+144;idste21;farmaci;59,25,12,10,17,52,35;1877;Ida Pindstoft Steenbjerg;idste21@student.sdu.dk;27-02-2023 14:47
+145;jesko21;biologi;29,47,45,26,15,54,5,44;1878;Jesper Volquartz Skovby;jesko21@student.sdu.dk;27-02-2023 14:47
+146;hechr21;farmaci;53,9,24,11,52,12,28,26,35,33;1879;Henriette Marie Ørum Christensen;hechr21@student.sdu.dk;27-02-2023 14:47
+147;nbral21;farmaci;12,9,53,52,35,28,24,23,33;1880;Naja Bralic;nbral21@student.sdu.dk;27-02-2023 14:47
+148;salau21;farmaci;60,59,10,17,24,52,28;1881;Sara Heidemann Laux;salau21@student.sdu.dk;27-02-2023 14:47
+149;emkwa21;biologi;14,61,45,54,20,5,29;1882;Emil Kwasniak;emkwa21@student.sdu.dk;27-02-2023 14:47
+150;josje20;biomedicin;4,34,27,21,7,62,39,5;1883;Josefine Kjeldsholm Jensen;josje20@student.sdu.dk;27-02-2023 14:47
+151;jenan21;biologi;54,20,25,16,26,4,15,14;1884;Jenny Morgaine Andersson;jenan21@student.sdu.dk;27-02-2023 14:47
+152;pasoe21;bmb;29,15,13,47,26,39,11;1885;Patrick Ørum Slot Sørensen;pasoe21@student.sdu.dk;27-02-2023 14:47
+153;albjo21;biomedicin;34,18,7,4,39,32,27;1886;Alberte Isabella Bekker Enbom;albjo21@student.sdu.dk;27-02-2023 14:47
+154;lguld21;biomedicin;15,26,32,39,21,3,11;1887;Lærke Beuschel Guldborg;lguld21@student.sdu.dk;27-02-2023 14:47
+155;torus21;biologi;54,14,45,22,61,5,36;1888;Tobias Krohn Rusbjerg;torus21@student.sdu.dk;27-02-2023 14:47
+156;mach321;biologi;54,45,61,20,25,16,15,4;1889;Mathilde Schougaard Abildtrup Christensen;mach321@student.sdu.dk;27-02-2023 14:47
+157;mangu21;farmaci;24,25,52,17,33,60,10;1890;Malena Ngoc My Tien Nguyen;mangu21@student.sdu.dk;27-02-2023 14:47
+158;makof21;bmb;11,23,49,42,50,39,27,56,57,59;1891;Mads Wied Kofoed;makof21@student.sdu.dk;27-02-2023 14:47
+159;rasch21;biomedicin;42,47,18,29,37,62,23,19,11;1892;Rasmus Schnoor-Madsen;rasch21@student.sdu.dk;27-02-2023 14:47
+161;makan21;biomedicin;4,43,25,18,32,34,39,56,57,59;1893;Maisa Kanoun;makan21@student.sdu.dk;27-02-2023 14:47
+162;pegaa21;biomedicin;7,4,34,15,26,32,13;1894;Pernille Gaarde;pegaa21@student.sdu.dk;27-02-2023 14:47
+163;suism20;farmaci;25,33,11,53,35,10,2;1895;Sumayo Ismail Ali;suism20@student.sdu.dk;27-02-2023 14:47
+164;Hohas21;farmaci;25,33,11,53,35,10,2;1896;Hodaman Hassan;hohas21@student.sdu.dk;27-02-2023 14:47
+165;faali21;farmaci;25,24,28,10,2,59,60;1897;Faduma Ali;faali21@student.sdu.dk;27-02-2023 14:47
+167;niwin21;bmb;26,15,4,7,18,39,36,56,50,49;1898;Nicklas Alexander Winther-Jørgensen;niwin21@student.sdu.dk;27-02-2023 14:47
+170;thadr21;biologi;61,20,54,45,5,14,22;1899;Thera Mayland Adriansen;thadr21@student.sdu.dk;27-02-2023 14:47
+171;sekun21;kemi;41,40,8,51,56,25,5;1900;Sebastian Haurholm Vig Kuntz;sekun21@student.sdu.dk;27-02-2023 14:47
+172;KRDAM21;kemi;25,39,32,5,18,14,34;1901;Kristian Ryge Damsgaard;krdam21@student.sdu.dk;27-02-2023 14:47
+173;molab21;farmaci;25,17,26,24,33,48,16;1902;Mousbah Mohamad Hassan Lababidi;molab21@student.sdu.dk;27-02-2023 14:47
+174;frmic21;farmaci;17,10,33,59,26,16,53,2,9,35,12,11;1903;Freja Michaelsen;frmic21@student.sdu.dk;27-02-2023 14:47
+175;moabd21;bmb;27,18,37,32,23,19,13;1904;Mohamed Abdelsalam;moabd21@student.sdu.dk;27-02-2023 14:47
+176;jelor21;kemi;8,2,3,40,11,32,50;1905;Jeppe Rye Lorensen;jelor21@student.sdu.dk;27-02-2023 14:47
+177;hearl21;biomedicin;4,3,25,32,39,43,11;1906;Helene Maria Arlø;hearl21@student.sdu.dk;27-02-2023 14:47
+179;shsaj21;biomedicin;18,4,3,27,43,11,42;1907;Shomia Sajeendraraj;shsaj21@student.sdu.dk;27-02-2023 14:47
+180;malip21;kemi;8,34,11,19,4,15,50,56,57,59;1908;Maria Vachek Lippert;malip21@student.sdu.dk;27-02-2023 14:47
+181;miviv21;biologi;34,45,13,3,23,5,21;1909;Mie Slente Vive;miviv21@student.sdu.dk;27-02-2023 14:47
+182;mslot21;biologi;22,47,61,19,56,26,25;1910;Mathias Maj Slott;mslot21@student.sdu.dk;27-02-2023 14:47
+183;tmads21;biologi;54,45,14,20,61,56,25,36,5;1911;Thea Vibe Rud Madsen;tmads21@student.sdu.dk;27-02-2023 14:47
+184;micha21;biomedicin;4,32,43,62,13,18,3,27;1912;Michelle Agathon Hansen;micha21@student.sdu.dk;27-02-2023 14:47
+185;naidr21;farmaci;33,35,10,59,60,17,12,31;1913;Nadia Idris;naidr21@student.sdu.dk;27-02-2023 14:47
+186;cengu21;farmaci;48,35,33,25,2,55,24;1914;Celine Thanh Nha Nguyen;cengu21@student.sdu.dk;27-02-2023 14:47
+187;siger19;kemi;50,8,41,29,40,42,58;1915;Silas Victor Max Gerbild;siger19@student.sdu.dk;27-02-2023 14:47
+188;laepe21;biologi;20,25,36,54,45,61,4;1916;Lærke Finken Pedersen;laepe21@student.sdu.dk;27-02-2023 14:47
+189;cajoe14;biomedicin;37,39,34,7,26,15,3,13,43,49,50;1917;Casper Allan Jørgensen;cajoe14@student.sdu.dk;27-02-2023 14:47
+190;Almoh19;bmb;39,15,4,26,58,43,18;1918;Ali Salh Mohammad;almoh19@student.sdu.dk;27-02-2023 14:47
+191;nikch21;farmaci;52,25,28,59,33,60,12,10;1919;Nikoline Lundgaard Christensen;nikch21@student.sdu.dk;27-02-2023 14:47
+192;emhan21;kemi;40,44,8,41,6,7,26,56,57,59;1920;Emilie Anne Frobøse Hansen;emhan21@student.sdu.dk;27-02-2023 14:47
+193;matsl21;biomedicin;34,11,3,62,1,18,32;1921;Matilde Skovbjerg Slot;matsl21@student.sdu.dk;27-02-2023 14:47
+194;anpau21;biologi;61,20,14,54,36,25,56;1922;Anna Paulsen;anpau21@student.sdu.dk;27-02-2023 14:47
+195;madam21;biomedicin;13,37,7,3,6,62,39;1923;Martin Damkjær;madam21@student.sdu.dk;27-02-2023 14:47
+196;REMUS21;farmaci;26,59,60,24,52,28,17,33;1924;Refat Mustafa;remus21@student.sdu.dk;27-02-2023 14:47
+197;signj21;bmb;34,39,27,49,4,15,18;1925;Signe Mundt Jensen;signj21@student.sdu.dk;27-02-2023 14:47
+198;zaalt21;farmaci;25,33,17,12,53,35,26;1926;Zahrae Salih Al-Tamimi;zaalt21@student.sdu.dk;27-02-2023 14:47
+199;nonas21;farmaci;24,28,52,59,17,16,25;1927;Noor Al-Sagit Naser;nonas21@student.sdu.dk;27-02-2023 14:47
+200;josje21;biomedicin;18,3,7,37,43,34,39,32;1928;Josefine Hedegaard Jensen;josje21@student.sdu.dk;27-02-2023 14:47
+201;juthe21;biomedicin;4,39,11,7,18,27,34,56,57,59;1929;Julie Therkildsen;juthe21@student.sdu.dk;27-02-2023 14:47
+202;thvij21;farmaci;24,35,12,52,28,33,59;1930;Thanya Vijayakumar;thvij21@student.sdu.dk;27-02-2023 14:47
+203;augil21;kemi;40,51,4,54,7,8,18,32,56,57,59;1931;Anna Louise Ugilt;augil21@student.sdu.dk;27-02-2023 14:47
+204;isand21;biomedicin;11,4,18,19,37,62,3,21,23,32,39,43,34,42,7,6;1932;Isabella Maria Andersen;isand21@student.sdu.dk;27-02-2023 14:47
+205;siha521;farmaci;17,59,11,33,23,24,9,28,52;1933;Signe Malig Hansen;siha521@student.sdu.dk;27-02-2023 14:47
+207;hasan20;farmaci;25,10,31,2,24,48,55,59;1934;Haya Mohamad Maher Sanjikdar;hasan20@student.sdu.dk;27-02-2023 14:47
+208;sebla21;farmaci;9,11,23,58,17,42,35,2,55;1935;Sebastian Black;sebla21@student.sdu.dk;27-02-2023 14:47
+209;sani521;kemi;41,8,40,11,58,2,3;1936;Sarah Slott Nielsen;sani521@student.sdu.dk;27-02-2023 14:47
+210;shcha21;farmaci;25,17,26,24,33,53,16;1937;Sherin Jamal Chaaban;shcha21@student.sdu.dk;27-02-2023 14:47
+212;abkab21;kemi;25,29,37,32,62,15,34;1938;Abdulaziz Kabbara;abkab21@student.sdu.dk;27-02-2023 14:47
+213;KAEDV21;kemi;40,8,25,44,11,41,3,56,57,59;1939;Kasper Edvardsen;kaedv21@student.sdu.dk;27-02-2023 14:47
+214;cgraf21;kemi;41,8,40,11,58,2,16;1940;Cecilie Graff;cgraf21@student.sdu.dk;27-02-2023 14:47
+215;Hajaw21;farmaci;25,17,26,24,33,53,16;1941;Hawraa Maitham Jawahiri;hajaw21@student.sdu.dk;27-02-2023 14:47
+216;armah21;farmaci;52,28,5,60,59,24,12;1942;Arya Mahmoud;armah21@student.sdu.dk;27-02-2023 14:47
+217;jujep21;biomedicin;34,11,26,15,44,39,37,4;1943;Julie Overgaard Jeppesen;jujep21@student.sdu.dk;27-02-2023 14:47
+218;viami20;farmaci;33,35,53,12,52,28,10;1944;Vina Shorash Abdulwahed Amin;viami20@student.sdu.dk;27-02-2023 14:47
+219;soban21;biomedicin;4,47,15,43,30,49,37;1945;Sofia Langæble Bangsø;soban21@student.sdu.dk;27-02-2023 14:47
+220;annej19;bmb;39,34,49,2,7,11,50,26,56,57,59;1946;Anne Sofie Jensen;annej19@student.sdu.dk;27-02-2023 14:47
+221;emmus21;farmaci;35,53,33,26,59,60,10,25;1947;Emel Selyatinova Mustafova;emmus21@student.sdu.dk;27-02-2023 14:47
+222;karoe21;kemi;40,41,8,25,16,2,36,56,57,59;1948;Kasper Axel Røpcke;karoe21@student.sdu.dk;27-02-2023 14:47
+223;zecel21;farmaci;35,24,33,52,28,53,59;1949;Zeynep Celik;zecel21@student.sdu.dk;27-02-2023 14:47
+224;frand21;biomedicin;18,34,4,7,37,43,3,39;1950;Freja Klausholt Andersen;frand21@student.sdu.dk;27-02-2023 14:47
+225;frean21;farmaci;23,44,26,11,9,59,60;1951;Freja Cecilie Bjelke Andersen;frean21@student.sdu.dk;27-02-2023 14:47
+226;rubar21;farmaci;33,35,10,59,60,17,12,31;1952;Rukaia Hamdi Bardan;rubar21@student.sdu.dk;27-02-2023 14:47
+227;nicjo20;biologi;45,54,14,61,20,25,36;1953;Nicklas Johannsen;nicjo20@student.sdu.dk;27-02-2023 14:47
+228;faahm21;farmaci;53,33,59,10,17,35,60;1954;Fahmo Bile Hassan Ahmed;faahm21@student.sdu.dk;27-02-2023 14:47
+230;Juset21;bmb;34,3,37,13,21,7,62;1955;Julie Louise Hinge Setholm;juset21@student.sdu.dk;27-02-2023 14:47
+231;ronem21;farmaci;25,59,60,10,17,9,26,56,57,59;1956;Roula Kamal Nemr;ronem21@student.sdu.dk;27-02-2023 14:47
+232;raalt21;farmaci;25,59,60,10,17,9,26,56,57,59;1957;Raghdaa Altoubaji;raalt21@student.sdu.dk;27-02-2023 14:47
+234;liami21;farmaci;25,60,17,59,10,33,12;1958;Limia Amini;liami21@student.sdu.dk;27-02-2023 14:47
+235;ceklo21;farmaci;52,28,24,12,35,33,23;1959;Cecilie Hersom Kløft;ceklo21@student.sdu.dk;27-02-2023 14:47
+236;diall21;farmaci;12,33,35,25,52,59,17,10,60;1960;Diana Allabed;diall21@student.sdu.dk;27-02-2023 14:47
+237;rasaw21;farmaci;12,33,35,25,52,59,17,10,60;1961;Raghad Sawwan;rasaw21@student.sdu.dk;27-02-2023 14:47
+238;maleb21;biologi;18,7,61,5,62,54,29,56,23;1962;Malene Jacobsen Berndt;maleb21@student.sdu.dk;27-02-2023 14:47
+239;dpete21;biomedicin;4,49,3,15,30,19,13;1963;Desirée Petersen;dpete21@student.sdu.dk;27-02-2023 14:47
+240;tomad21;biomedicin;34,37,3,21,13,7,4,30;1964;Tobias Madsen;tomad21@student.sdu.dk;27-02-2023 14:47
+241;sofso21;biomedicin;56,11,39,49,37,4,19;1965;Sofie Thyregod Sørensen;sofso21@student.sdu.dk;27-02-2023 14:47
+242;Ibhaj20;farmaci;25,17,26,24,33,53,16;1966;Ibrahim Adnan Hajjaj;ibhaj20@student.sdu.dk;27-02-2023 14:47
+243;Laban21;farmaci;60,59,11,35,53,33,9,17,10,16;1967;Laurits Emil Lindegaard Bang;laban21@student.sdu.dk;27-02-2023 14:47
+244;kwnag21;farmaci;10,53,25,24,60,59,55,9;1968;Kwiny Precious Nagujja;kwnag21@student.sdu.dk;27-02-2023 14:47
+245;ldamg21;farmaci;52,24,33,28,35,11,23;1969;Lærke Damgaard;ldamg21@student.sdu.dk;27-02-2023 14:47
+246;higha20;bmb;4,25,11,2,26,32,16,15;1970;Hilda Ghasem Mehdi;higha20@student.sdu.dk;27-02-2023 14:47
+247;ilnuu21;farmaci;25,17,26,24,33,48,16;1971;Ilyaas Kayse Aadan Nuur;ilnuu21@student.sdu.dk;27-02-2023 14:47
+248;zoahm21;farmaci;25,59,60,10,17,33,26,28;1972;Zoya Ahmad;zoahm21@student.sdu.dk;27-02-2023 14:47
+249;soalh21;farmaci;52,28,24,17,10,59,60;1973;Sondos Khaled Al Hosnie;soalh21@student.sdu.dk;27-02-2023 14:47
+250;Sakha21;farmaci;52,28,24,17,10,25,59;1974;Salwa Khadija;sakha21@student.sdu.dk;27-02-2023 14:47
+251;tohan21;farmaci;60,59,10,25,12,33,26;1975;Tonia Charity Hanberg;tohan21@student.sdu.dk;27-02-2023 14:47
+252;tobih21;biomedicin;39,4,34,50,3,11,6,58,30,26;1976;Tobias Grønholt Hansen;tobih21@student.sdu.dk;27-02-2023 14:47
+253;satar21;farmaci;25,10,16,53,17,11,26;1977;Samia Bint Mohammad Tariq;satar21@student.sdu.dk;27-02-2023 14:47
+254;jujoe20;biologi;54,45,61,20,5,51,14,56,22;1978;Julie Gwen Jørgensen;jujoe20@student.sdu.dk;27-02-2023 14:47
+255;krila21;farmaci;17,10,53,59,33,35,25,60,11;1979;Kristina Kræmer Lauritzen;krila21@student.sdu.dk;27-02-2023 14:47
+257;carje21;biomedicin;27,4,37,39,3,18,11;1980;Caroline Møller Jensen;carje21@student.sdu.dk;27-02-2023 14:47
+258;raalz21;farmaci;33,35,53,26,12,25,52;1981;Rasha Naeem Alzahrawy;raalz21@student.sdu.dk;27-02-2023 14:47
+259;mskov21;farmaci;55,53,17,24,60,33,35;1982;Marius Emil Skov;mskov21@student.sdu.dk;27-02-2023 14:47
+260;Clvan21;bmb;39,47,15,29,37,49,34,26;1983;Clara Friis Vangsgaard;clvan21@student.sdu.dk;27-02-2023 14:47
+261;saraa21;farmaci;26,60,59,44,2,10,23;1984;Sarah Carmen Ringsmose Andersen;saraa21@student.sdu.dk;27-02-2023 14:47
+262;siall21;farmaci;25,16,12,10,28,52,59;1985;Silva Alloush;siall21@student.sdu.dk;27-02-2023 14:47
+263;famos21;farmaci;25,16,12,10,28,52,59;1986;Farzaneh Mostafavi;famos21@student.sdu.dk;27-02-2023 14:47
+264;alhod21;farmaci;53,48,16,25,17,5,59;1987;Aldina Hodzic;alhod21@student.sdu.dk;27-02-2023 14:47
+265;Jahar21;biomedicin;7,6,34,13,15,26,39;1988;Jakob Refsgaard Hartvig;jahar21@student.sdu.dk;27-02-2023 14:47
+266;Aforu21;biologi;45,61,22,14,36,29,5;1989;Alba Elisabeth Forum;aforu21@student.sdu.dk;27-02-2023 14:47
+267;cehan21;farmaci;60,17,59,10,9,2,55;1990;Cecilie Nordberg Hansen;cehan21@student.sdu.dk;27-02-2023 14:47
+268;mmaza21;farmaci;17,33,12,35,24,25,59;1991;Malik Mazaev;mmaza21@student.sdu.dk;27-02-2023 14:47
+269;aigho21;farmaci;25,17,26,24,33,53,16;1992;Aidin Ghodsi Yangjeh;aigho21@student.sdu.dk;27-02-2023 14:47
+271;sian421;biomedicin;47,18,4,15,3,11,39;1993;Simon Washington Lang Andersen;sian421@student.sdu.dk;27-02-2023 14:47
+272;loped21;biologi;45,4,14,13,61,11,5,54,7;1994;Louise Andie Pedersen;loped21@student.sdu.dk;27-02-2023 14:47
+274;amrob21;bmb;37,30,27,3,13,18,39;1995;Amal Mohamud Awad Roble;amrob21@student.sdu.dk;27-02-2023 14:47
+275;ratot21;bmb;4,11,18,15,19,37,30,39;1996;Rama Totanji;ratot21@student.sdu.dk;27-02-2023 14:47
+276;kathe21;bmb;4,19,62,30,23,51,37,49;1997;Katharina Gorma Horsholm Therkildsen;kathe21@student.sdu.dk;27-02-2023 14:47
+277;wayas21;bmb;4,19,62,30,23,37,49,3,32;1998;Wafa'a Ahmed Ali Yassin;wayas21@student.sdu.dk;27-02-2023 14:47
+278;viuge21;bmb;5,19,18,13,34,32,3,26,1,42,54,62;1999;Victor Majlund Øgelund;viuge21@student.sdu.dk;27-02-2023 14:47
+279;Magnm21;bmb;47,29,43,39,25,30,5,36,37,3,19,62,32,15,26;2000;Magnus Ertbølle Mørkeberg;magnm21@student.sdu.dk;27-02-2023 14:47
+280;sapra21;farmaci;24,52,35,28,16,33,53,25,17;2001;Safina Prathapan;sapra21@student.sdu.dk;27-02-2023 14:47
+281;anmoh21;farmaci;25,26,24,17,33,48,16;2002;Anas Mohammad Mahfouz Mohammad;anmoh21@student.sdu.dk;27-02-2023 14:47
+283;sirut21;bmb;54,25,45,44,5,36,14,56,16;2003;Sine Bach Rüttel;sirut21@student.sdu.dk;27-02-2023 14:47
+284;miatt21;farmaci;25,59,60,10,12,33,28;2004;Milan Atto;miatt21@student.sdu.dk;27-02-2023 14:47
+285;baser16;farmaci;42,25,38,24,26,16,31,17;2005;Bækas Husni Seref;baser16@student.sdu.dk;27-02-2023 14:47
+286;lisor21;biomedicin;34,4,21,7,62,27,11,18;2006;Lina Malou Sörensen;lisor21@student.sdu.dk;27-02-2023 14:47
+287;saomi20;farmaci;28,25,48,12,15,10,9,52,53,55,59,60,17;2007;Sara Omidvar;saomi20@student.sdu.dk;27-02-2023 14:47
+288;jajam21;farmaci;9,25,17,26,11,36,32,56,57,59;2008;Jakarkhoun Jamil Mnla Mohamad;jajam21@student.sdu.dk;27-02-2023 14:47
+289;maje221;farmaci;17,24,35,33,28,52,9;2009;Mads Klink Jensen;maje221@student.sdu.dk;27-02-2023 14:47
+290;majah21;biomedicin;34,49,7,39,37,27,26,23;2010;Maja Emilie Juel Hansen;majah21@student.sdu.dk;27-02-2023 14:47
+291;Mahed21;bmb;7,6,21,18,5,37,4,49,61;2011;Magnus Emmanuel Hedeby;mahed21@student.sdu.dk;27-02-2023 14:47
+292;saduk21;farmaci;33,11,53,12,28,35,8;2012;Sara Dukic;saduk21@student.sdu.dk;27-02-2023 14:47
+293;hamar21;farmaci;59,28,24,10,52,53,12,23;2013;Hannah Martinussen;hamar21@student.sdu.dk;27-02-2023 14:47
+294;shpat21;biomedicin;7,34,21,39,18,15,37,23,26;2014;Sharan Pathmasekaran;shpat21@student.sdu.dk;27-02-2023 14:47

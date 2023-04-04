@@ -1,5 +1,6 @@
 import sys
 import adsigno.utils as utils
+import json
 
 def search_unstable_students(k, sol, problem, members, soldirname="") -> int:
     # returns number of unstable students        
@@ -192,6 +193,22 @@ def check_sol(solutions, problem, soldirname=""):
                         #else:
                         #    f.write(s + "\t" + str(sol.topics[s]) +
                         #            "\t" + 'abcdefghi'[sol.teams[s]] + "\n")
+            # write the stats of the solution to a json file
+            filename = "%s/stat_%03d.json" % (soldirname, k+1)
+            stats = {
+                "students_num":log[0],
+                "students_unass":log[3],
+                "students_outside":counter_area,
+                "teams_num":log[1],
+                "topics_num":log[2],
+                "underfull_teams":log[4],
+                "num_unstable":log[5],
+                "tot_util":log[6],
+                "tot_envy":log[7]
+            }
+            stats["priority"] = {str(i)+". priority":counter[i] for i in range(1, max_rank + 1)}
+            with open(filename, "w") as filehandle:
+                json.dump(stats,filehandle)
         log += sol.solved
         logs += [log]        
     return logs

@@ -61,7 +61,7 @@ class Problem:
             self.tighten_student_priorities()
 
         
-        self.write_logs()
+        self.write_logs(dirname)
         # self.minimax_sol = self.minimax_sol(dirname)
         self.minimax_sol = 0
 
@@ -190,7 +190,7 @@ class Problem:
         project_table.email = project_table.email.apply(lambda x: x.lower())
         project_table.prj_id = project_table.prj_id.astype(str)
         project_table.ID = project_table.ID.astype(int)
-        project_table.index = project_table["ID"].astype(str) #+project_table["team"].astype(str)  # project_table["prj_id"]
+        project_table.index = project_table["prj_id"].astype(str)# project_table["ID"].astype(str) #+project_table["team"].astype(str)  # project_table["prj_id"]
         topic_details = project_table.to_dict("index", into=OrderedDict)
         # topics = {x: list(map(lambda p: p["team"], team_details[x])) for x in team_details}
         print(project_table.type.unique())
@@ -285,14 +285,16 @@ class Problem:
         return (student_details, priorities, groups, std_type)
 
 
-    def write_logs(self):
-        with codecs.open(os.path.join("log", "projects.json"),  "w", "utf-8") as filehandle:
+    def write_logs(self,dirname):
+        log = dirname+"/log"
+        os.makedirs(log, exist_ok=True)
+        with codecs.open(os.path.join(log, "projects.json"),  "w", "utf-8") as filehandle:
             json.dump(self.team_details, fp=filehandle, sort_keys=True,
                     indent=4, separators=(',', ': '),  ensure_ascii=False)
-        with codecs.open(os.path.join("log", "students.json"),  "w", "utf-8") as filehandle:
+        with codecs.open(os.path.join(log, "students.json"),  "w", "utf-8") as filehandle:
             json.dump(self.student_details, fp=filehandle, sort_keys=True,
                     indent=4, separators=(',', ': '),  ensure_ascii=False)
-        with codecs.open(os.path.join("log", "ranks.json"),  "w", "utf-8") as filehandle:
+        with codecs.open(os.path.join(log, "ranks.json"),  "w", "utf-8") as filehandle:
             sorted_computed_ranks = {x: sorted(
                 self.std_ranks_av[x].items(), key=lambda item: item[1]) for x in self.std_ranks_av}
             json.dump(sorted_computed_ranks, fp=filehandle, sort_keys=True,
@@ -427,14 +429,14 @@ class Problem:
 
             valid_prjs = [x for x, item in self.teams_per_topic.items() if item[0].type in valid_prjtypes[t]]
             filtered = list(filter(lambda x: x in utils.flatten_list_of_lists(self.priorities[s]),  valid_prjs))
-            if (len(filtered) <= 1):
+            if (len(filtered) < 1):
                 # prob.std_ranks_av[prob.groups[g][0]])
                 
                 print(s, self.std_type[s],  valid_prjtypes[t])
                 print(sorted(utils.flatten_list_of_lists(self.priorities[s])), sorted(valid_prjs), filtered) #, self.priorities)
                 print([item[0].type for x, item in self.teams_per_topic.items()])
                 print(self.teams_per_topic.keys())
-                raise SystemError("type_compliance: degenerate priority list")
+                raise SystemError("type_compliance: degenerate priority list\n%s" % s)
 
         return valid_prjtypes
 
