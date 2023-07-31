@@ -1,6 +1,8 @@
 library(googleVis)
 
-priorities <- read.csv("out/popularity.csv",header=TRUE,na.strings="NA",dec=".", sep=";")
+args <- commandArgs(trailingOnly = TRUE)
+
+priorities <- read.csv(file.path(args[1],"popularity.csv"),header=TRUE,na.strings="NA",dec=".", sep=";")
 #priorities <- priorities[,c(1:5,6:(6+11))]
 #names(priorities) <- c("Topic ID","Title","Type","Inst","Preferences in total","1st pr.","2nd pr.","3rd pr.","4th pr.",paste(c(5:12),"th pr.",sep=""))
 #names <- c("1st pr.","2nd pr.","3rd pr.","4th pr.")
@@ -13,28 +15,28 @@ priorities <- read.csv("out/popularity.csv",header=TRUE,na.strings="NA",dec=".",
 
 
 Table <- gvisTable(priorities)
-print(Table,file="out/popularity.html")
+print(Table,file=file.path(args[1],"popularity.html"))
 
 #plot(Table)
 
 
-projects <- read.csv("out/projects.csv",header=TRUE,na.strings="NA",dec=".", sep=";")
+projects <- read.csv(file.path(args[1],"projects.csv"),header=TRUE,na.strings="NA",dec=".", sep=";")
 Table <- gvisTable(projects)
-print(Table,file="out/projects.html")
+print(Table,file=file.path(args[1],"projects.html"))
 
 plot(Table)
 
 
 
-students <- read.csv("out/students.csv",header=TRUE,na.strings="NA",dec=".", sep=";")
+students <- read.csv(file.path(args[1],"students.csv"),header=TRUE,na.strings="NA",dec=".", sep=";")
 Table <- gvisTable(students)
-print(Table,file="out/students.html")
+print(Table,file=file.path(args[1],"students.html"))
 
 plot(Table)
 
 
-advisors <- read.csv("out/advisors.csv",header=TRUE,na.strings="NA",dec=".", sep=";")
+advisors <- read.csv(file.path(args[1],"advisors.csv"),header=TRUE,na.strings="NA",dec=".", sep=";")
 Table <- gvisTable(advisors)
-print(Table,file="out/advisors.html")
+print(Table,file=file.path(args[1],"advisors.html"))
 
 plot(Table)

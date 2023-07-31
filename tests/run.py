@@ -44,4 +44,5 @@ except (SystemError,SystemExit) as e:
 
 options.solution_file = 'sln'+'/sol_001.txt' # now it must be the path to the solution
 adsigno.report_sol_new(path, options) # outputs files in 'out'
+adsigno.make_gtables("out") # using files in 'out' and outputting there too
 adsigno.report_4_natfak(path, options) # outputs files in 'out'

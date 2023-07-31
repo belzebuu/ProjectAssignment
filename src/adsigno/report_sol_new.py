@@ -311,7 +311,8 @@ def report_sol_new(dirname, options):
         advisor_table(ass_std2team, ass_team2std, problem)
     summarize(ass_std2team, ass_team2std, max_p, problem)
 
-    log = subprocess.run(["Rscript","scripts/make_gtables.R"],capture_output=True)
+def make_gtables(dirpath="out"):
+    log = subprocess.run(["Rscript", "scripts/make_gtables.R", dirpath], capture_output=True)
 
 
 if __name__ == "__main__":
