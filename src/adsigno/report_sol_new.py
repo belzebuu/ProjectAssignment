@@ -15,7 +15,7 @@ from adsigno.load_data import Problem
 import functools
 import adsigno.cml_parser as cml_parser
 import adsigno.utils as utils
-
+import subprocess
 
 def read_solution(solfile):
     ass_std2team = {}
@@ -218,9 +218,7 @@ def summarize(ass_std2team, ass_team2std, max_p, prob) -> None:
     f.close()
 
 
-def count_popularity(prob):
-    outfile = os.path.join("out", "popularity")
-
+def make_popularity(prob):
     popularity = {}
     max_p = 0
     students = list(prob.student_details.keys())
@@ -235,7 +233,10 @@ def count_popularity(prob):
                 if pId not in prob.teams_per_topic.keys():
                     continue  # pId = int(prob.priorities[s][i])
                 popularity[pId][i] += 1
+    return popularity, max_p
 
+
+def write_popularity(popularity, max_p, prob):
     topic_popularity = OrderedDict()
     for item in sorted(popularity.items(), key=lambda x: x[1][0], reverse=True):
         i = item[0]
@@ -248,10 +249,10 @@ def count_popularity(prob):
     table = pd.DataFrame.from_dict(topic_popularity, orient='index')
     columns = ["title", "type", "instit", "tot_popularity"] + \
         [str(j+1)+". prio." for j in range(max_p)]
+    
+    outfile = os.path.join("out", "popularity")
     table.to_csv(outfile+".csv", sep=";", index=True,
                  index_label="ID", columns=columns)
-
-    return popularity, max_p
 
 
 def advisor_table(ass_std2team, ass_team2std, problem):
@@ -273,7 +274,7 @@ def advisor_table(ass_std2team, ass_team2std, problem):
         rest["assigned_groups"] = groups
         rest["capacity_left_grps"] = rest["groups_max"]-groups
         rest["assigned_stds"] = stds
-        rest["capacity_left_stds"] = rest["capacity_max"]-stds
+        rest["capacity_left_stds"] = rest["capacity_max"]-stds if "capacity_max" in rest else "ND"
 
     advisors_dict = {k: problem.advisors[k] for k in problem.advisors}
     table = pd.DataFrame.from_dict(advisors_dict, orient='index')
@@ -284,9 +285,7 @@ def advisor_table(ass_std2team, ass_team2std, problem):
                           index_label="username")  # ,columns=columns)
 
 
-def main(argv):
-    options, dirname = cml_parser.cml_parse()
-
+def report_sol_new(dirname, options):    
     problem = Problem(dirname, options, True)
     ass_std2team, ass_team2std = read_solution(options.solution_file)
     S = set(ass_team2std.keys()) - set(problem.team_details.keys())
@@ -301,7 +300,8 @@ def main(argv):
         else:
             raise SystemExit("Some team assigned not among those available")
 
-    popularity, max_p = count_popularity(problem)
+    popularity, max_p = make_popularity(problem)
+    write_popularity(popularity, max_p, problem)
     if not check_sol(ass_std2team, ass_team2std, problem, max_p):
         print("WARNING: Solution infeasible")
     project_table(ass_std2team, ass_team2std, popularity, max_p, problem)
@@ -311,12 +311,9 @@ def main(argv):
         advisor_table(ass_std2team, ass_team2std, problem)
     summarize(ass_std2team, ass_team2std, max_p, problem)
 
-
-def usage():
-    print("Check sol and writes three output files\n")
-    print("Usage: [\"help\", \"dir=\"]\n")
-    sys.exit(1)
+    log = subprocess.run(["Rscript","scripts/make_gtables.R"],capture_output=True)
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    options, dirname = cml_parser.cml_parse()
+    report_sol_new(dirname, options)
