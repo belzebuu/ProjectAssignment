@@ -50,7 +50,7 @@ def owa_weights_distribution(max_rank):
     weights[0] = np.nan 
     weights[1] = rescale * f_i[1] * \
         beta**(yager_n_values-1)/(1+beta)**(yager_n_values-1)  # 1
-    for i in range(2, yager_n_values+1):
+    for i in range(2, min(yager_n_values, number_of_values)+1):
         weights[i] = rescale * f_i[i] * beta**(yager_n_values-i)/(1+beta)**(yager_n_values+1-i)   # 2,3,...,number_of_values
         
     if number_of_values > yager_n_values:

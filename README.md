@@ -37,6 +37,17 @@ The following files are required:
 See `data/2021-example` for an example of this input.
 
 
+Work flow as python module
+==========================
+
+Install for editing:
+```
+pip install -e .
+```
+
+```
+```
+
 
 Work flow in association with valkyrien.imada.sdu.dk/BADM500 Portal
 ===================================================================

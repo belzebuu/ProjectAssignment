@@ -17,7 +17,7 @@ from collections import defaultdict
 from collections import OrderedDict
 from adsigno.load_data import Problem
 import functools
-from adsigno.report_sol_new import read_solution, count_popularity
+from adsigno.report_sol_new import read_solution, make_popularity
 import adsigno.cml_parser as cml_parser
 
 
@@ -508,9 +508,7 @@ def institute_wise(prob):
     print(stds_per_retning)
 
 
-def main(argv):
-    options, dirname = cml_parser.cml_parse()
-    
+def report_4_natfak(dirname, options):    
     problem = Problem(dirname,options)
     ass_std2team, ass_team2std = read_solution(options.solution_file)
     S = set(ass_team2std.keys()) - set(problem.team_details.keys())
@@ -525,18 +523,14 @@ def main(argv):
         else:
             raise SystemExit("Some team assigned not among those available")
 
-
-    popularity, max_p = count_popularity(problem)
+    popularity, max_p = make_popularity(problem)
     studentassignments = check_sol(ass_std2team, ass_team2std, problem, popularity, max_p)  # tablefile)
     per_student(studentassignments, ass_std2team, ass_team2std, problem, popularity, max_p)  
     #institute_wise(problem)
 
 
-def usage():
-    print("Check sol and writes three output files\n")
-    print("Usage: [\"help\", \"dir=\"]\n")
-    sys.exit(1)
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    options, dirname = cml_parser.cml_parse()
+    report_4_natfak(dirname, options)

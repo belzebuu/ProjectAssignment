@@ -196,8 +196,9 @@ def model_ip_weighted(prob, config, minimax):
     for rest in prob.restrictions:
         m.addConstr(quicksum(a[g]*x[g, p, t] for g in cal_G for p in rest["topics"] for t in range(
             len(prob.teams_per_topic[p]))) >= rest["capacity_min"], "rstr_nstds_min_%s" % rest["username"])
-        m.addConstr(quicksum(a[g]*x[g, p, t] for g in cal_G for p in rest["topics"] for t in range(
-            len(prob.teams_per_topic[p]))) <= rest["capacity_max"], "rstr_nstds_max_%s" % rest["username"])
+        if "capacity_max" in rest:
+            m.addConstr(quicksum(a[g]*x[g, p, t] for g in cal_G for p in rest["topics"] for t in range(
+                len(prob.teams_per_topic[p]))) <= rest["capacity_max"], "rstr_nstds_max_%s" % rest["username"])
 
     ############################################################
     # Symmetry breaking on the teams

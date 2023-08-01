@@ -365,12 +365,23 @@ class Problem:
 
     def read_restrictions(self, dirname):
         """ reads restrictions """
+        restrictions=dict()
         if os.path.exists(dirname+"/restrictions.json"):
-            return self.read_restrictions_json(dirname)
+            restrictions = self.read_restrictions_json(dirname)
         elif os.path.exists(dirname+"/restrictions.csv"):
-            return self.read_restrictions_csv(dirname)
+            restrictions = self.read_restrictions_csv(dirname)
         else:
             sys.exit(f"File {dirname}/restrictions.[json|csv] missing\n")
+        for x in restrictions:
+            if "groups_min" not in x:
+                x["groups_min"]=0
+            if "groups_max" not in x:
+                x["groups_max"]=float("inf")
+            if "capacity_min" not in x:
+                x["capacity_min"]=0  
+            if "capacity_max" not in x:
+                x["capacity_max"]=float("inf")     
+        return restrictions
 
     def read_restrictions_json(self, dirname):
         """ reads restrictions """
@@ -499,8 +510,12 @@ class Problem:
         for x in self.restrictions:  # self.teams_per_topic.keys():
             n_teams += x["groups_max"]  # len(self.teams_per_topic[p])
         n_places = 0
+        ignore_capacity=False
         for x in self.restrictions:
-            n_places += x["capacity_max"]
+            if "capacity_max" in x:
+                n_places += x["capacity_max"] 
+            else:
+                ignore_capacity=True
         print("-"*70)
         print(
             f"Number of students: {n_stds} on number of places available: {n_places}")
@@ -508,7 +523,7 @@ class Problem:
             f"Number of student groups: {n_groups} on number of teams available: {n_teams}")
         print("-"*70)
 
-        if n_stds > n_places:
+        if n_stds > n_places and not ignore_capacity:
             raise utils.MissingCapacity("After restrictions, potential places not enough for all students. Ignore if restictions not globally set.")
         elif n_groups > n_teams and pre_grouping:
             raise utils.MissingCapacity("After restrictions, no teams enough to cover all groups. Ignore if restrictions not globally set.")
