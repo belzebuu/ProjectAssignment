@@ -5,7 +5,7 @@ from adsigno.models_ip import *
 #from models_ip_scip import *
 from adsigno.models_ip_weighted import *
 from adsigno.check_sol import *
-import adsigno.cml_parser
+from adsigno import cml_parser
 
 from subprocess import *
 
@@ -17,12 +17,12 @@ from adsigno.models_hooker import *
 
 
 
-def solve(dirname, options):
-    problem = Problem(dirname, options)
+def solve(options):
+    problem = Problem(options)
     max_topic = max(problem.teams_per_topic.keys())
 
-    sln = dirname+"/sln"
-    os.makedirs(sln,exist_ok=True)
+    sln_dir = options.output_dir+"/sln"
+    os.makedirs(sln_dir, exist_ok=True)
     
     model = "minimax"
     print(problem.teams_per_topic)
@@ -35,32 +35,28 @@ def solve(dirname, options):
                 problem.recalculate_ranks_values()
             else:
                 break
-        stat = check_sol(solutions, problem, soldirname=sln)
         
-        for st in stat:
-            log = ['x']+[model]+solutions[0].solved+[os.path.basename(dirname)]+st
-            print('%s' % ' '.join(map(str, log)))
-
-        
+        write_solution(solutions, problem, options, solutions[0].solved, sln_dir)
         start = perf_counter()
-        model = "minimax_instab_weighted"
-        model = model+"-"+options.Wmethod
         value, solutions = model_ip_weighted(problem, options, minimax)
         elapsed = (perf_counter() - start)
     elif options.Wmethod=="lexi":
+        start = perf_counter()
         solutions = lex_ip_procedure(problem, options)
+        elapsed = (perf_counter() - start)
     else:
         sys.exit("Wmethod not recognized")
+    write_solution(solutions, problem, options, elapsed, sln_dir)
 
 
-
-
-    stat = check_sol(solutions, problem, soldirname=sln)
+def write_solution(solutions, problem, options, time_elapsed, sln_dir):    
+    stat = check_sol(solutions, problem, sln_dir)
+    model = f"{options.Wmethod}-{options.instability}"
     for st in stat:
-        log = ['x']+[model]+[elapsed]+[os.path.basename(dirname)]+st
+        log = ['x']+[model]+[time_elapsed]+[sln_dir]+st
         print('%s' % ' '.join(map(str, log)))
 
-# print '%s' % ' '.join(map(str, solutions[0].solved))
+    # print '%s' % ' '.join(map(str, solutions[0].solved))
 
 
 if __name__ == "__main__":

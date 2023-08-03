@@ -46,22 +46,41 @@ pip install -e .
 ```
 
 ```
+python3 -m pip freeze
 ```
 
 
 Work flow in association with valkyrien.imada.sdu.dk/BADM500 Portal
 ===================================================================
 
-Solve the assignment problem with `src/main.py` and the needed parameters. For
-an example, see `Makefile` variable `RUN_FLAGS`. 
+Solve the assignment problem with `src/__main__.py` and the needed parameters. 
+
 Check the options available:
 ```
-python3 src/main.py -h
+python3 src/__main__.py -h
 ```
-In particular the `-e` option is to distinguish between a `projects.csv` file that already contains the teams or not.
-By default the solution is written in `sln`.
+In particular, the `-e` option is to distinguish between a `projects.csv` file that already contains the teams or not.
 
-To execute:
+For example:
+```
+python3 src/adsigno/__main__.py -i -g post -w owa -m 3 -o tmp data/2021-example
+```
+
+This writes in the directory `tmp` the directories `sln` and `log` containing the solutions and the log files.
+
+To generate the various kind of reports in `tmp/out`:  
+```
+python3 src/adsigno/solution_report.py -i -g post -w owa -m 3 -s tmp/sln/sol_001.txt -o tmp data/2021-example
+```
+To generate even more output for the administration:
+```
+python3 src/adsigno/solution_report_admin.py -i -g post -w owa -m 3 -s tmp/sln/sol_001.txt -o tmp data/2021-example
+```
+
+
+
+A `Makefile` is available. 
+To solve:
 ```
 make run
 ```

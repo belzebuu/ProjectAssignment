@@ -5,6 +5,7 @@ import sys
 import os
 import csv
 import json
+import os
 import codecs
 import pandas as pd
 from collections import defaultdict
@@ -25,23 +26,26 @@ class Problem:
     def __init__(self):
         return
 
-    def __init__(self, dirname=None, options=None, keep_original_priorities=False):
-        if dirname is None and options is None:
-            return
+    def __init__(self, options=None, keep_original_priorities=False):
+        if options.data_dirname is None and options is None:
+            raise SystemError("Missing info to 'solve'.")
+        data_dirname = options.data_dirname
+        if not os.path.exists(data_dirname):
+            raise SystemError(f"The path '{data_dirname}' does not exist.")
         self.cml_options = options
         self.study_programs = set()
 
         self.student_details, self.priorities, self.groups, self.std_type = self.read_students(
-            dirname)
-        self.restrictions = self.read_restrictions(dirname)
-        self.team_details, self.teams_per_topic, self.advisors = self.read_projects(dirname)
+            data_dirname)
+        self.restrictions = self.read_restrictions(data_dirname)
+        self.team_details, self.teams_per_topic, self.advisors = self.read_projects(data_dirname)
         for k in self.restrictions:
             self.advisors[k["username"].lower()].update(k)
         
         #DF = pd.DataFrame.from_dict(self.team_details,orient="index")
         #print(DF)
         #raise SystemError
-        self.valid_prjtype = self.type_compliance(dirname)
+        self.valid_prjtype = self.type_compliance(data_dirname)
 
         self.restrictions = self.tighten_restrictions()
         
@@ -61,8 +65,8 @@ class Problem:
             self.tighten_student_priorities()
 
         
-        self.write_logs(dirname)
-        # self.minimax_sol = self.minimax_sol(dirname)
+        self.write_logs(options.output_dir)
+        # self.minimax_sol = self.minimax_sol(data_dirname)
         self.minimax_sol = 0
 
         print("Read instance... Done")
@@ -77,29 +81,29 @@ class Problem:
         return program
 
 
-    def read_projects(self, dirname):
+    def read_projects(self, data_dirname):
         '''It must come after restrictions'''
         if self.cml_options.expand_topics:
-            topic_details = self.read_topics(dirname)
+            topic_details = self.read_topics(data_dirname)
             team_details = update_projects.expand_topics(topic_details, self.restrictions)
             teams_per_topic, advisors = self.arrange_teams_per_topic(team_details)
         else:
-            team_details = self.read_teams(dirname)
+            team_details = self.read_teams(data_dirname)
             teams_per_topic, advisors = self.arrange_teams_per_topic(team_details)
         return team_details, teams_per_topic, advisors
 
 
 
 
-    def read_teams(self, dirname):
+    def read_teams(self, data_dirname):
         '''already expanded topics'''
-        projects_file = dirname+"/projects.csv"
+        projects_file = data_dirname+"/projects.csv"
         print("read ", projects_file)        
         # We assume header to be:
         # ID;team;title;min_cap;max_cap;type;prj_id;instit;institute;mini;wl;teachers;email
         # NEW: ProjektNr; Underprojek; Projekttitel; Min; Max;Projekttype; ProjektNr  i BB; Institut forkortelse; Institutnavn; Obligatorisk minikursus; Gruppeplacering
         # OLD: ProjektNr; Underprojek; Projekttitel; Min; Max;Projekttype; ProjektNr  i BB; Institut forkortelse; Obligatorisk minikursus; Gruppeplacering
-        project_table = pd.read_csv(dirname+"/projects.csv", sep=";")
+        project_table = pd.read_csv(data_dirname+"/projects.csv", sep=";")
         print(project_table)
         project_table.team = project_table.team.fillna('')
         project_table.instit = project_table.instit.fillna('')
@@ -178,12 +182,12 @@ class Problem:
         return dict(teams_per_topic), dict(sorted(advisors.items()))
 
 
-    def read_topics(self, dirname):
+    def read_topics(self, data_dirname):
         '''Topics to expand in teams'''
-        projects_file = dirname+"/projects.csv"
+        projects_file = data_dirname+"/projects.csv"
         print("read ", projects_file)
         
-        project_table = pd.read_csv(dirname+"/projects.csv", sep=";")
+        project_table = pd.read_csv(data_dirname+"/projects.csv", sep=";")
         print(project_table)
         project_table.team = project_table.team.fillna('')
         project_table.instit = project_table.instit.fillna('')
@@ -199,14 +203,14 @@ class Problem:
 
         
 
-    def read_students(self, dirname):
-        students_file = dirname+"/students.csv"
+    def read_students(self, data_dirname):
+        students_file = data_dirname+"/students.csv"
         print("read ", students_file)
 
         # grp_id;(group);username;type;priority_list;(student_id);full_name;email;timestamp
         # group is not needed
         student_table = pd.read_csv(
-            dirname+"/students.csv", sep=";",  converters={"priority_list": str})
+            data_dirname+"/students.csv", sep=";",  converters={"priority_list": str})
 
         student_table["username"] = student_table["username"].apply(str.lower)
         student_table.index = student_table["username"]
@@ -285,8 +289,8 @@ class Problem:
         return (student_details, priorities, groups, std_type)
 
 
-    def write_logs(self,dirname):
-        log = dirname+"/log"
+    def write_logs(self,output_dirname):
+        log = output_dirname+"/log"
         os.makedirs(log, exist_ok=True)
         with codecs.open(os.path.join(log, "projects.json"),  "w", "utf-8") as filehandle:
             json.dump(self.team_details, fp=filehandle, sort_keys=True,
@@ -363,15 +367,15 @@ class Problem:
     def recalculate_ranks_values(self) -> None:
         self.std_values, self.std_ranks_av, self.std_ranks_min = self.calculate_ranks_and_values()
 
-    def read_restrictions(self, dirname):
+    def read_restrictions(self, data_dirname):
         """ reads restrictions """
         restrictions=dict()
-        if os.path.exists(dirname+"/restrictions.json"):
-            restrictions = self.read_restrictions_json(dirname)
-        elif os.path.exists(dirname+"/restrictions.csv"):
-            restrictions = self.read_restrictions_csv(dirname)
+        if os.path.exists(data_dirname+"/restrictions.json"):
+            restrictions = self.read_restrictions_json(data_dirname)
+        elif os.path.exists(data_dirname+"/restrictions.csv"):
+            restrictions = self.read_restrictions_csv(data_dirname)
         else:
-            sys.exit(f"File {dirname}/restrictions.[json|csv] missing\n")
+            sys.exit(f"File {data_dirname}/restrictions.[json|csv] missing\n")
         for x in restrictions:
             if "groups_min" not in x:
                 x["groups_min"]=0
@@ -383,9 +387,9 @@ class Problem:
                 x["capacity_max"]=float("inf")     
         return restrictions
 
-    def read_restrictions_json(self, dirname):
+    def read_restrictions_json(self, data_dirname):
         """ reads restrictions """
-        with open(dirname+"/restrictions.json", "r") as jsonfile:
+        with open(data_dirname+"/restrictions.json", "r") as jsonfile:
             restrictions = json.load(jsonfile)
         for r in restrictions["nteams"]:
             r["username"] = r["username"].lower()
@@ -403,10 +407,10 @@ class Problem:
                 processed += [r]
         return processed
 
-    def read_restrictions_csv(self, dirname):
+    def read_restrictions_csv(self, data_dirname):
         """ reads restrictions """
         reader = csv.reader(
-            open(dirname+"/restrictions.csv", "r"), delimiter=";")
+            open(data_dirname+"/restrictions.csv", "r"), delimiter=";")
         restrictions = []
         try:
             for row in reader:
@@ -419,9 +423,9 @@ class Problem:
         
         return restrictions
 
-    def type_compliance(self, dirname):
+    def type_compliance(self, data_dirname):
         """ reads types """
-        reader = csv.reader(open(dirname+"/types.csv", "r"), delimiter=";")
+        reader = csv.reader(open(data_dirname+"/types.csv", "r"), delimiter=";")
         valid_prjtypes = {}
         try:
             for row in reader:

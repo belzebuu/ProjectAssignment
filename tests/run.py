@@ -1,3 +1,4 @@
+import os
 import adsigno
 
 from collections import defaultdict
@@ -9,6 +10,7 @@ class AttributeDict(defaultdict):
 	"""
 	def __init__(self):
 		super(AttributeDict, self).__init__(AttributeDict)
+		self.set_defaults()
 
 	def __getattr__(self, key):
 		try:
@@ -19,30 +21,34 @@ class AttributeDict(defaultdict):
 	def __setattr__(self, key, value):
 		self[key] = value
 
+	def set_defaults(self):
+		self.data_dirname = None
+		self.output_dir = None
+		self.allsol = False
+		self.instability = False
+		self.expand_topics = False
+		self.groups = 'post'
+		self.Wmethod = 'owa'
+		self.cut_off = 10
+		self.cut_off_type = None
+		self.prioritize_all = False
+		self.allow_unassigned = False
+		self.min_preferences = 3
+		self.solution_file = None
 
-path = "data/2021-example"
+
 
 options = AttributeDict()
-options.allsol = False
-options.instability = False
-options.expand_topics = False
-options.groups = 'post'
-options.Wmethod = 'owa'
-options.cut_off = 10
-options.cut_off_type = None
-options.prioritize_all = False
-options.allow_unassigned = False
-options.min_preferences = 3
-options.solution_file = None # this is not used, always written in 'sln'
-
+options.data_dirname = "data/2021-example"
+options.output_dir = options.data_dirname
 
 try:
-    adsigno.solve(path, options)
+    adsigno.solve(options) # writes output in output_dir
 except (SystemError,SystemExit) as e:
     print(e)
 
+options.solution_file = os.path.join(options.output_dir,'sln/sol_001.txt') # path to the solution
 
-options.solution_file = 'sln'+'/sol_001.txt' # now it must be the path to the solution
-adsigno.report_sol_new(path, options) # outputs files in 'out'
-adsigno.make_gtables("out") # using files in 'out' and outputting there too
-adsigno.report_4_natfak(path, options) # outputs files in 'out'
+adsigno.solution_report(options) # outputs files in 'out'
+adsigno.make_gtables(options) # using files in 'out' and outputting there too
+adsigno.solution_report_4_admin(options) # outputs files in 'out'

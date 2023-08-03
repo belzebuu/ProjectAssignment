@@ -120,7 +120,7 @@ def model_ip(prob, config):
     ############################################################
     # Compute optimal solution
     m.setObjective(v, GRB.MINIMIZE)
-    m.write("model_ip.lp")
+    m.write(os.path.join(config.output_dir, "log/model_ip.lp"))
     m.optimize()
     if m.status == GRB.status.INFEASIBLE:  # do IIS
         if config.allow_unassigned:
@@ -128,7 +128,7 @@ def model_ip(prob, config):
         else:
             print('The model is infeasible; computing IIS')
             m.computeIIS()
-            m.write(os.path.join("optprj_IIS.ilp"))
+            m.write(os.path.join(config.output_dir, "log/optprj_IIS.ilp"))
             print('\nThe following constraint(s) cannot be satisfied:')
             for c in m.getConstrs():
                 if c.IISConstr:
@@ -427,7 +427,7 @@ def model_lex(prob, v, h, z, options: Dict, direction: str):
     m.setParam("OptimalityTol", 1e-09)
     m.setParam("Threads", 1)
     m.update()
-    m.write("model.lp")
+    m.write(os.path.join(options.output_dir, "log/model.lp"))
     m.optimize()
     # m.write("model-"+str(h)+".lp")
     # Print solution

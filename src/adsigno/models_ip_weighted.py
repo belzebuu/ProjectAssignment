@@ -271,13 +271,14 @@ def model_ip_weighted(prob, config, minimax):
     m.setParam("Method", 4)  # for deterministic behavior
     m.setParam("TimeLimit", 3600)
     m.update()
-    m.write("model.lp")
+    m.write(os.path.join(config.output_dir, "log/model.lp"))
     m.optimize()
-    m.write("model.sol")
+    m.write(os.path.join(config.output_dir, "log/model.sol"))
+
     if m.status == GRB.status.INFEASIBLE:  # do IIS
         print('The model is infeasible; computing IIS')
         m.computeIIS()
-        m.write(os.path.join("optprj_IIS.ilp"))
+        m.write(os.path.join(config.output_dir, "log/optprj_IIS.ilp"))
         print('\nThe following constraint(s) cannot be satisfied:')
         for c in m.getConstrs():
             if c.IISConstr:

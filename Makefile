@@ -41,7 +41,7 @@ OUTPUT_FLAGS=--allow_unassigned --prioritize_all --min_preferences 5
 OUTPUT_FLAGS=-e --min_preferences 7
 OUTPUT_FLAGS=-g post -w owa -i -m 7
 
-projects: # careful, read README.md before use
+projects: # careful, read README.md.old before use. It should not be necessary anymore
 	python3 src/update_projects.py  ${DATADIR}/${CASE}
 
 
@@ -79,9 +79,9 @@ yrun:
 	
 
 output: | $(OUTPUTDIR)
-	yes | python3 src/adsigno/report_sol_new.py ${OUTPUT_FLAGS} -s ${SOLDIR}/sol_001.txt ${DATADIR}/${CASE} 
-	yes | python3 src/adsigno/report_sol.py ${OUTPUT_FLAGS} -s ${SOLDIR}/sol_001.txt ${DATADIR}/${CASE}
-	Rscript scripts/make_gtables.R
+	yes | python3 src/adsigno/solution_report.py ${OUTPUT_FLAGS} -s ${SOLDIR}/sol_001.txt ${DATADIR}/${CASE} 
+	yes | python3 src/adsigno/solution_report_admin.py ${OUTPUT_FLAGS} -s ${SOLDIR}/sol_001.txt ${DATADIR}/${CASE}
+	# Rscript scripts/make_gtables.R
 
 
 publish: 

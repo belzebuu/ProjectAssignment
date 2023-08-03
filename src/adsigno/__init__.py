@@ -1,5 +1,5 @@
 from adsigno.solve import solve
 
-from adsigno.report_sol_new import report_sol_new
-from adsigno.report_sol_new import make_gtables
-from adsigno.report_sol import report_4_natfak
+from adsigno.solution_report import solution_report
+from adsigno.solution_report import make_gtables
+from adsigno.solution_report_admin import solution_report_4_admin

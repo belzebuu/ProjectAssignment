@@ -22,12 +22,16 @@ def cml_parse() -> dict:
     # parser.add_option("-n","--number", dest="number", type="int", default=10, metavar="NUMBER",
     #                  help="How many tasks/exercises [default: %default]")
     parser.add_option("-s", "--solution_file", dest="solution_file", metavar="PATH", default=None, help="The file where the solution is stored [default: %default]")
+    parser.add_option("-o", "--output_dir", dest="output_dir", metavar="PATH", default=None, help="The directory where the output directories are stored ('log/' 'sln/' 'out/'). If 'None', then same as input direcotry. [default: %default]")
 
     (options, args) = parser.parse_args()  # by default it uses sys.argv[1:]
 
     if not len(args) == 1:
         parser.error("Directory missing")
+        
+    options.data_dirname = args[0]    
+    if options.output_dir is None:
+        options.output_dir = options.data_dirname
 
-    dirname = args[0]
     print(yaml.dump(options))
-    return options, dirname
+    return options

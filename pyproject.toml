@@ -1,16 +1,16 @@
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["flit_core>=3.4"]
+build-backend = "flit_core.buildapi"
 
 [project]
 name = "adsigno"
 version = "0.0.1"
 authors = [
-  { name="Example Author", email="author@example.com" },
+  { name="Marco Chiarandini", email="marco@imada.sdu.dk" },
 ]
-description = "A small example package"
+description = "A program to assign students to projects according to their preferences"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.7"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
@@ -19,3 +19,5 @@ classifiers = [
 
 [project.urls]
 "Homepage" = "https://github.com/belzebuu/ProjectAssignment"
+"Bug Tracker" = "https://github.com/belzebuu/ProjectAssignment/issues"
+
