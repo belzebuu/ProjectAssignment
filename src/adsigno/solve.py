@@ -20,6 +20,9 @@ from adsigno.models_hooker import *
 def solve(dirname, options):
     problem = Problem(dirname, options)
     max_topic = max(problem.teams_per_topic.keys())
+
+    sln = dirname+"/sln"
+    os.makedirs(sln,exist_ok=True)
     
     model = "minimax"
     print(problem.teams_per_topic)
@@ -32,8 +35,7 @@ def solve(dirname, options):
                 problem.recalculate_ranks_values()
             else:
                 break
-        
-        stat = check_sol(solutions, problem, soldirname="sln")
+        stat = check_sol(solutions, problem, soldirname=sln)
         
         for st in stat:
             log = ['x']+[model]+solutions[0].solved+[os.path.basename(dirname)]+st
@@ -53,7 +55,7 @@ def solve(dirname, options):
 
 
 
-    stat = check_sol(solutions, problem, soldirname="sln")
+    stat = check_sol(solutions, problem, soldirname=sln)
     for st in stat:
         log = ['x']+[model]+[elapsed]+[os.path.basename(dirname)]+st
         print('%s' % ' '.join(map(str, log)))
