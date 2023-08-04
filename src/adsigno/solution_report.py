@@ -333,7 +333,7 @@ def make_gtables(options):
         os.path.exists(os.path.join(out_dir, "projects.csv")) and \
         os.path.exists(os.path.join(out_dir, "students.csv")) and \
         os.path.exists(os.path.join(out_dir, "advisors.csv")):
-        log = subprocess.run(["Rscript", "scripts/make_gtables.R", out_dir], capture_output=True)
+        log = subprocess.run(["Rscript", options.scripts_dir+"make_gtables.R", out_dir], capture_output=True)
     else:
         raise SystemError(f'Incorrect path to files in out for make_gtables. Eg: {os.path.join(out_dir, "popularity.csv")}')
 
