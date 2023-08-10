@@ -327,7 +327,7 @@ def solution_report(options):
 def make_gtables(options):
 
     out_dir = options.output_dir+"/out"
-    script_dir = options.get('scripts_dir','/scripts/')
+    script_dir = options.get('scripts_dir','scripts/')
     os.makedirs(out_dir, exist_ok=True)
     
     if os.path.exists(os.path.join(out_dir, "popularity.csv")) and \
