@@ -116,7 +116,7 @@ class Problem:
         
         project_table.prj_id = project_table.prj_id.astype(str)
     
-        project_table.ID = project_table.ID.astype(int)
+        project_table.ID = project_table.ID.astype(str)
         project_table.index = project_table["ID"].astype(
             str)+project_table["team"].astype(str)  # project_table["prj_id"]
         team_details = project_table.to_dict("index", into=OrderedDict)
@@ -232,7 +232,7 @@ class Problem:
                 return []
             pos_s = instring.find("(")
             if pos_s == -1:
-                return [[int(x.strip())] for x in instring.split(",")]
+                return [[x.strip()] for x in instring.split(",")]
             else:
                 pos_e = instring.find(")")
                 return process_string(instring[0:pos_s]) + handle_tie(instring[pos_s+1:pos_e]) + process_string(instring[pos_e+1:])
