@@ -1,3 +1,8 @@
+- set all to largest priority of the cohort.
+
+- change the hard coded 8 in mode_weighted
+
+
 - update model_ip_lexicogrphic as the others
 
 - introduce balance as a possible constraint after minmax
