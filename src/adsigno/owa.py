@@ -38,7 +38,7 @@ def owa_weights_distribution(max_rank):
          Weights for rank values [0, 1, ... ,\Delta]. The first element (weights[0] is the largest value in weights)
     """
     number_of_values = max_rank  # the default, not used for numerical reasons and because in our instances it is never necessary to have m>8
-    yager_n_values = 8  # max number for which to use Yager formula, hardcoded to 8
+    yager_n_values = 8  # max number for which to use Yager formula, hardcoded to 8, beyond this number numerical issues may arise
     # preparing weights element 0 will become the m-th element
     weights = np.zeros(number_of_values+1, dtype="float")
     # beta: smaller than the smallest perceived difference among values which is 1 and 1/Delta after normalization
@@ -61,7 +61,7 @@ def owa_weights_distribution(max_rank):
     # print(["%0.5f" % x for x in weights[1:]])
     return weights
 
-def owa_single_weight(rank, max_rank):
+def owa_single_weight(rank, max_rank) -> float:
     """Calculates the OWA weights with the distribution approach
     More specifically, the function returns the product of w_h and \bar{f}_h
     used in the last equation of page 54 of the article.

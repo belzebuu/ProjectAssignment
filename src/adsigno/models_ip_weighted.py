@@ -4,10 +4,11 @@ from time import perf_counter
 from gurobipy import *
 from adsigno.owa import *
 import numpy as np
+import numpy.typing as npt
 
 import pprint
 
-def calculate_weights(weight_method: str, max_rank: int):
+def calculate_weights(weight_method: str, max_rank: int) -> npt.NDArray[np.int_]:
     if weight_method == "identity":
         weights = np.arange(max_rank + 1, dtype="float")
         weights[0] = np.nan  # max_rank + 1
@@ -20,13 +21,13 @@ def calculate_weights(weight_method: str, max_rank: int):
         # weights[2:] = map(lambda x: rescale*f_i[x-1]*beta**(max_rank-x)/(1+beta)**(max_rank+1-x), range(2,max_rank+1))
         # weights[0] = max(weights[1:])+1
     elif weight_method == "powers":
-        weights = np.array([np.nan]+[-2 ** max(8 - x, 0)
+        weights = np.array([np.nan]+[-2 ** max(8 - x, 0) ## TODO: hardcoded: larger values may introduce numerial troubles
                            for x in range(1, max_rank + 1)], dtype="float")
   
     return weights
 
 
-def calculate_weight(weight_method: str, max_rank: int, rank: int):
+def calculate_weight(weight_method: str, max_rank: int, rank: int) -> int | float:
     if weight_method == "identity":
         weight = rank  # np.arange(max_rank + 1, dtype="float")
     elif weight_method == "owa":
@@ -38,7 +39,7 @@ def calculate_weight(weight_method: str, max_rank: int, rank: int):
         # weights[2:] = map(lambda x: rescale*f_i[x-1]*beta**(max_rank-x)/(1+beta)**(max_rank+1-x), range(2,max_rank+1))
         # weights[0] = max(weights[1:])+1
     elif weight_method == "powers":
-        weight = -2 ** max(8 - rank, 0)
+        weight = -2 ** max(8 - rank, 0) ## TODO: hardcoded: larger values may introduce numerial troubles
     return weight
 
 
