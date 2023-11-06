@@ -221,7 +221,7 @@ class Problem:
         #    student_details[s]["priority_list"] = [
         #        int(x.strip()) for x in student_details[s]["priority_list"].split(",")]
         def handle_tie(part):
-            ties = [int(x.strip()) for x in part.split(",")]
+            ties = [x.strip() for x in part.split(",")]
             # random.shuffle(ties)
             return [ties]
 
