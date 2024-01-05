@@ -57,7 +57,7 @@ Solve the assignment problem with `src/__main__.py` and the needed parameters.
 
 Check the options available:
 ```
-python3 src/__main__.py -h
+python3 src/adsigno/__main__.py -h
 ```
 In particular, the `-e` option is to distinguish between a `projects.csv` file that already contains the teams or not.
 

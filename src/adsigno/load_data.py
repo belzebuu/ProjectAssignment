@@ -39,6 +39,8 @@ class Problem:
             data_dirname)
         self.restrictions = self.read_restrictions(data_dirname)
         self.team_details, self.teams_per_topic, self.advisors = self.read_projects(data_dirname)
+        print(self.advisors)
+        print(self.restrictions)
         for k in self.restrictions:
             self.advisors[k["username"].lower()].update(k)
         
