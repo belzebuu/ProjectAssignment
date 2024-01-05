@@ -25,7 +25,7 @@ def read_solution(solfile):
     for l in lines:
         l = l.replace("\n", "")
         parts = l.split("\t")
-        ass_std2team[parts[0]] = (int(parts[1]), parts[2].strip())
+        ass_std2team[parts[0]] = (parts[1], parts[2].strip())
         ass_team2std[(parts[1]+parts[2]).strip()].add(parts[0])
 
     # print(ass_std2team, ass_team2std)
@@ -69,7 +69,7 @@ def project_table(ass_std2team, ass_team2std, popularity, max_p, prob, out_dir):
     team_details = OrderedDict()
     for i in sorted(prob.teams_per_topic.keys()):
         for team in prob.teams_per_topic[i]:
-            pID = str(int(i))+team.team_id.strip()
+            pID = str(i)+team.team_id.strip()
             team_details[pID] = prob.team_details[pID]
             team_details[pID]["popularity_tot"] = sum(popularity[i])
             team_details[pID]["popularity_details"] = str(popularity[i])

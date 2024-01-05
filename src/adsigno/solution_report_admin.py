@@ -90,7 +90,7 @@ def write_txt_4_admin(ass_std2team, ass_team2std, prob, popularity, max_p, out_d
     studentassignments = []
     for i in sorted(prob.teams_per_topic.keys()):
         for team in prob.teams_per_topic[i]:
-            pID = str(int(i))+team.team_id.strip()
+            pID = str(i)+team.team_id.strip()
             s = "ProjectID: "+prob.team_details[pID]["prj_id"]+prob.team_details[pID]["team"]+"\n"
             s = s + "Project title: \""+prob.team_details[pID]["title"]+"\""+"\n"
             s = s + "Popularity: (tot. "+str(popularity[i][0])+") " + \
@@ -194,12 +194,12 @@ def write_csv_per_student_4_admin(studentassignments, ass_std2team, ass_team2std
     f.write("institute;mini;wl\n")
     students.sort()
     for s in students:
-        pID = str(int(ass_std2team[s][0]))+ass_std2team[s][1]
+        pID = str(ass_std2team[s][0])+ass_std2team[s][1]
         # print pID;
         #print(prob.student_details[s])
         #print(prob.team_details[pID])
         priolist = prob.student_details[s]["priority_list"]
-        valgt = [x for x in range(1, len(priolist)+1) if int(prob.team_details[pID]["ID"]) in priolist[x-1]]
+        valgt = [x for x in range(1, len(priolist)+1) if prob.team_details[pID]["ID"] in priolist[x-1]]
         gottenprio = '%s' % ', '.join(map(str, valgt))
         f.write("%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s\n" %
                 (
