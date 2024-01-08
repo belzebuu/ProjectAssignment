@@ -195,7 +195,7 @@ class Problem:
         project_table.instit = project_table.instit.fillna('')
         project_table.email = project_table.email.apply(lambda x: x.lower())
         project_table.prj_id = project_table.prj_id.astype(str)
-        project_table.ID = project_table.ID.astype(int)
+        project_table.ID = project_table.ID.astype(str)
         project_table.index = project_table["prj_id"].astype(str)# project_table["ID"].astype(str) #+project_table["team"].astype(str)  # project_table["prj_id"]
         topic_details = project_table.to_dict("index", into=OrderedDict)
         # topics = {x: list(map(lambda p: p["team"], team_details[x])) for x in team_details}

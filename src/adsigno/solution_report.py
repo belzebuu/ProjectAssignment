@@ -25,10 +25,10 @@ def read_solution(solfile):
     for l in lines:
         l = l.replace("\n", "")
         parts = l.split("\t")
-        ass_std2team[parts[0]] = (parts[1], parts[2].strip())
-        ass_team2std[(parts[1]+parts[2]).strip()].add(parts[0])
+        ass_std2team[parts[0]] = (str(parts[1].strip()), parts[2].strip())
+        ass_team2std[(str(parts[1])+parts[2]).strip()].add(parts[0])
 
-    # print(ass_std2team, ass_team2std)
+    print(ass_std2team, ass_team2std)
     return ass_std2team, ass_team2std
 
 
@@ -135,10 +135,12 @@ def student_table(ass_std2team, ass_team2std, prob, out_dir):
     student_details = OrderedDict()
     for g in prob.groups.keys():
         for s in prob.groups[g]:
+            print(prob.std_ranks_min[s])
             student_details[s] = (prob.student_details[s]).copy()
             student_details[s]["topic_assigned"] = ass_std2team[s][0]
             # "".join(map(str, ass_std2team[s]) )
             student_details[s]["team_assigned"] = ass_std2team[s][1]
+            print(ass_std2team[s][0])
             student_details[s]["priority_assigned"] = prob.std_ranks_min[s][ass_std2team[s][0]]
 
     with codecs.open(outfile+".json",  "w", "utf-8") as filehandle:
