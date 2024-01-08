@@ -135,12 +135,10 @@ def student_table(ass_std2team, ass_team2std, prob, out_dir):
     student_details = OrderedDict()
     for g in prob.groups.keys():
         for s in prob.groups[g]:
-            print(prob.std_ranks_min[s])
             student_details[s] = (prob.student_details[s]).copy()
             student_details[s]["topic_assigned"] = ass_std2team[s][0]
             # "".join(map(str, ass_std2team[s]) )
             student_details[s]["team_assigned"] = ass_std2team[s][1]
-            print(ass_std2team[s][0])
             student_details[s]["priority_assigned"] = prob.std_ranks_min[s][ass_std2team[s][0]]
 
     with codecs.open(outfile+".json",  "w", "utf-8") as filehandle:
@@ -330,6 +328,8 @@ def make_gtables(options):
 
     out_dir = options.output_dir+"/out"
     script_dir = options.get('scripts_dir','scripts/')
+    print("================> ",script_dir)
+    raise SystemExit
     os.makedirs(out_dir, exist_ok=True)
     
     if os.path.exists(os.path.join(out_dir, "popularity.csv")) and \
