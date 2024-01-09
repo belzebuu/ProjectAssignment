@@ -325,10 +325,11 @@ def solution_report(options):
     
 
 def make_gtables(options):
-
+    #import yaml
+    #print(yaml.dump(options))
     out_dir = options.output_dir+"/out"
     script_dir = options.get('scripts_dir','scripts/')
-    print("================> ",script_dir)
+    
     raise SystemExit
     os.makedirs(out_dir, exist_ok=True)
     
