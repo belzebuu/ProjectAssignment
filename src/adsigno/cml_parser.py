@@ -1,4 +1,5 @@
 from optparse import OptionParser
+from pathlib import Path
 import yaml
 
 def cml_parse() -> dict:
@@ -25,14 +26,14 @@ def cml_parse() -> dict:
     parser.add_option("-c", "--cut_off", dest="cut_off", type="int", default=10, help="The cut off value on preferences to favour a type of users. [default: %default]")
     
     parser.add_option("-s", "--solution_file", dest="solution_file", metavar="PATH", default=None, help="The file where the solution is stored [default: %default]")
-    parser.add_option("-o", "--output_dir", dest="output_dir", metavar="PATH", default=None, help="The directory where the output directories are stored ('log/' 'sln/' 'out/'). If 'None', then same as input direcotry. [default: %default]")
+    parser.add_option("-o", "--output_dir", dest="output_dir", type=Path, metavar="PATH", default=None, help="The directory where the output directories are stored ('log/' 'sln/' 'out/'). If 'None', then same as input direcotry. [default: %default]")
 
     (options, args) = parser.parse_args()  # by default it uses sys.argv[1:]
 
     if not len(args) == 1:
         parser.error("Directory missing")
         
-    options.data_dirname = args[0]    
+    options.data_dirname = Path(args[0])    
     if options.output_dir is None:
         options.output_dir = options.data_dirname
 

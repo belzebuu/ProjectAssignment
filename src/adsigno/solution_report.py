@@ -16,6 +16,7 @@ import functools
 import adsigno.cml_parser as cml_parser
 import adsigno.utils as utils
 import subprocess
+from pathlib import Path
 
 def read_solution(solfile):
     ass_std2team = {}
@@ -62,9 +63,9 @@ def project_table(ass_std2team, ass_team2std, popularity, max_p, prob, out_dir):
 
     # Print per project in std
     # and collect student assigned for later output
-    output1 = os.path.join(out_dir, "projects")
+    output1 = out_dir / "projects"
 
-    filehandle = open(output1+".txt", "w")
+    filehandle = open(output1.with_suffix(".txt"), "w")
     studentassignments = []
     team_details = OrderedDict()
     for i in sorted(prob.teams_per_topic.keys()):
@@ -116,7 +117,7 @@ def project_table(ass_std2team, ass_team2std, popularity, max_p, prob, out_dir):
                 team_details[pID]["assigned"])
     filehandle.close()
 
-    with codecs.open(output1+".json",  "w", "utf-8") as filehandle:
+    with codecs.open(output1.with_suffix(".json"),  "w", "utf-8") as filehandle:
         json.dump(team_details, fp=filehandle, sort_keys=True,
                   indent=4, separators=(',', ': '),  ensure_ascii=False)
     # "prj_id"
@@ -124,13 +125,13 @@ def project_table(ass_std2team, ass_team2std, popularity, max_p, prob, out_dir):
                "min_cap", "max_cap", "assigned_stds", "places_left", "team_status", "assigned"]
     table = pd.DataFrame.from_dict(
         team_details, orient='index', columns=columns)
-    table.to_csv(output1+".csv", sep=";", index=False)
+    table.to_csv(output1.with_suffix(".csv"), sep=";", index=False)
 
 
 def student_table(ass_std2team, ass_team2std, prob, out_dir):
     # Now output to a file the info per student
     # output:
-    outfile = os.path.join(out_dir, "students")
+    outfile = out_dir / "students.csv"
 
     student_details = OrderedDict()
     for g in prob.groups.keys():
@@ -141,7 +142,7 @@ def student_table(ass_std2team, ass_team2std, prob, out_dir):
             student_details[s]["team_assigned"] = ass_std2team[s][1]
             student_details[s]["priority_assigned"] = prob.std_ranks_min[s][ass_std2team[s][0]]
 
-    with codecs.open(outfile+".json",  "w", "utf-8") as filehandle:
+    with codecs.open(outfile.with_suffix(".json"),  "w", "utf-8") as filehandle:
         json.dump(student_details, fp=filehandle, sort_keys=True,
                   indent=4, separators=(',', ': '),  ensure_ascii=False)
 
@@ -152,7 +153,7 @@ def student_table(ass_std2team, ass_team2std, prob, out_dir):
     else:
         cols = ["username", "type", "grp_id", "topic_assigned",
                 "team_assigned", "priority_assigned", "priority_list_wties"]
-    table.to_csv(outfile+".csv", sep=";", index=False, columns=cols)
+    table.to_csv(outfile, sep=";", index=False, columns=cols)
 
     # filehandle = open(outfile+".csv", "w")
     # filehandle.close()
@@ -212,7 +213,7 @@ def summarize(ass_std2team, ass_team2std, max_p, prob, out_dir) -> None:
     print(s)
     print("{Topic: (n_teams, n_stds)}")
     print(wload_topic)
-    outfile = os.path.join(out_dir, "summary.txt")
+    outfile = out_dir / "summary.txt"
     f = open(outfile, "w")
     f.write(s)
     f.close()
@@ -250,13 +251,13 @@ def write_popularity(popularity, max_p, prob, out_dir):
     columns = ["title", "type", "instit", "tot_popularity"] + \
         [str(j+1)+". prio." for j in range(max_p)]
     
-    outfile = os.path.join(out_dir, "popularity")
-    table.to_csv(outfile+".csv", sep=";", index=True,
+    outfile = out_dir / "popularity.csv"
+    table.to_csv(outfile, sep=";", index=True,
                  index_label="ID", columns=columns)
 
 
 def advisor_table(ass_std2team, ass_team2std, problem, out_dir):
-    outfile = os.path.join(out_dir, "advisors")
+    outfile = out_dir / "advisors.csv"
     print(ass_std2team)
     print(ass_team2std)
 
@@ -281,7 +282,7 @@ def advisor_table(ass_std2team, ass_team2std, problem, out_dir):
     print(table)
     columns = ["full_name", "groups_min", "groups_max", "assigned_groups", "capacity_left_grps",
                "capacity_min", "capacity_max", "assigned_stds", "capacity_left_stds"]
-    table[columns].to_csv(outfile+".csv", sep=";", index=True,
+    table[columns].to_csv(outfile, sep=";", index=True,
                           index_label="username")  # ,columns=columns)
 
 
@@ -291,7 +292,7 @@ def load_all(options):
 
     problem = Problem(options, True)
 
-    out_dir = options.output_dir+"/out"
+    out_dir = Path(options.output_dir) / "out"
     os.makedirs(out_dir, exist_ok=True)
     
     ass_std2team, ass_team2std = read_solution(options.solution_file)
@@ -319,27 +320,31 @@ def solution_report(options):
     project_table(ass_std2team, ass_team2std, popularity, max_p, problem, out_dir)
     # institute_wise()
     student_table(ass_std2team, ass_team2std, problem, out_dir)
-    if len(problem.restrictions) > 0:
-        advisor_table(ass_std2team, ass_team2std, problem, out_dir)
+    #if len(problem.restrictions) > 0:
+    advisor_table(ass_std2team, ass_team2std, problem, out_dir)
     summarize(ass_std2team, ass_team2std, max_p, problem, out_dir)
     
 
 def make_gtables(options):
     #import yaml
     #print(yaml.dump(options))
-    out_dir = options.output_dir+"/out"
+
+    out_dir = Path(options.output_dir) / "out"
     try:
         script_dir = options.get('script_dir')
     except AttributeError as e:
-        script_dir='./scripts/'
+        script_dir=Path('./scripts/')
     
-    if os.path.exists(os.path.join(out_dir, "popularity.csv")) and \
-        os.path.exists(os.path.join(out_dir, "projects.csv")) and \
-        os.path.exists(os.path.join(out_dir, "students.csv")) and \
-        os.path.exists(os.path.join(out_dir, "advisors.csv")):
-        log = subprocess.run(["Rscript", script_dir+"make_gtables.R", out_dir], capture_output=True)
+    if os.path.exists(out_dir / "popularity.csv") and \
+        os.path.exists(out_dir / "projects.csv") and \
+        os.path.exists(out_dir / "students.csv") and \
+        os.path.exists(out_dir / "advisors.csv"):
+        try:
+            log = subprocess.run(["Rscript", script_dir / "make_gtables.R", out_dir], capture_output=True)
+        except Exception as e:
+            raise Exception(e)            
     else:
-        raise SystemError(f'Incorrect path to files in out for make_gtables. Eg: {os.path.join(out_dir, "popularity.csv")}')
+        raise SystemError(f'Incorrect path to files in out for make_gtables. Eg: {out_dir / "popularity.csv"}')
 
 if __name__ == "__main__":
     options = cml_parser.cml_parse()

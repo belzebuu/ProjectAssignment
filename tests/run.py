@@ -1,5 +1,6 @@
 import os
 import adsigno
+from pathlib import Path
 
 from collections import defaultdict
 
@@ -24,7 +25,7 @@ class AttributeDict(defaultdict):
 	def set_defaults(self):
 		self.data_dirname = None
 		self.output_dir = None
-		self.script_dir = "scripts/"
+		self.script_dir = Path("./scripts/")
 		self.allsol = False
 		self.instability = False
 		self.expand_topics = False
