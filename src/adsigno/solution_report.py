@@ -328,10 +328,10 @@ def make_gtables(options):
     #import yaml
     #print(yaml.dump(options))
     out_dir = options.output_dir+"/out"
-    script_dir = options.get('scripts_dir','scripts/')
-    
-    raise SystemExit
-    os.makedirs(out_dir, exist_ok=True)
+    try:
+        script_dir = options.get('script_dir')
+    except AttributeError as e:
+        script_dir='./scripts/'
     
     if os.path.exists(os.path.join(out_dir, "popularity.csv")) and \
         os.path.exists(os.path.join(out_dir, "projects.csv")) and \

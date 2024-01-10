@@ -24,6 +24,7 @@ class AttributeDict(defaultdict):
 	def set_defaults(self):
 		self.data_dirname = None
 		self.output_dir = None
+		self.script_dir = "scripts/"
 		self.allsol = False
 		self.instability = False
 		self.expand_topics = False

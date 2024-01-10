@@ -70,11 +70,11 @@ This writes in the directory `tmp` the directories `sln` and `log` containing th
 
 To generate the various kind of reports in `tmp/out`:  
 ```
-python3 src/adsigno/solution_report.py -i -g post -w owa -m 3 -s tmp/sln/sol_001.txt -o tmp data/2021-example
+python3 src/adsigno/solution_report.py -m 3 -s tmp/sln/sol_001.txt -o tmp data/2021-example
 ```
 To generate even more output for the administration:
 ```
-python3 src/adsigno/solution_report_admin.py -i -g post -w owa -m 3 -s tmp/sln/sol_001.txt -o tmp data/2021-example
+python3 src/adsigno/solution_report_admin.py -m 3 -s tmp/sln/sol_001.txt -o tmp data/2021-example
 ```
 
 
