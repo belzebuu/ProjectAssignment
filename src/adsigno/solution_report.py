@@ -344,7 +344,7 @@ def make_gtables(options):
         except Exception as e:
             raise Exception(e)            
     else:
-        raise SystemError(f'Incorrect path to files in out for make_gtables. Eg: {out_dir / "popularity.csv"}')
+        raise SystemError(f'Something wrong in make_gtables at path: {out_dir} there should be popularity.csv projects.csv students.csv advisors.csv')
 
 if __name__ == "__main__":
     options = cml_parser.cml_parse()
