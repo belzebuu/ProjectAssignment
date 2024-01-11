@@ -21,7 +21,7 @@ def solve(options):
     problem = Problem(options)
     max_topic = max(problem.teams_per_topic.keys())
 
-    sln_dir = options.output_dir+"/sln"
+    sln_dir = options.output_dir / "sln"
     os.makedirs(sln_dir, exist_ok=True)
     
     model = "minimax"

@@ -99,13 +99,13 @@ class Problem:
 
     def read_teams(self, data_dirname):
         '''already expanded topics'''
-        projects_file = data_dirname+"/projects.csv"
+        projects_file = data_dirname / "projects.csv"
         print("read ", projects_file)        
         # We assume header to be:
         # ID;team;title;min_cap;max_cap;type;prj_id;instit;institute;mini;wl;teachers;email
         # NEW: ProjektNr; Underprojek; Projekttitel; Min; Max;Projekttype; ProjektNr  i BB; Institut forkortelse; Institutnavn; Obligatorisk minikursus; Gruppeplacering
         # OLD: ProjektNr; Underprojek; Projekttitel; Min; Max;Projekttype; ProjektNr  i BB; Institut forkortelse; Obligatorisk minikursus; Gruppeplacering
-        project_table = pd.read_csv(data_dirname+"/projects.csv", sep=";")
+        project_table = pd.read_csv(data_dirname / "projects.csv", sep=";")
         print(project_table)
         project_table.team = project_table.team.fillna('')
         project_table.instit = project_table.instit.fillna('')
@@ -206,13 +206,13 @@ class Problem:
         
 
     def read_students(self, data_dirname):
-        students_file = data_dirname+"/students.csv"
+        students_file = data_dirname / "students.csv"
         print("read ", students_file)
 
         # grp_id;(group);username;type;priority_list;(student_id);full_name;email;timestamp
         # group is not needed
         student_table = pd.read_csv(
-            data_dirname+"/students.csv", sep=";",  converters={"priority_list": str})
+            data_dirname / "students.csv", sep=";",  converters={"priority_list": str})
 
         student_table["username"] = student_table["username"].apply(str.lower)
         student_table.index = student_table["username"]
@@ -292,7 +292,7 @@ class Problem:
 
 
     def write_logs(self,output_dirname):
-        log = output_dirname+"/log"
+        log = output_dirname / "log"
         os.makedirs(log, exist_ok=True)
         with codecs.open(os.path.join(log, "projects.json"),  "w", "utf-8") as filehandle:
             json.dump(self.team_details, fp=filehandle, sort_keys=True,
@@ -372,9 +372,9 @@ class Problem:
     def read_restrictions(self, data_dirname):
         """ reads restrictions """
         restrictions=dict()
-        if os.path.exists(data_dirname+"/restrictions.json"):
+        if os.path.exists(data_dirname / "restrictions.json"):
             restrictions = self.read_restrictions_json(data_dirname)
-        elif os.path.exists(data_dirname+"/restrictions.csv"):
+        elif os.path.exists(data_dirname / "restrictions.csv"):
             restrictions = self.read_restrictions_csv(data_dirname)
         else:
             sys.exit(f"File {data_dirname}/restrictions.[json|csv] missing\n")
@@ -391,7 +391,7 @@ class Problem:
 
     def read_restrictions_json(self, data_dirname):
         """ reads restrictions """
-        with open(data_dirname+"/restrictions.json", "r") as jsonfile:
+        with open(data_dirname / "restrictions.json", "r") as jsonfile:
             restrictions = json.load(jsonfile)
         for r in restrictions["nteams"]:
             r["username"] = r["username"].lower()
@@ -427,7 +427,7 @@ class Problem:
 
     def type_compliance(self, data_dirname):
         """ reads types """
-        reader = csv.reader(open(data_dirname+"/types.csv", "r"), delimiter=";")
+        reader = csv.reader(open(data_dirname / "types.csv", "r"), delimiter=";")
         valid_prjtypes = {}
         try:
             for row in reader:
