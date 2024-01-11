@@ -331,7 +331,7 @@ def make_gtables(options):
 
     out_dir = Path(options.output_dir) / "out"
     try:
-        script_dir = options.get('script_dir')
+        script_dir = Path(options.get('script_dir'))
     except AttributeError as e:
         script_dir=Path('./scripts/')
     
@@ -339,10 +339,13 @@ def make_gtables(options):
         os.path.exists(out_dir / "projects.csv") and \
         os.path.exists(out_dir / "students.csv") and \
         os.path.exists(out_dir / "advisors.csv"):
+        print("*"*30)
+        print(" ".join(["Rscript", str(script_dir / "make_gtables.R"), str(out_dir)]))
+        print("*"*30)
         try:
             log = subprocess.run(["Rscript", script_dir / "make_gtables.R", out_dir], capture_output=True)
         except Exception as e:
-            raise Exception(e)            
+            raise SystemError(f'Rscript {str(script_dir)}/make_gtables.R {str(out_dir)}')            
     else:
         raise SystemError(f'Something wrong in make_gtables at path: {out_dir} there should be popularity.csv projects.csv students.csv advisors.csv')
 
