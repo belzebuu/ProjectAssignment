@@ -44,7 +44,7 @@ def calculate_weight(weight_method: str, max_rank: int, rank: int) -> int | floa
 
 
 def model_ip_weighted(prob, config, minimax):
-    print("-"*60+"\nSolving model_ip_weighted")
+    logging.info("-"*60+"\nSolving model_ip_weighted")
     start = perf_counter()
     m = Model('weighted')
 
@@ -76,9 +76,9 @@ def model_ip_weighted(prob, config, minimax):
     ############################################################
     weights = calculate_weights(config.Wmethod, max_rank)
     #pprint.pprint(grp_ranks)
-    print(f"Topics available ({len(cal_P)}): {repr(cal_P)}")
-    print(f"Number of prioritized projects between {min_rank} and {max_rank}") 
-    print(f"Weights ({len(weights)}): "+repr(weights))
+    logging.info(f"Topics available ({len(cal_P)}): {repr(cal_P)}")
+    logging.info(f"Number of prioritized projects between {min_rank} and {max_rank}") 
+    logging.info(f"Weights ({len(weights)}): "+repr(weights))
     ############################################################
     # Create variables
     x = {}  # # assignment vars
@@ -305,7 +305,7 @@ def model_ip_weighted(prob, config, minimax):
                         expr += 1 - x[g, p, t]
                     else:
                         expr += x[g, p, t]
-        print("solution " + str(i) + " found\n")
+        logging.info("solution " + str(i) + " found\n")
         elapsed = (perf_counter() - start)
         solutions.append(
             Solution(topics=topics, teams=teams, solved=[elapsed]))

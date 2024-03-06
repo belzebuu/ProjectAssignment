@@ -1,4 +1,4 @@
-from adsigno.solve import solve
+from adsigno.process import process
 
 from adsigno.solution_report import solution_report
 from adsigno.solution_report import make_gtables

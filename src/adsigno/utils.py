@@ -1,5 +1,7 @@
 from collections import namedtuple
 import itertools
+import sys
+import logging
 
 Team = namedtuple("Team", ("team_id", "min", "max", "type"))
 
@@ -59,3 +61,42 @@ class MissingCapacity(Exception):
 		self.message = message
 		super().__init__(self.message)
 
+
+
+class DataIssueStop(Exception):
+	"""Exception raised when there are problems with data
+
+    Attributes:
+        message -- explanation of the error
+    """
+
+	def __init__(self, message="Data issue"):
+		self.message = message
+		super().__init__(self.message)
+
+
+class TypeComplianceError(Exception):
+	"""Exception raised when there are problems with data
+
+    Attributes:
+        message -- explanation of the error
+    """
+
+	def __init__(self, message="Type Complianace Error"):
+		self.message = message
+		super().__init__(self.message)
+
+
+
+def data_issue_continue(msg: str, execution_mode: bool) -> None:	
+	logging.debug(msg)
+	match execution_mode:
+		case "interactive":
+			msg1 = msg + " Continue? (y/n)\n"
+			answer = input(msg1)
+			if answer not in ['Y', 'y']:
+				sys.exit("You decided to stop")
+		case "exception":
+			raise DataIssueStop(msg) 
+		case "yes":
+			pass

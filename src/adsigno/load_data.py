@@ -17,18 +17,21 @@ import random
 import numpy
 import pprint
 import adsigno.update_projects as update_projects
+import logging
 
 random.seed(3)
 
 
 class Problem:
+    options: dict
 
     def __init__(self):
         return
 
     def __init__(self, options=None, keep_original_priorities=False):
-        if options.data_dirname is None and options is None:
-            raise SystemError("Missing info to 'solve'.")
+        if options is None and options.data_dirname is None:
+            raise SystemError("Missing info to 'process'.")
+        self.options=options
         data_dirname = options.data_dirname
         if not os.path.exists(data_dirname):
             raise SystemError(f"The path '{data_dirname}' does not exist.")
@@ -39,9 +42,10 @@ class Problem:
             data_dirname)
         self.restrictions = self.read_restrictions(data_dirname)
         self.team_details, self.teams_per_topic, self.advisors = self.read_projects(data_dirname)
-        print(self.advisors)
-        print(self.restrictions)
+        #print(self.advisors)
+        #print(self.restrictions)
         for k in self.restrictions:
+            logging.info(k)
             self.advisors[k["username"].lower()].update(k)
         
         #DF = pd.DataFrame.from_dict(self.team_details,orient="index")
@@ -58,8 +62,9 @@ class Problem:
         except utils.MissingCapacity as e:
             if options.allow_unassigned:
                 self.add_capacity(options.groups == "pre")
+                logging.warning("Missing capacity and but unssiagnments allowed: capacity added and grouping set to 'pre' prior to assignement")
             else:
-                print(e)
+                logging.warning(e)
                 #raise SystemExit
 
         self.std_values, self.std_ranks_av, self.std_ranks_min = self.calculate_ranks_and_values()
@@ -71,7 +76,7 @@ class Problem:
         # self.minimax_sol = self.minimax_sol(data_dirname)
         self.minimax_sol = 0
 
-        print("Read instance... Done")
+        logging.info("Read instance... Done")
         # self.__dict__.update(kwds)
 
     def program_transform(self, program):
@@ -100,13 +105,13 @@ class Problem:
     def read_teams(self, data_dirname):
         '''already expanded topics'''
         projects_file = data_dirname / "projects.csv"
-        print("read ", projects_file)        
+        logging.info("read "+str(projects_file))
         # We assume header to be:
         # ID;team;title;min_cap;max_cap;type;prj_id;instit;institute;mini;wl;teachers;email
         # NEW: ProjektNr; Underprojek; Projekttitel; Min; Max;Projekttype; ProjektNr  i BB; Institut forkortelse; Institutnavn; Obligatorisk minikursus; Gruppeplacering
         # OLD: ProjektNr; Underprojek; Projekttitel; Min; Max;Projekttype; ProjektNr  i BB; Institut forkortelse; Obligatorisk minikursus; Gruppeplacering
         project_table = pd.read_csv(data_dirname / "projects.csv", sep=";")
-        print(project_table)
+        logging.debug(project_table)
         project_table.team = project_table.team.fillna('')
         project_table.instit = project_table.instit.fillna('')
         if "email" in project_table.columns:
@@ -141,7 +146,7 @@ class Problem:
         # Gruppeplacering=(((len(line)>6 and len(line)==12) and line[11]) or (len(line)>6 and line[10]) or "") # to take into account format before 2012
         # )
         
-        print(project_table.type.unique())
+        logging.debug(project_table.type.unique())
         return team_details
 
     def arrange_teams_per_topic(self, team_details):
@@ -169,7 +174,7 @@ class Problem:
         
         advisors=dict()
         for _, x in team_details.items(): # doubles should just be overwritten
-            advisor_id = x["email"].split("@")[0].strip()
+            advisor_id = x["email"].split("@")[0].strip().lower()
             d={"teams_id": [_]}
             if "teachers" in x:
                 d.update( {"full_name": x["teachers"].split(",")[0]} )
@@ -177,7 +182,7 @@ class Problem:
                 advisors[advisor_id] = d
             else:
                 advisors[advisor_id]["teams_id"]+=[_]
-      
+
         #print(team_details.keys())
         #print(teams_per_topic.keys())
         #raise SystemExit
@@ -186,11 +191,11 @@ class Problem:
 
     def read_topics(self, data_dirname):
         '''Topics to expand in teams'''
-        projects_file = data_dirname+"/projects.csv"
-        print("read ", projects_file)
+        projects_file = data_dirname / "projects.csv"
+        logging.info("read " + str(projects_file))
         
-        project_table = pd.read_csv(data_dirname+"/projects.csv", sep=";")
-        print(project_table)
+        project_table = pd.read_csv(data_dirname / "projects.csv", sep=";")
+        logging.debug(project_table)
         project_table.team = project_table.team.fillna('')
         project_table.instit = project_table.instit.fillna('')
         project_table.email = project_table.email.apply(lambda x: x.lower())
@@ -199,7 +204,7 @@ class Problem:
         project_table.index = project_table["prj_id"].astype(str)# project_table["ID"].astype(str) #+project_table["team"].astype(str)  # project_table["prj_id"]
         topic_details = project_table.to_dict("index", into=OrderedDict)
         # topics = {x: list(map(lambda p: p["team"], team_details[x])) for x in team_details}
-        print(project_table.type.unique())
+        logging.debug(project_table.type.unique())
         
         return topic_details
 
@@ -207,7 +212,7 @@ class Problem:
 
     def read_students(self, data_dirname):
         students_file = data_dirname / "students.csv"
-        print("read ", students_file)
+        logging.debug("read " + str(students_file))
 
         # grp_id;(group);username;type;priority_list;(student_id);full_name;email;timestamp
         # group is not needed
@@ -216,7 +221,7 @@ class Problem:
 
         student_table["username"] = student_table["username"].apply(str.lower)
         student_table.index = student_table["username"]
-        print(student_table)
+        logging.debug(student_table)
         student_details = student_table.to_dict("index", into=OrderedDict)
 
         # for s in student_details:
@@ -247,8 +252,7 @@ class Problem:
                 student_details[s]["priority_list"].strip())
             prj_prioritized = len(utils.flatten_list_of_lists(student_details[s]["priority_list"]))
             if prj_prioritized < self.cml_options.min_preferences:
-                print("WARNING: " +
-                      f" {prj_prioritized} < {self.cml_options.min_preferences} preferences for "+student_details[s]['username'])
+                logging.warning(f" {prj_prioritized} < {self.cml_options.min_preferences} preferences for "+student_details[s]['username'])
                 raise SystemExit(
                     "Found a student who declared less priorities than requested. The case needs handling.")
 
@@ -270,7 +274,7 @@ class Problem:
                         break
                 # student_details[s]["priority_list"][:self.cml_options.cut_off]
                 student_details[s]["priority_list"] = tmp
-                print("WARNING: updated", student_details[s])
+                logging.warning("updated", student_details[s])
 
 
         # print(json.dumps(student_details,indent=4))
@@ -412,7 +416,7 @@ class Problem:
     def read_restrictions_csv(self, data_dirname):
         """ reads restrictions """
         reader = csv.reader(
-            open(data_dirname+"/restrictions.csv", "r"), delimiter=";")
+            open(data_dirname / "restrictions.csv", "r"), delimiter=";")
         restrictions = []
         try:
             for row in reader:
@@ -436,9 +440,9 @@ class Problem:
             sys.exit('file %s, line %d: %s' %
                      ("/types.csv", reader.line_num, e))
             # return {'biologi': ["alle", "natbidat"],"farmaci": ["alle","farmaci"],"natbidat": ["alle","natbidat"]}
-        print("In students:", {x for _,x in self.std_type.items()})
-        print("In projects:", {x["type"] for _,x in self.team_details.items()})
-        print("In types:",valid_prjtypes)
+        logging.debug("In students:" + str({x for _,x in self.std_type.items()}))
+        logging.debug("In projects:" + str({x["type"] for _,x in self.team_details.items()}))
+        logging.debug("In types: " + str(valid_prjtypes))
 
         # check
         for s in self.std_type:
@@ -447,13 +451,12 @@ class Problem:
             valid_prjs = [x for x, item in self.teams_per_topic.items() if item[0].type in valid_prjtypes[t]]
             filtered = list(filter(lambda x: x in utils.flatten_list_of_lists(self.priorities[s]),  valid_prjs))
             if (len(filtered) < 1):
-                # prob.std_ranks_av[prob.groups[g][0]])
-                
-                print(s, self.std_type[s],  valid_prjtypes[t])
-                print(sorted(utils.flatten_list_of_lists(self.priorities[s])), sorted(valid_prjs), filtered) #, self.priorities)
-                print([item[0].type for x, item in self.teams_per_topic.items()])
-                print(self.teams_per_topic.keys())
-                raise SystemError("type_compliance: degenerate priority list\n%s" % s)
+                # prob.std_ranks_av[prob.groups[g][0]])                
+                logging.debug(s, self.std_type[s],  valid_prjtypes[t])
+                logging.debug(sorted(utils.flatten_list_of_lists(self.priorities[s])), sorted(valid_prjs), filtered) #, self.priorities)
+                logging.debug([item[0].type for x, item in self.teams_per_topic.items()])
+                logging.debug(self.teams_per_topic.keys())
+                raise utils.TypeComplianceError("Type compliance error: priority list empty after type filtering\n%s" % s)
 
         return valid_prjtypes
 
@@ -522,13 +525,10 @@ class Problem:
                 n_places += x["capacity_max"] 
             else:
                 ignore_capacity=True
-        print("-"*70)
-        print(
-            f"Number of students: {n_stds} on number of places available: {n_places}")
-        print(
-            f"Number of student groups: {n_groups} on number of teams available: {n_teams}")
-        print("-"*70)
-
+        
+        logging.info(f"Number of students: {n_stds} on number of places available: {n_places}")
+        logging.info(f"Number of student groups: {n_groups} on number of teams available: {n_teams}")
+        
         if n_stds > n_places and not ignore_capacity:
             raise utils.MissingCapacity("After restrictions, potential places not enough for all students. Ignore if restictions not globally set.")
         elif n_groups > n_teams and pre_grouping:
@@ -539,12 +539,9 @@ class Problem:
                        for k in self.team_details])
         n_stds = len(self.student_details)
         if (capacity < n_stds):
-            answer = input(
-                "Not enough capacity from all projects\nHandle this by including a dummy project with the needed capacity? (y/n)\n")
-            if answer in ['Y', 'y']:
-                sys.exit("to implement")
-                # file.write(str(len(project_dict)+1)+";;1;"+str(n_stds-capacity)+";"+program+"\n")
-                #project_dict[len(project_dict)+1] = n_stds-capacity
+            raise utils.MissingCapacity("Not enough capacity from all projects. A possible workaround could be to include a placeholder project with the needed capacity.")
+            # file.write(str(len(project_dict)+1)+";;1;"+str(n_stds-capacity)+";"+program+"\n")
+            #project_dict[len(project_dict)+1] = n_stds-capacity
 
     def tighten_student_priorities(self) -> None:
         
@@ -552,17 +549,14 @@ class Problem:
             for sub_list in plist: #self.student_details[s]["priority_list"]:
                 for p in sub_list:
                     if p not in self.teams_per_topic.keys():
-                        print("WARNING: " + s + " expressed a preference for a project " +
-                                str(p)+" which is not available")
-                        print(self.student_details[s]["priority_list"])
-                        answer = input("Continue? (y/n)\n")
-                        if answer not in ['', 'Y', 'y']:
-                            sys.exit("You decided to stop")
+                        msg = "WARNING: " + s + " expressed a preference for a project " + str(p)+" which is not available\n<br/>"
+                        msg += str(self.student_details[s]["priority_list"])
+                        utils.data_issue_continue(msg, self.options.execution_mode)                        
+                        logging.warning(self.student_details[s]["priority_list"])
                         sub_list.remove(p)
                         if len(sub_list)==0:
-                            self.student_details[s]["priority_list"].remove(sub_list)
-                        print(self.student_details[s]["priority_list"])
-                        return True
+                            self.student_details[s]["priority_list"].remove(sub_list)                        
+                        return True                    
             return False
 
         for s in self.student_details.keys():            

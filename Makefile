@@ -11,6 +11,7 @@ else
 endif
 DATADIR=/home/marco/workspace/git/TT/ProjectAssignment_git_imada/data
 
+DATADIR=/Users/march/workspace/git/TT/ProjectAssignment_git_imada/data/2024-ff501/20240304_004053
 #DATADIR=/home/marco/Teaching/Bachelor/aaskh20/student_alloc/media
 #CASE=2021-zhiru
 #CASE=2019-bachelor
@@ -23,7 +24,7 @@ CASE=2023-badm500/Assignment
 CASE=2022-ff501
 CASE=28022023_133345
 CASE=2023-ff501
-
+CASE=2024-ff501
 
 SOLDIR=sln
 OUTPUTDIR=out
@@ -83,6 +84,10 @@ output: | $(OUTPUTDIR)
 	yes | python3 src/adsigno/solution_report_admin.py ${OUTPUT_FLAGS} -s ${SOLDIR}/sol_001.txt ${DATADIR}/${CASE}
 	# Rscript scripts/make_gtables.R
 
+output2:
+	yes | python3 src/adsigno/solution_report.py ${OUTPUT_FLAGS} -s ${DATADIR}/${SOLDIR}/sol_001.txt -o ${DATADIR} ${DATADIR}
+	yes | python3 src/adsigno/solution_report_admin.py ${OUTPUT_FLAGS} -s ${DATADIR}/${SOLDIR}/sol_001.txt -o ${DATADIR} ${DATADIR}
+	# Rscript scripts/make_gtables.R
 
 publish: 
 	#/bin/rm -rf /home/marco/public_html/out/
