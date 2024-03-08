@@ -88,15 +88,18 @@ class TypeComplianceError(Exception):
 
 
 
-def data_issue_continue(msg: str, execution_mode: bool) -> None:	
+def data_issue_continue(msg: str, execution_mode: str) -> None:	
 	logging.debug(msg)
+	print(execution_mode)
 	match execution_mode:
 		case "interactive":
 			msg1 = msg + " Continue? (y/n)\n"
 			answer = input(msg1)
 			if answer not in ['Y', 'y']:
 				sys.exit("You decided to stop")
-		case "exception":
+		case "except":
 			raise DataIssueStop(msg) 
 		case "yes":
 			pass
+		case _:
+			raise SystemError("Option " + execution_mode+" not recognized")

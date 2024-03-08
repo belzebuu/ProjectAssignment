@@ -64,6 +64,7 @@ In particular, the `-e` option is to distinguish between a `projects.csv` file t
 For example:
 ```
 python3 src/adsigno/__main__.py -i -g post -w owa -m 3 -o tmp data/2021-example
+python3 src/adsigno/__main__.py -i --groups post --min_preferences 7 -x except /Users/march/workspace/git/TT/apps/adsigno/student_alloc/media/20240304_004053/
 ```
 
 This writes in the directory `tmp` the directories `sln` and `log` containing the solutions and the log files.

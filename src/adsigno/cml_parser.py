@@ -22,7 +22,7 @@ def cml_parse() -> dict:
     parser.add_argument("-w", "--Wmethod", dest="Wmethod", default="owa", choices=["identity","owa","powers"], help="The weighting scheme, eg, \"owa\". [default: %(default)s]")    
     parser.add_argument("-i", "--instability", action="store_true", dest="instability", default=False, help="Whether the constraint on instability should be included or not [default: %(default)s]")
     parser.add_argument("-a", "--allsol", action="store_true", dest="allsol", default=False, help="All solutions")
-    parser.add_argument("-x", "--execution_mode", dest="execution_mode", choices=["except","interact","continue"], default="except", help="Interactive execution. [default: %(default)s]")
+    parser.add_argument("-x", "--execution_mode", dest="execution_mode", choices=["except","interact","continue"], default="except", help="Interactive execution mode. [default: %(default)s]")
     
     parser.add_argument("-t", "--cut_off_type", dest="cut_off_type", default=None, help="The type of users eligible for a privileged treatment. [default: %(default)s]")
     parser.add_argument("-c", "--cut_off", dest="cut_off", type=int, default=10, help="The cut off value on preferences to favour a type of users. [default: %(default)s]")
