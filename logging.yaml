@@ -1,0 +1,32 @@
+version: 1
+disable_existing_loggers: False
+formatters:
+  simple:
+    format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+  extended: 
+    format: '[%(levelname)s] %(asctime)s %(module)s %(name)s.%(funcName)s:%(lineno)s: %(message)s'
+    datefmt: '%Y-%m-%d %H:%M:%S'
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: extended
+    stream: ext://sys.stdout
+  file:
+    formatter: extended
+    filename: adsigno.log
+    mode: w
+    class: logging.FileHandler
+loggers:
+  gurobi:
+    level: DEBUG
+    handlers: [console,file]
+    propagate: True
+  preprocessing:
+    level: DEBUG
+    handlers: [console,file]
+    propagate: True
+root:
+  level: DEBUG
+  handlers: [file]
+
