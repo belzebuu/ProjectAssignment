@@ -98,3 +98,22 @@ Finally, publish online:
 make publish
 ```
 
+
+
+# Poetry
+
+```
+2038  pyenv versions
+ 2039  pyenv install 3.12
+ 2040  pyenv local 3.12.7
+ 2042  poetry env use 3.12
+ 2051  poetry add pandas
+ 2053  poetry add pyYAML
+ 2055  poetry add numpy
+ 2058  poetry add pyscipopt
+ 2059  poetry add gurobipy
+ 2060  o pyproject.toml
+ 2061  poetry shell
+poetry install
+exit
+```
