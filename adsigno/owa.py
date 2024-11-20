@@ -24,8 +24,9 @@ def owa_weights_values(number_of_values, beta):
     return weights
 
 
-def owa_weights_distribution(max_rank):
+def owa_weights_distribution(max_rank: int) -> float:
     """Calculates the OWA weights with the distribution approach
+
     More specifically, the function returns the product of w_h and \bar{f}_h
     used in the last equation of page 54 of the article.
     With respect to the function above the function includes the calculation of beta and the values \bar{f}_h.
@@ -35,7 +36,7 @@ def owa_weights_distribution(max_rank):
          max_rank: max rank expressed by the students
 
     Returns:
-         Weights for rank values [0, 1, ... ,\Delta]. The first element (weights[0] is the largest value in weights)
+         Weights for rank values [0, 1, ... ,\\Delta]. The first element (weights[0] is the largest value in weights)
     """
     number_of_values = max_rank  # the default, not used for numerical reasons and because in our instances it is never necessary to have m>8
     yager_n_values = 8  # max number for which to use Yager formula, hardcoded to 8, beyond this number numerical issues may arise
@@ -61,8 +62,9 @@ def owa_weights_distribution(max_rank):
     # print(["%0.5f" % x for x in weights[1:]])
     return weights
 
-def owa_single_weight(rank, max_rank) -> float:
-    """Calculates the OWA weights with the distribution approach
+def owa_single_weight(rank: int, max_rank: int) -> float:
+    """Calculates the OWA weight with the distribution approach
+
     More specifically, the function returns the product of w_h and \bar{f}_h
     used in the last equation of page 54 of the article.
     With respect to the function above the function includes the calculation of beta and the values \bar{f}_h.
@@ -72,7 +74,7 @@ def owa_single_weight(rank, max_rank) -> float:
          max_rank: max rank expressed by the students
 
     Returns:
-         Weights for rank values [0, 1, ... ,\Delta]. The first element (weights[0] is the largest value in weights)
+         Weights for rank values [0, 1, ... ,\\Delta]. The first element (weights[0] is the largest value in weights)
     """
     number_of_values = max_rank  # the default, not used for numerical reasons and because in our instances it is never necessary to have m>8
     number_of_values = 8  # max number for which to use Yager formula, hardcoded to 8

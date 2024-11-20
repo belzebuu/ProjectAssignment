@@ -16,7 +16,8 @@ import itertools
 import random
 import numpy
 import pprint
-import adsigno.update_projects as update_projects
+import adsigno.ravel_topics_1 as ravel_topics_1
+import adsigno.ravel_topics_2 as ravel_topics_2
 import logging
 
 random.seed(3)
@@ -25,10 +26,9 @@ random.seed(3)
 class Problem:
     options: dict
 
-    def __init__(self):
-        return
-
     def __init__(self, options=None, keep_original_priorities=False):
+        if options is None and keep_original_priorities is False:
+            return 
         if options is None and options.data_dirname is None:
             raise SystemError("Missing info to 'process'.")
         self.options=options
@@ -92,7 +92,7 @@ class Problem:
         '''It must come after restrictions'''
         if self.cml_options.expand_topics:
             topic_details = self.read_topics(data_dirname)
-            team_details = update_projects.expand_topics(topic_details, self.restrictions)
+            team_details = ravel_topics_1.expand_topics(topic_details, self.restrictions)
             teams_per_topic, advisors = self.arrange_teams_per_topic(team_details)
         else:
             team_details = self.read_teams(data_dirname)
@@ -112,7 +112,12 @@ class Problem:
         # OLD: ProjektNr; Underprojek; Projekttitel; Min; Max;Projekttype; ProjektNr  i BB; Institut forkortelse; Obligatorisk minikursus; Gruppeplacering
         project_table = pd.read_csv(data_dirname / "projects.csv", sep=";")
         logging.debug(project_table)
-        project_table.team = project_table.team.fillna('')
+        if "team" in project_table:
+            project_table.team = project_table.team.fillna('')
+        elif "number_of_teams" in project_table:
+            project_table.number_of_teams = project_table.number_of_teams.fillna('')
+        else:
+            raise("team or number_of_teams missing in topics")
         project_table.instit = project_table.instit.fillna('')
         if "email" in project_table.columns:
             project_table.email = project_table.email.apply(lambda x: str(x).lower())
@@ -120,8 +125,10 @@ class Problem:
             project_table.email = project_table.ID.apply(lambda x: str(x).lower())
         if "proj_id" in project_table.columns:
             project_table.rename(columns={"proj_id":"prj_id"},inplace=True)
-        
-        project_table.prj_id = project_table.prj_id.astype(str)
+        if "prj_id" in project_table:
+            project_table.prj_id = project_table.prj_id.astype(str)
+        else:
+            project_table.prj_id = project_table.ID
     
         project_table.ID = project_table.ID.astype(str)
         project_table.index = project_table["ID"].astype(
@@ -145,7 +152,7 @@ class Problem:
         # Gruppeplacering=(len(line) > 6 and line[8] or "")
         # Gruppeplacering=(((len(line)>6 and len(line)==12) and line[11]) or (len(line)>6 and line[10]) or "") # to take into account format before 2012
         # )
-        
+
         logging.debug(project_table.type.unique())
         return team_details
 
@@ -196,12 +203,22 @@ class Problem:
         
         project_table = pd.read_csv(data_dirname / "projects.csv", sep=";")
         logging.debug(project_table)
-        project_table.team = project_table.team.fillna('')
+        if "team" in project_table:
+            project_table.team = project_table.team.fillna('')
+        elif "number_of_teams" in project_table:
+            project_table.number_of_teams = project_table.number_of_teams.fillna('')
+        else:
+            raise("team or number_of_teams missing in topics")
         project_table.instit = project_table.instit.fillna('')
-        project_table.email = project_table.email.apply(lambda x: x.lower())
-        project_table.prj_id = project_table.prj_id.astype(str)
+        project_table.email = project_table.email.apply(lambda x: str(x).lower())
         project_table.ID = project_table.ID.astype(str)
-        project_table.index = project_table["prj_id"].astype(str)# project_table["ID"].astype(str) #+project_table["team"].astype(str)  # project_table["prj_id"]
+        if "prj_id" in project_table:
+            project_table.prj_id = project_table.prj_id.astype(str)
+        else:
+            project_table.prj_id = project_table.ID
+        
+        project_table.index = project_table.prj_id.astype(str)# project_table["ID"].astype(str) #+project_table["team"].astype(str)  # project_table["prj_id"]
+        
         topic_details = project_table.to_dict("index", into=OrderedDict)
         # topics = {x: list(map(lambda p: p["team"], team_details[x])) for x in team_details}
         logging.debug(project_table.type.unique())
@@ -253,8 +270,8 @@ class Problem:
             prj_prioritized = len(utils.flatten_list_of_lists(student_details[s]["priority_list"]))
             if prj_prioritized < self.cml_options.min_preferences:
                 logging.warning(f" {prj_prioritized} < {self.cml_options.min_preferences} preferences for "+student_details[s]['username'])
-                raise SystemExit(
-                    "Found a student who declared less priorities than requested. The case needs handling.")
+                #raise SystemExit(
+                #    "Found a student who declared less priorities than requested. The case needs handling.")
 
             if self.cml_options.cut_off_type is not None and student_details[s]["stype"] == self.cml_options.cut_off_type:
                 # We need to ensure all students have the eact same number of priorities
@@ -456,7 +473,7 @@ class Problem:
                 logging.debug(sorted(utils.flatten_list_of_lists(self.priorities[s])), sorted(valid_prjs), filtered) #, self.priorities)
                 logging.debug([item[0].type for x, item in self.teams_per_topic.items()])
                 logging.debug(self.teams_per_topic.keys())
-                raise utils.TypeComplianceError("Type compliance error: priority list empty after type filtering\n%s" % s)
+                #raise utils.TypeComplianceError("Type compliance error: priority list empty after type filtering\n%s" % s)
 
         return valid_prjtypes
 
@@ -500,15 +517,15 @@ class Problem:
         n_places = 0
         for x in self.restrictions:
             n_places += x["capacity_max"]
-
+        
         if n_stds > n_places:
             missing_places = n_stds - n_places
-            topic_nr = max(self.teams_per_topic.keys())+1
+            topic_nr = max(map(lambda x : int(x), self.teams_per_topic.keys()))+1
             for _ in range(missing_places):
                 self.add_fake_project(topic_nr)
         if n_groups > n_teams and pre_grouping:
             missing_teams = n_groups - n_teams + 3
-            topic_nr = max(self.teams_per_topic.keys())+1
+            topic_nr = max(map(lambda x : int(x), self.teams_per_topic.keys()))+1
             for _ in range(missing_teams):
                 self.add_fake_project(topic_nr)
 
