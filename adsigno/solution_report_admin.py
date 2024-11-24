@@ -96,10 +96,10 @@ def write_txt_4_admin(ass_std2team, ass_team2std, prob, popularity, max_p, out_d
             s = s + "Popularity: (tot. "+str(popularity[i][0])+") " + \
                 str(popularity[i][1:(max_p+1)])+"\n"
             s = s + "Project type: "+prob.team_details[pID]["title"]+"\n"
-            s = s + "Min participants: "+str(prob.team_details[pID]["min_cap"])+"\n"
-            s = s + "Max participants: "+str(prob.team_details[pID]["max_cap"])+"\n"
+            s = s + "Min participants: "+str(prob.team_details[pID]["size_min"])+"\n"
+            s = s + "Max participants: "+str(prob.team_details[pID]["size_max"])+"\n"
             std_assigned = pID in ass_team2std and len(ass_team2std[pID]) or 0
-            prob.team_details[pID]["LedigePladser"] = prob.team_details[pID]["max_cap"]-std_assigned
+            prob.team_details[pID]["LedigePladser"] = prob.team_details[pID]["size_max"]-std_assigned
             s = s + "Available places: "+str(prob.team_details[pID]["LedigePladser"])+"\n"
             if (prob.team_details[pID]["LedigePladser"] < 0):
                 sys.exit('project %s has LedigePladser %s ' %
@@ -107,7 +107,7 @@ def write_txt_4_admin(ass_std2team, ass_team2std, prob, popularity, max_p, out_d
             s = s + "Assigned students IDs:"+"\n"
             if std_assigned == 0:
                 prob.team_details[pID]["ProjektStatus"] = "Not open"
-            elif prob.team_details[pID]["min_cap"] > std_assigned:
+            elif prob.team_details[pID]["size_min"] > std_assigned:
                 prob.team_details[pID]["ProjektStatus"] = "Underfull"
             else:
                 prob.team_details[pID]["ProjektStatus"] = "Not underfull"
@@ -141,7 +141,7 @@ def write_txt_4_admin(ass_std2team, ass_team2std, prob, popularity, max_p, out_d
                 # studentassignments.append([sID,sType,pID,ptitle,ptype,
                 #                                                   underfull,wishlist])
             f1.write("Underfull? ")
-            s = prob.team_details[pID]["min_cap"] > std_assigned and "Yes" or "No"
+            s = prob.team_details[pID]["size_min"] > std_assigned and "Yes" or "No"
             s += (std_assigned > 0 and " " or " (Not open)")
             f1.write(str(s)+"\n")
             f1.write("\n")
@@ -189,7 +189,7 @@ def write_csv_per_student_4_admin(studentassignments, ass_std2team, ass_team2std
                 tmp.append(p)
             prob.student_details[s]["DerfraIkkeTilladt"] = tmp
 
-    f.write("username;std_type;topic;team;title;prj_type;ProjektStatus;TildeltPrio;priority_list;DerfraIkkeTilladt;min_cap;max_cap;")
+    f.write("username;std_type;topic;team;title;prj_type;ProjektStatus;TildeltPrio;priority_list;DerfraIkkeTilladt;size_min;size_max;")
     f.write("LedigePladser;full_name;email;grp_id;timestamp;instit;")
     f.write("institute;mini;wl\n")
     students.sort()
@@ -213,8 +213,8 @@ def write_csv_per_student_4_admin(studentassignments, ass_std2team, ass_team2std
                     gottenprio,
                     str(functools.reduce(lambda a,b: a+b,prob.student_details[s]["priority_list"])),
                     prob.student_details[s]["DerfraIkkeTilladt"],
-                    prob.team_details[pID]["min_cap"],
-                    prob.team_details[pID]["max_cap"],
+                    prob.team_details[pID]["size_min"],
+                    prob.team_details[pID]["size_max"],
                     prob.team_details[pID]["LedigePladser"],
                     # prob.team_details[pID]["ProjektNrBB"],
                     # prob.student_details[s]["CprNr"],
@@ -290,8 +290,8 @@ def per_student_old_labels(studentassignments, ass_std2team, ass_team2std, prob,
                     gottenprio,
                     str(functools.reduce(lambda a,b: a+b,prob.student_details[s]["priority_list"])),
                     prob.student_details[s]["DerfraIkkeTilladt"],
-                    prob.team_details[pID]["min_cap"],
-                    prob.team_details[pID]["max_cap"],
+                    prob.team_details[pID]["size_min"],
+                    prob.team_details[pID]["size_max"],
                     prob.team_details[pID]["LedigePladser"],
                     # prob.team_details[pID]["ProjektNrBB"],
                     # prob.student_details[s]["CprNr"],

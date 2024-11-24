@@ -35,7 +35,7 @@ the following fields:
 Example:
 
 ```{.example}
-ID;team;title;min_cap;max_cap;type;prj_id;instit;institute;mini;wl
+ID;team;title;size_min;size_max;type;prj_id;instit;institute;mini;wl
 1;a;Algorithms to identify something from something else;3;5;alle studier, dog ikke farmaci;01a;IMADA;Institut for Matematik og Datalogi;Skriftlig formidling og rapportskrivning (online),Rapportskrivning med LaTeX,Posterfremstilling;IMADA
 1;b;Algorithms to identify something from something else;3;5;alle studier, dog ikke farmaci;01b;IMADA;Institut for Matematik og Datalogi;Skriftlig formidling og rapportskrivning (online),Rapportskrivning med LaTeX,Posterfremstilling;IMADA
 2;;Alternative topic in project topics;3;5;alle studier, dog ikke farmaci;02;BI;Biologisk Institut;Skriftlig formidling og rapportskrivning (online),Naturvidenskabelig informationskompetence,Posterfremstilling;Biologisk Institut

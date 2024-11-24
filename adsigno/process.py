@@ -19,8 +19,7 @@ from adsigno.models_hooker import *
 
 def process(options):
     problem = Problem(options)
-    max_topic = max(problem.teams_per_topic.keys())
-
+    
     sln_dir = options.output_dir / "sln"
     os.makedirs(sln_dir, exist_ok=True)
     
@@ -31,7 +30,7 @@ def process(options):
             try:
                 minimax, solutions = model_ip(problem, options)
             except ProblemInfeasible:
-                problem.add_fake_project(max_topic+1)
+                problem.add_fake_project()
                 problem.recalculate_ranks_values()
             else:
                 break

@@ -107,10 +107,10 @@ class Problem:
         projects_file = data_dirname / "projects.csv"
         logging.info("read "+str(projects_file))
         # We assume header to be:
-        # ID;team;title;min_cap;max_cap;type;prj_id;instit;institute;mini;wl;teachers;email
+        # ID;team;title;size_min;size_max;type;prj_id;instit;institute;mini;wl;teachers;email
         # NEW: ProjektNr; Underprojek; Projekttitel; Min; Max;Projekttype; ProjektNr  i BB; Institut forkortelse; Institutnavn; Obligatorisk minikursus; Gruppeplacering
         # OLD: ProjektNr; Underprojek; Projekttitel; Min; Max;Projekttype; ProjektNr  i BB; Institut forkortelse; Obligatorisk minikursus; Gruppeplacering
-        project_table = pd.read_csv(data_dirname / "projects.csv", sep=";")
+        project_table = pd.read_csv(projects_file, sep=";")
         logging.debug(project_table)
         if "team" in project_table:
             project_table.team = project_table.team.fillna('')
@@ -119,6 +119,7 @@ class Problem:
         else:
             raise("team or number_of_teams missing in topics")
         project_table.instit = project_table.instit.fillna('')
+        project_table.advisor_main=project_table.advisor_main.astype(str)
         if "email" in project_table.columns:
             project_table.email = project_table.email.apply(lambda x: str(x).lower())
         else:
@@ -173,8 +174,8 @@ class Problem:
             for t in teams_per_topic_short[topic]:
                 _id = str(topic)+t.strip()
                 teams_per_topic[topic].append(utils.Team(t,
-                                                         team_details[_id]["min_cap"],
-                                                         team_details[_id]["max_cap"],
+                                                         team_details[_id]["size_min"],
+                                                         team_details[_id]["size_max"],
                                                          team_details[_id]["type"]
                                                          )
                                               )
@@ -273,26 +274,29 @@ class Problem:
                 #raise SystemExit(
                 #    "Found a student who declared less priorities than requested. The case needs handling.")
 
-            if self.cml_options.cut_off_type is not None and student_details[s]["stype"] == self.cml_options.cut_off_type:
-                # We need to ensure all students have the eact same number of priorities
+            if self.cml_options.cut_off_type is not None and str(student_details[s]["stype"]) == self.cml_options.cut_off_type:
+                # We need to ensure all students have the exact same number of priorities
                 # we cut off and if a group of ties exceeds the cut off size, we select
                 # remaining at random
                 tmp = []
                 size = 0
                 for _ in student_details[s]["priority_list"]:
-                    if len(_) + size < self.cml_options.cut_off:
-                        tmp += [_]
-                        size += len(_)
-                    elif len(_) + size > self.cml_options.cut_off:
-                        tmp += [random.choices(_,
-                                               k=self.cml_options.cut_off - size)]
+                    tmp += [_]
+                    size += len(_)
+                    if size >= self.cml_options.cut_off:
                         break
-                    else:
-                        break
+                    #if len(_) + size <= self.cml_options.cut_off:
+                    #    tmp += [_]
+                    #    size += len(_)
+                    #elif len(_) + size > self.cml_options.cut_off:
+                    #    tmp += [random.choices(_,
+                    #                           k=self.cml_options.cut_off - size)]
+                    #    break
+                    #else:
+                    #    break
                 # student_details[s]["priority_list"][:self.cml_options.cut_off]
                 student_details[s]["priority_list"] = tmp
                 logging.warning("updated", student_details[s])
-
 
         # print(json.dumps(student_details,indent=4))
 
@@ -400,14 +404,14 @@ class Problem:
         else:
             sys.exit(f"File {data_dirname}/restrictions.[json|csv] missing\n")
         for x in restrictions:
-            if "groups_min" not in x:
-                x["groups_min"]=0
-            if "groups_max" not in x:
-                x["groups_max"]=float("inf")
-            if "capacity_min" not in x:
-                x["capacity_min"]=0  
-            if "capacity_max" not in x:
-                x["capacity_max"]=float("inf")     
+            if "teams_min" not in x:
+                x["teams_min"]=0
+            if "teams_max" not in x:
+                x["teams_max"]=float("inf")
+            if "students_min" not in x:
+                x["students_min"]=0  
+            if "students_max" not in x:
+                x["students_max"]=float("inf")     
         return restrictions
 
     def read_restrictions_json(self, data_dirname):
@@ -416,7 +420,7 @@ class Problem:
             restrictions = json.load(jsonfile)
         for r in restrictions["nteams"]:
             r["username"] = r["username"].lower()
-        #print({x["username"]: x["groups_max"] for x in restrictions["nteams"]})        
+        #print({x["username"]: x["teams_max"] for x in restrictions["nteams"]})        
         return restrictions["nteams"] 
 
     def tighten_restrictions(self):
@@ -477,33 +481,40 @@ class Problem:
 
         return valid_prjtypes
 
-    def add_fake_project(self, topic_nr: int) -> None:
+    def add_fake_project(self) -> None:
         """Must occurr before calculating ranks and values"""
-
+        new_id="Unassigned"
         #Team = namedtuple("Team", ("team_id", "min", "max", "type"))
         letters = "abcdefghi"
 
         # copy the type of the first team
-        type = self.teams_per_topic[1][0].type
+        type = self.teams_per_topic[list(self.teams_per_topic.keys())[0]][0].type
 
-        n = len(self.teams_per_topic[topic_nr]
-                ) if topic_nr in self.teams_per_topic else 0
+        n=0
+        if new_id not in self.teams_per_topic:
+            self.teams_per_topic[new_id]=[utils.Team(letters[n], 0, 5, type)]
+        else:
+            n = len(self.teams_per_topic[new_id]) 
+            self.teams_per_topic[new_id].append(utils.Team(letters[n], 0, 5, type))
 
-        self.teams_per_topic[topic_nr].append(
-            utils.Team(letters[n], 0, 5, type))
-
-        _id = str(topic_nr)+letters[n]
-        self.team_details[_id] = {'ID': topic_nr, 'team': letters[n],
-                                  'title': 'Unassigned', 'min_cap': 0, 'max_cap': 5, 'type': type,
+        _id = str(new_id)+letters[n]
+        self.team_details[_id] = {'ID': new_id, 'team': letters[n],
+                                  'title': 'Unassigned', 'size_min': 0, 'size_max': 5, 'type': type,
                                   'prj_id': _id, 'instit': 'IMADA', 'institute': 'IMADA', 'mini': numpy.nan, 'wl': numpy.nan,
                                   'teachers': 'Nobody', 'email': 'nobody@sdu.dk'}
 
         for s in self.priorities:
-            if not any([topic_nr in x for x in self.priorities[s]]):
-                self.priorities[s] += [[topic_nr]]
+            if self.cml_options.cut_off_type is not None and str(self.student_details[s]["stype"]) == self.cml_options.cut_off_type:
+                continue
+            if not any([new_id in x for x in self.priorities[s]]):
+                self.priorities[s] += [[new_id]]
+        #print(json.dumps(self.priorities,indent=4))
+        
         for s in self.student_details:
-            if not any([topic_nr in x for x in self.student_details[s]["priority_list"]]):
-                self.student_details[s]["priority_list"] += [[topic_nr]]
+            if self.cml_options.cut_off_type is not None and str(self.student_details[s]["stype"]) == self.cml_options.cut_off_type:
+                continue
+            if not any([new_id in x for x in self.student_details[s]["priority_list"]]):
+                self.student_details[s]["priority_list"] += [[new_id]]
             # print(self.student_details[s]["priority_list"])
 
     def add_capacity(self, pre_grouping: bool) -> None:
@@ -513,10 +524,10 @@ class Problem:
         n_groups = len(self.groups)
         n_teams = 0
         for x in self.restrictions:  # self.teams_per_topic.keys():
-            n_teams += x["groups_max"]  # len(self.teams_per_topic[p])
+            n_teams += x["teams_max"]  # len(self.teams_per_topic[p])
         n_places = 0
         for x in self.restrictions:
-            n_places += x["capacity_max"]
+            n_places += x["students_max"]
         
         if n_stds > n_places:
             missing_places = n_stds - n_places
@@ -534,12 +545,12 @@ class Problem:
         n_groups = len(self.groups)
         n_teams = 0
         for x in self.restrictions:  # self.teams_per_topic.keys():
-            n_teams += x["groups_max"]  # len(self.teams_per_topic[p])
+            n_teams += x["teams_max"]  # len(self.teams_per_topic[p])
         n_places = 0
         ignore_capacity=False
         for x in self.restrictions:
-            if "capacity_max" in x:
-                n_places += x["capacity_max"] 
+            if "students_max" in x:
+                n_places += x["students_max"] 
             else:
                 ignore_capacity=True
         
@@ -552,7 +563,7 @@ class Problem:
             raise utils.MissingCapacity("After restrictions, no teams enough to cover all groups. Ignore if restrictions not globally set.")
 
     def check_tot_capacity(self) -> None:
-        capacity = sum([self.team_details[k]["max_cap"]
+        capacity = sum([self.team_details[k]["size_max"]
                        for k in self.team_details])
         n_stds = len(self.student_details)
         if (capacity < n_stds):

@@ -68,6 +68,7 @@ def project_table(ass_std2team, ass_team2std, popularity, max_p, prob, out_dir):
     filehandle = open(output1.with_suffix(".txt"), "w")
     studentassignments = []
     team_details = OrderedDict()
+
     for i in sorted(prob.teams_per_topic.keys()):
         for team in prob.teams_per_topic[i]:
             pID = str(i)+team.team_id.strip()
@@ -76,19 +77,20 @@ def project_table(ass_std2team, ass_team2std, popularity, max_p, prob, out_dir):
             team_details[pID]["popularity_details"] = str(popularity[i])
             std_assigned = len(ass_team2std[pID]) if pID in ass_team2std else 0
             team_details[pID]["assigned_stds"] = std_assigned
-            team_details[pID]["places_left"] = prob.team_details[pID]["max_cap"]-std_assigned
+            team_details[pID]["places_left"] = prob.team_details[pID]["size_max"]-std_assigned
             if (team_details[pID]["places_left"] < 0):
                 sys.exit('project %s has places_left %s ' %
                          (pID, team_details[pID]["places_left"]))
             if std_assigned == 0:
                 team_details[pID]["team_status"] = "Not used"
-            elif prob.team_details[pID]["max_cap"] > std_assigned:
+            elif prob.team_details[pID]["size_max"] > std_assigned:
                 team_details[pID]["team_status"] = "Underfull"
             else:
                 team_details[pID]["team_status"] = "Full"
 
             team_details[pID]["assigned"] = []
             if (std_assigned > 0):
+                print(team_details[pID])
                 if "teachers" in team_details[pID]:
                     filehandle.write("%s: %s (advisors: %s; contact: %s) \n" %
                                      (  # pID,
@@ -122,9 +124,14 @@ def project_table(ass_std2team, ass_team2std, popularity, max_p, prob, out_dir):
                   indent=4, separators=(',', ': '),  ensure_ascii=False)
     # "prj_id"
     columns = ["ID", "team", "title", "teachers", "email", "type", "instit", "mini", "wl", "popularity_tot", "popularity_details",
-               "min_cap", "max_cap", "assigned_stds", "places_left", "team_status", "assigned"]
+               "size_min", "size_max", "assigned_stds", "places_left", "team_status", "assigned"]
     table = pd.DataFrame.from_dict(
         team_details, orient='index', columns=columns)
+
+    is_all_numeric = table['ID'].apply(lambda x: isinstance(x, (int))).all()
+    if is_all_numeric:
+        table['ID']=pd.to_numeric(table['ID'])
+        table['ID']=table['ID'].astype(int)
     table.to_csv(output1.with_suffix(".csv"), sep=";", index=False)
 
 
@@ -273,15 +280,15 @@ def advisor_table(ass_std2team, ass_team2std, problem, out_dir):
                         stds += len(ass_team2std[team_id])
         # rest["full_name"]=problem.advisors[rest["username"]]["full_name"] if rest["username"] in problem.advisors else ""
         rest["assigned_groups"] = groups
-        rest["capacity_left_grps"] = rest["groups_max"]-groups
+        rest["capacity_left_grps"] = rest["teams_max"]-groups
         rest["assigned_stds"] = stds
-        rest["capacity_left_stds"] = rest["capacity_max"]-stds if "capacity_max" in rest else "ND"
+        rest["capacity_left_stds"] = rest["students_max"]-stds if "students_max" in rest else "ND"
 
     advisors_dict = {k: problem.advisors[k] for k in problem.advisors}
     table = pd.DataFrame.from_dict(advisors_dict, orient='index')
     print(table)
-    columns = ["full_name", "groups_min", "groups_max", "assigned_groups", "capacity_left_grps",
-               "capacity_min", "capacity_max", "assigned_stds", "capacity_left_stds"]
+    columns = ["full_name", "teams_min", "teams_max", "assigned_groups", "capacity_left_grps",
+               "students_min", "students_max", "assigned_stds", "capacity_left_stds"]
     table[columns].to_csv(outfile, sep=";", index=True,
                           index_label="username")  # ,columns=columns)
 
@@ -300,9 +307,8 @@ def load_all(options):
 
     if len(S) > 0:
         if options.allow_unassigned:
-            N = max(problem.teams_per_topic.keys())
             for t in S:
-                problem.add_fake_project(N+1)
+                problem.add_fake_project()
             problem.recalculate_ranks_values()
             print(problem.team_details)
         else:

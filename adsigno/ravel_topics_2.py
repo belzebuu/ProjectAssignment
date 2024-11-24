@@ -35,7 +35,7 @@ def main():
     #restrictions = problem.read_restrictions_json(dirname)
     #with open(dirname+"/restrictions.json", "r") as jsonfile:
     #    restrictions=json.load(jsonfile)
-    #print({x["username"]:x["groups_max"] for x in restrictions["nteams"]})
+    #print({x["username"]:x["teams_max"] for x in restrictions["nteams"]})
 
     OD = expand_topics(topic_details)
 

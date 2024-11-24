@@ -34,7 +34,7 @@ def main():
     #restrictions = problem.read_restrictions_json(dirname)
     with open(dirname+"/restrictions.json", "r") as jsonfile:
         restrictions=json.load(jsonfile)
-    print({x["username"]:x["groups_max"] for x in restrictions["nteams"]})
+    print({x["username"]:x["teams_max"] for x in restrictions["nteams"]})
 
     OD = expand_topics(topic_details, teams_per_topic, restrictions)
 
@@ -55,14 +55,16 @@ def expand_topics(topic_details, restrictions):
         n_teams=0
         for r in restrictions:
             if advisor == r["username"]:
-                n_teams = r["groups_max"]
+                n_teams = r["teams_max"]
                 break
         if n_teams==0:
             print(f"Topic {k} removed")
         for t in range(n_teams):
             id = str(k)+letters[t]
-            topic["team"]=letters[t]
-            OD[id]=topic.copy()
+            team = topic.copy()
+            team["team"]=letters[t]
+            team["prj_id"]=id
+            OD[id]=team
     
     return OD
 

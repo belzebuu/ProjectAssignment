@@ -24,7 +24,7 @@ def cml_parse() -> dict:
     parser.add_argument("-a", "--allsol", action="store_true", dest="allsol", default=False, help="All solutions")
     parser.add_argument("-x", "--execution_mode", dest="execution_mode", choices=["except","interact","continue"], default="except", help="Interactive execution mode. [default: %(default)s]")
     
-    parser.add_argument("-t", "--cut_off_type", dest="cut_off_type", default=None, help="The type of users eligible for a privileged treatment. [default: %(default)s]")
+    parser.add_argument("-t", "--cut_off_type", dest="cut_off_type", type=str, default=None, help="The type of users eligible for a privileged treatment. String. [default: %(default)s]")
     parser.add_argument("-c", "--cut_off", dest="cut_off", type=int, default=10, help="The cut off value on preferences to favour a type of users. [default: %(default)s]")
     
     parser.add_argument("-l", "--logging_file", dest="logging_file", metavar="PATH", default=None, type=Path, help="The file where the logging is sent [default: stderr]")

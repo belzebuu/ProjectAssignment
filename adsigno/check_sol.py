@@ -15,10 +15,10 @@ def search_unstable_students(k, sol, problem, members, soldirname="") -> int:
                 if (problem.std_ranks_min[s][p] < rank):
                     for t in range(len(problem.teams_per_topic[p])):
                         if len(members[p][t]) > 0:
-                            if len(members[p][t])+len(problem.groups[g]) <= problem.teams_per_topic[p][t].max:
+                            if len(members[p][t])+len(problem.groups[g]) <= problem.teams_per_topic[p][t].size_max:
                                 out_str += "student " + str(s) + " could go in "+str(p) + "\n"
                                 unstable += len(problem.groups[g])
-                        elif len(problem.groups[g]) >= problem.teams_per_topic[p][t].min and (len(problem.groups[g]) <= problem.teams_per_topic[p][t].max):
+                        elif len(problem.groups[g]) >= problem.teams_per_topic[p][t].size_min and (len(problem.groups[g]) <= problem.teams_per_topic[p][t].size_max):
                             out_str+="student " + str(s) + " could go in unopened "+str(p)+"\n"
                             unstable += len(problem.groups[g])
     out_str += "-"*60
@@ -72,8 +72,8 @@ def check_sol(solutions, problem, soldirname=""):
             for t in range(len(problem.teams_per_topic[p])):
                 nteams += 1
                 # print str(len(members[p][t])) +" "+ str(problem.teams_per_topic[p][t][1])
-                assert (len(members[p][t]) <= problem.teams_per_topic[p][t].max)
-                if len(members[p][t]) < problem.teams_per_topic[p][t].min and len(members[p][t]) > 0:
+                assert (len(members[p][t]) <= problem.teams_per_topic[p][t].size_max)
+                if len(members[p][t]) < problem.teams_per_topic[p][t].size_min and len(members[p][t]) > 0:
                     underfull += 1
         # check how many students are not assigned to their area
         counter_area = 0

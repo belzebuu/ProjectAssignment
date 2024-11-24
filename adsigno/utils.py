@@ -3,7 +3,7 @@ import itertools
 import sys
 import logging
 
-Team = namedtuple("Team", ("team_id", "min", "max", "type"))
+Team = namedtuple("Team", ("team_id", "size_min", "size_max", "type"))
 
 
 def flatten_list_of_lists(List: list) -> list:
@@ -92,7 +92,7 @@ def data_issue_continue(msg: str, execution_mode: str) -> None:
 	logging.debug(msg)
 	print(execution_mode)
 	match execution_mode:
-		case "interactive":
+		case "interact":
 			msg1 = msg + " Continue? (y/n)\n"
 			answer = input(msg1)
 			if answer not in ['Y', 'y']:
