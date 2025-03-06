@@ -220,10 +220,10 @@ def model_ip_weighted(prob, config, minimax):
         for p in cal_P:
             for t in range(len(prob.teams_per_topic[p])):
                 for g in list(prob.groups.keys()):
-                    if a[g] <= prob.teams_per_topic[p][t].max:
-                        m.addConstr(slack[p, t] + 1 - a[g] <= prob.teams_per_topic[p][t].max * z[g, p, t], 'c30_%s_%s_%s' % (g, p, t))
-                        m.addConstr(a[g] + 1 - (1 - y[p, t]) * prob.teams_per_topic[p][t].min <= prob.teams_per_topic[p][t].max
-                                    * z[g, p, t] + (prob.teams_per_topic[p][t].max + 1) * y[p, t], 'c31_%s_%s_%s' % (g, p, t))
+                    if a[g] <= prob.teams_per_topic[p][t].size_max:
+                        m.addConstr(slack[p, t] + 1 - a[g] <= prob.teams_per_topic[p][t].size_max * z[g, p, t], 'c30_%s_%s_%s' % (g, p, t))
+                        m.addConstr(a[g] + 1 - (1 - y[p, t]) * prob.teams_per_topic[p][t].size_min <= prob.teams_per_topic[p][t].size_max
+                                    * z[g, p, t] + (prob.teams_per_topic[p][t].size_max + 1) * y[p, t], 'c31_%s_%s_%s' % (g, p, t))
                     else:
                         m.addConstr(z[g, p, t] == 0,
                                     'c3031_%s_%s_%s' % (g, p, t))

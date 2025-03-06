@@ -9,9 +9,9 @@ ifeq (${HOST},ADM-131257-Mac)
 else
 	DATADIR=/home/marco/workspace/git/flask/Assignment/Assign/data/
 endif
-DATADIR=/home/marco/workspace/git/TT/ProjectAssignment_git_imada/data
 
 DATADIR=/Users/march/workspace/git/TT/ProjectAssignment_git_imada/data/2024-ff501/20240304_004053
+DATADIR=/home/marco/workspace/git/EMT/ProjectAssignment_gitsdu/data
 #DATADIR=/home/marco/Teaching/Bachelor/aaskh20/student_alloc/media
 #CASE=2021-zhiru
 #CASE=2019-bachelor
@@ -25,11 +25,12 @@ CASE=2022-ff501
 CASE=28022023_133345
 CASE=2023-ff501
 CASE=2024-ff501
+CASE=2025-ff501
 
 SOLDIR=sln
 OUTPUTDIR=out
 
-PROGRAM=python3 src/adsigno/__main__.py
+PROGRAM=python3 adsigno/__main__.py
 #PROGRAM=python3 -m adsigno 
 
 RUN_FLAGS=-i --Wmethod owa --groups post --min_preferences 7 --cut_off_type stype --cut_off 2 # 2022-psy
@@ -80,8 +81,8 @@ yrun:
 	
 
 output: | $(OUTPUTDIR)
-	yes | python3 src/adsigno/solution_report.py ${OUTPUT_FLAGS} -s ${SOLDIR}/sol_001.txt ${DATADIR}/${CASE} 
-	yes | python3 src/adsigno/solution_report_admin.py ${OUTPUT_FLAGS} -s ${SOLDIR}/sol_001.txt ${DATADIR}/${CASE}
+	yes | python3 adsigno/solution_report.py ${OUTPUT_FLAGS} -s ${SOLDIR}/sol_001.txt ${DATADIR}/${CASE} 
+	yes | python3 adsigno/solution_report_admin.py ${OUTPUT_FLAGS} -s ${SOLDIR}/sol_001.txt ${DATADIR}/${CASE}
 	# Rscript scripts/make_gtables.R
 
 output2:

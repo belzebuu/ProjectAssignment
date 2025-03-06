@@ -40,6 +40,7 @@ retning2inst = {'Biologi': "Biologisk Institut",
                 "Biomedicin": "Institut for Biokemi og Molekylær Biologi",
                 "Nanobioscience": "Institut for Fysik, Kemi og Farmaci",
                 'Farmaci': "Institut for Fysik, Kemi og Farmaci",
+                'Medicinalkemi': "Institut for Fysik, Kemi og Farmaci",
                 'Kemi': "Institut for Fysik, Kemi og Farmaci",
                         'Fysik': "Institut for Fysik, Kemi og Farmaci",
                         'NAT': "Placeholder"}

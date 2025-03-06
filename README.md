@@ -78,9 +78,34 @@ To generate even more output for the administration:
 python3 src/adsigno/solution_report_admin.py -m 3 -s tmp/sln/sol_001.txt -o tmp data/2021-example
 ```
 
+## 2025 FF501
+
+Data preparation (creation of fictitious requirements.json file), in `ProjectAssignment_gitsdu/data/2025-ff501`:
+```
+python3 ../scripts/restrictions_ff501.py
+```
+
+To solve in `ProjectAssignment_github`:
+```
+$ python3 adsigno/__main__.py -g post -w owa -i -m 7 /home/marco/workspace/git/EMT/ProjectAssignment_gitsdu/data/2025-ff501 | tee /home/marco/workspace/git/EMT/ProjectAssignment_gitsdu/data/2025-ff501/log.txt
+```
+and to produce reporting:
+```
+$p ython3 adsigno/solution_report.py -m 7 -s /home/marco/workspace/git/EMT/ProjectAssignment_gitsdu/data/2025-ff501/sln/sol_001.txt /home/marco/workspace/git/EMT/ProjectAssignment_gitsdu/data/2025-ff501
+$ python3 adsigno/solution_report_admin.py -m 7 -s /home/marco/workspace/git/EMT/ProjectAssignment_gitsdu/data/2025-ff501/sln/sol_001.txt /home/marco/workspace/git/EMT/ProjectAssignment_gitsdu/data/2025-ff501
+```
+
+## Makefile
+
+### 2025 FF501
 
 
-A `Makefile` is available. 
+```
+make ff501
+```
+
+The rest below is outdated.
+
 To solve:
 ```
 make run
@@ -99,21 +124,20 @@ make publish
 ```
 
 
-
-# Poetry
+## Poetry
 
 ```
-2038  pyenv versions
- 2039  pyenv install 3.12
- 2040  pyenv local 3.12.7
- 2042  poetry env use 3.12
- 2051  poetry add pandas
- 2053  poetry add pyYAML
- 2055  poetry add numpy
- 2058  poetry add pyscipopt
- 2059  poetry add gurobipy
- 2060  o pyproject.toml
- 2061  poetry shell
+pyenv versions
+pyenv install 3.12
+pyenv local 3.12.7
+poetry env use 3.12
+poetry add pandas
+poetry add pyYAML
+poetry add numpy
+poetry add pyscipopt
+poetry add gurobipy
+o pyproject.toml
+poetry shell
 poetry install
 exit
 ```
