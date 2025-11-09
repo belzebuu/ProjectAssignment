@@ -102,8 +102,7 @@ class Problem:
 
 
 
-    def read_teams(self, data_dirname):
-        '''already expanded topics'''
+    def read_projects_file(self, data_dirname):
         projects_file = data_dirname / "projects.csv"
         logging.info("read "+str(projects_file))
         # We assume header to be:
@@ -112,27 +111,60 @@ class Problem:
         # OLD: ProjektNr; Underprojek; Projekttitel; Min; Max;Projekttype; ProjektNr  i BB; Institut forkortelse; Obligatorisk minikursus; Gruppeplacering
         project_table = pd.read_csv(projects_file, sep=";")
         logging.debug(project_table)
+
         if "team" in project_table:
             project_table.team = project_table.team.fillna('')
         elif "number_of_teams" in project_table:
             project_table.number_of_teams = project_table.number_of_teams.fillna('')
         else:
             raise("team or number_of_teams missing in topics")
-        project_table.instit = project_table.instit.fillna('')
-        project_table.advisor_main=project_table.advisor_main.astype(str)
+        
+        if "instit" in project_table.columns:
+            project_table["institute_short"] = project_table.instit.fillna('')
+        elif "institute_short" in project_table.columns:
+            project_table.institute_short = project_table.institute_short.fillna('')
+        else:
+            raise ValueError("instit or institute_short missing in topics")   
+           
+        if "main_advisor" in project_table.columns:
+            project_table.main_advisor=project_table.main_advisor.astype(str)
+        elif "advisor_main" in project_table.columns:
+            project_table["main_advisor"]=project_table.advisor_main.astype(str)
+        else:
+            raise ValueError("main_advisor or advisor_main missing in topics")
+        
         if "email" in project_table.columns:
             project_table.email = project_table.email.apply(lambda x: str(x).lower())
         else:
             project_table.email = project_table.ID.apply(lambda x: str(x).lower())
+
+        if "project_name" in project_table.columns:
+            project_table.rename(columns={"project_name":"title"},inplace=True) 
+
+        if "min" in project_table.columns:
+            project_table.rename(columns={"min":"size_min"},inplace=True) 
+        if "max" in project_table.columns:
+            project_table.rename(columns={"max":"size_max"},inplace=True) 
+
+
+
         if "proj_id" in project_table.columns:
-            project_table.rename(columns={"proj_id":"prj_id"},inplace=True)
-        if "prj_id" in project_table:
-            project_table.prj_id = project_table.prj_id.astype(str)
-        else:
-            project_table.prj_id = project_table.ID
-    
-        project_table.ID = project_table.ID.astype(str)
-        project_table.index = project_table["ID"].astype(
+            project_table.rename(columns={"proj_id":"topic_id"},inplace=True)            
+        if "project_number" in project_table.columns:
+            project_table.rename(columns={"project_number":"topic_id"},inplace=True)            
+        if "ID" in project_table.columns:
+            project_table.rename(columns={"ID":"topic_id"},inplace=True)
+
+        project_table.topic_id = project_table.topic_id.astype(str)        
+        
+
+        return project_table
+
+    def read_teams(self, data_dirname):
+        '''already expanded topics'''
+        project_table = self.read_projects_file(data_dirname)
+
+        project_table.index = project_table["topic_id"].astype(
             str)+project_table["team"].astype(str)  # project_table["prj_id"]
         team_details = project_table.to_dict("index", into=OrderedDict)
         # topics = {x: list(map(lambda p: p["team"], team_details[x])) for x in team_details}
@@ -157,11 +189,25 @@ class Problem:
         logging.debug(project_table.type.unique())
         return team_details
 
+
+    def read_topics(self, data_dirname):
+        '''Topics to expand in teams'''
+        project_table = self.read_projects_file(data_dirname)
+        
+        project_table.index = project_table.topic_id.astype(str)# project_table["ID"].astype(str) #+project_table["team"].astype(str)  # project_table["prj_id"]
+        
+        topic_details = project_table.to_dict("index", into=OrderedDict)
+        # topics = {x: list(map(lambda p: p["team"], team_details[x])) for x in team_details}
+        logging.debug(project_table.type.unique())
+        
+        return topic_details
+
+
     def arrange_teams_per_topic(self, team_details):
         teams_per_topic_short = defaultdict(list)
         for k, v in team_details.items():
             label = v["team"] if len(v["team"])>0 else " "
-            teams_per_topic_short[v["ID"]] += list(label) 
+            teams_per_topic_short[v["topic_id"]] += list(label) 
             #    k: list(v) for k, v in project_table.groupby('ID')['team']}
 
         # full_details_dict = {k: v.to_dict("records") for k, v in project_table.groupby("ID")}
@@ -197,34 +243,6 @@ class Problem:
         return dict(teams_per_topic), dict(sorted(advisors.items()))
 
 
-    def read_topics(self, data_dirname):
-        '''Topics to expand in teams'''
-        projects_file = data_dirname / "projects.csv"
-        logging.info("read " + str(projects_file))
-        
-        project_table = pd.read_csv(data_dirname / "projects.csv", sep=";")
-        logging.debug(project_table)
-        if "team" in project_table:
-            project_table.team = project_table.team.fillna('')
-        elif "number_of_teams" in project_table:
-            project_table.number_of_teams = project_table.number_of_teams.fillna('')
-        else:
-            raise("team or number_of_teams missing in topics")
-        project_table.instit = project_table.instit.fillna('')
-        project_table.email = project_table.email.apply(lambda x: str(x).lower())
-        project_table.ID = project_table.ID.astype(str)
-        if "prj_id" in project_table:
-            project_table.prj_id = project_table.prj_id.astype(str)
-        else:
-            project_table.prj_id = project_table.ID
-        
-        project_table.index = project_table.prj_id.astype(str)# project_table["ID"].astype(str) #+project_table["team"].astype(str)  # project_table["prj_id"]
-        
-        topic_details = project_table.to_dict("index", into=OrderedDict)
-        # topics = {x: list(map(lambda p: p["team"], team_details[x])) for x in team_details}
-        logging.debug(project_table.type.unique())
-        
-        return topic_details
 
         
 

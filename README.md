@@ -141,3 +141,28 @@ poetry shell
 poetry install
 exit
 ```
+
+```
+pyenv versions
+pyenv install 3.12.7
+pyenv local 3.12.7
+```
+
+```
+poetry add <package>
+poetry remove <package>
+poetry update
+poetry lock
+poetry export -f requirements.txt --output requirements.txt --without-hashes
+```
+
+
+
+From `/Adsigno/`:
+```bash
+poetry install
+poetry shell
+
+
+exit # from poetry shell
+```

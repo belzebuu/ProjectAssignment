@@ -55,7 +55,7 @@ def expand_topics(topic_details, restrictions):
         n_teams=0
         for r in restrictions:
             if advisor == r["username"]:
-                n_teams = r["teams_max"]
+                n_teams = r["teams_max"] if "teams_max" in r else r["number_of_teams"]
                 break
         if n_teams==0:
             print(f"Topic {k} removed")
@@ -63,7 +63,8 @@ def expand_topics(topic_details, restrictions):
             id = str(k)+letters[t]
             team = topic.copy()
             team["team"]=letters[t]
-            team["prj_id"]=id
+            team["team_id"]=id
+            team["topic_id"]=topic["topic_id"]
             OD[id]=team
     
     return OD

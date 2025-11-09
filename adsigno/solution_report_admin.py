@@ -92,7 +92,7 @@ def write_txt_4_admin(ass_std2team, ass_team2std, prob, popularity, max_p, out_d
     for i in sorted(prob.teams_per_topic.keys()):
         for team in prob.teams_per_topic[i]:
             pID = str(i)+team.team_id.strip()
-            s = "ProjectID: "+prob.team_details[pID]["prj_id"]+prob.team_details[pID]["team"]+"\n"
+            s = "ProjectID: "+prob.team_details[pID]["topic_id"]+prob.team_details[pID]["team"]+"\n"
             s = s + "Project title: \""+prob.team_details[pID]["title"]+"\""+"\n"
             s = s + "Popularity: (tot. "+str(popularity[i][0])+") " + \
                 str(popularity[i][1:(max_p+1)])+"\n"
@@ -117,11 +117,11 @@ def write_txt_4_admin(ass_std2team, ass_team2std, prob, popularity, max_p, out_d
 
             if (std_assigned > 0):
                 f2.write("%s: %s\n" %
-                         (str(prob.team_details[pID]["ID"])+prob.team_details[pID]["team"],
+                         (str(prob.team_details[pID]["topic_id"])+prob.team_details[pID]["team"],
                           prob.team_details[pID]["title"])
                          )
 
-            if (prob.team_details[pID]["instit"] == "IMADA"):
+            if (prob.team_details[pID]["institute_short"] == "IMADA"):
                 print("\n "+str(prob.team_details[pID]["ID"]) +
                       ": "+prob.team_details[pID]["title"])
                 print("Popularity: (tot. "+str(popularity[i]
@@ -136,7 +136,7 @@ def write_txt_4_admin(ass_std2team, ass_team2std, prob, popularity, max_p, out_d
                              (prob.student_details[sID]["full_name"],
                               # prob.student_details[sID]["Efternavn"],
                               prob.student_details[sID]["email"]))
-                    if (prob.team_details[pID]["instit"] == "IMADA"):
+                    if (prob.team_details[pID]["institute_short"] == "IMADA"):
                         print(str(prob.student_details[sID]["full_name"])+" "+prob.student_details[sID]
                               ["email"]+" "+str(functools.reduce(lambda a,b: a+b, prob.student_details[sID]["priority_list"])))
                 # studentassignments.append([sID,sType,pID,ptitle,ptype,
@@ -190,7 +190,7 @@ def write_csv_per_student_4_admin(studentassignments, ass_std2team, ass_team2std
                 tmp.append(p)
             prob.student_details[s]["DerfraIkkeTilladt"] = tmp
 
-    f.write("username;std_type;topic;team;title;prj_type;ProjektStatus;TildeltPrio;priority_list;DerfraIkkeTilladt;size_min;size_max;")
+    f.write("username;std_type;stype;topic;team;title;prj_type;ProjektStatus;TildeltPrio;priority_list;DerfraIkkeTilladt;size_min;size_max;")
     f.write("LedigePladser;full_name;email;grp_id;timestamp;instit;")
     f.write("institute;mini;wl\n")
     students.sort()
@@ -200,16 +200,17 @@ def write_csv_per_student_4_admin(studentassignments, ass_std2team, ass_team2std
         #print(prob.student_details[s])
         #print(prob.team_details[pID])
         priolist = prob.student_details[s]["priority_list"]
-        valgt = [x for x in range(1, len(priolist)+1) if prob.team_details[pID]["ID"] in priolist[x-1]]
+        valgt = [x for x in range(1, len(priolist)+1) if prob.team_details[pID]["topic_id"] in priolist[x-1]]
         gottenprio = '%s' % ', '.join(map(str, valgt))
-        f.write("%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s\n" %
+        f.write("%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s;%s\n" %
                 (
                     prob.student_details[s]["username"],
                     prob.student_details[s]["type"],
-                    prob.team_details[pID]["prj_id"],
+                    prob.student_details[s]["stype"],
+                    prob.team_details[pID]["topic_id"],
                     prob.team_details[pID]["team"],
                     prob.team_details[pID]["title"],
-                    prob.team_details[pID]["type"],
+                    prob.team_details[pID]["type"],                    
                     prob.team_details[pID]["ProjektStatus"],
                     gottenprio,
                     str(functools.reduce(lambda a,b: a+b,prob.student_details[s]["priority_list"])),
@@ -224,11 +225,12 @@ def write_csv_per_student_4_admin(studentassignments, ass_std2team, ass_team2std
                     prob.student_details[s]["email"],
                     prob.student_details[s]["grp_id"],
                     prob.student_details[s]["timestamp"],
-                    prob.team_details[pID]["instit"],
+                    prob.team_details[pID]["institute_short"],
                     prob.team_details[pID]["institute"],
-                    prob.team_details[pID]["mini"],
+                    prob.team_details[pID]["mini"] if "mini" in prob.team_details[pID] else "",
                     # # prob.team_details[pID]["Minikursus_anb"],
-                    prob.team_details[pID]["wl"]))
+                    prob.team_details[pID]["wl"] if "wl" in prob.team_details[pID] else "")
+        )
     f.close()
 
 

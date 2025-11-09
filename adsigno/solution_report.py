@@ -23,9 +23,9 @@ def read_solution(solfile):
     ass_team2std = defaultdict(set)
     with open(solfile) as f:
         lines = f.readlines()
-    for l in lines:
-        l = l.replace("\n", "")
-        parts = l.split("\t")
+    for line in lines:
+        line = line.replace("\n", "")
+        parts = line.split("\t")
         ass_std2team[parts[0]] = (str(parts[1].strip()), parts[2].strip())
         ass_team2std[(str(parts[1])+parts[2]).strip()].add(parts[0])
 
@@ -94,7 +94,7 @@ def project_table(ass_std2team, ass_team2std, popularity, max_p, prob, out_dir):
                 if "teachers" in team_details[pID]:
                     filehandle.write("%s: %s (advisors: %s; contact: %s) \n" %
                                      (  # pID,
-                                         team_details[pID]["prj_id"],
+                                         team_details[pID]["topic_id"],
                                          team_details[pID]["title"],
                                          team_details[pID]["teachers"],
                                          team_details[pID]["email"],
@@ -103,7 +103,7 @@ def project_table(ass_std2team, ass_team2std, popularity, max_p, prob, out_dir):
                 else:
                     filehandle.write("%s: %s\n" %
                                      (  # pID,
-                                         team_details[pID]["prj_id"],
+                                         team_details[pID]["topic_id"],
                                          team_details[pID]["title"]
                                      )
                                      )
@@ -123,15 +123,15 @@ def project_table(ass_std2team, ass_team2std, popularity, max_p, prob, out_dir):
         json.dump(team_details, fp=filehandle, sort_keys=True,
                   indent=4, separators=(',', ': '),  ensure_ascii=False)
     # "prj_id"
-    columns = ["ID", "team", "title", "teachers", "email", "type", "instit", "mini", "wl", "popularity_tot", "popularity_details",
+    columns = ["topic_id", "team", "title", "teachers", "email", "type", "institute_short", "mini", "wl", "popularity_tot", "popularity_details",
                "size_min", "size_max", "assigned_stds", "places_left", "team_status", "assigned"]
     table = pd.DataFrame.from_dict(
         team_details, orient='index', columns=columns)
 
-    is_all_numeric = table['ID'].apply(lambda x: isinstance(x, (int))).all()
+    is_all_numeric = table['topic_id'].apply(lambda x: isinstance(x, (int))).all()
     if is_all_numeric:
-        table['ID']=pd.to_numeric(table['ID'])
-        table['ID']=table['ID'].astype(int)
+        table['topic_id']=pd.to_numeric(table['ID'])
+        table['topic_id']=table['topic_id'].astype(int)
     table.to_csv(output1.with_suffix(".csv"), sep=";", index=False)
 
 
@@ -255,12 +255,12 @@ def write_popularity(popularity, max_p, prob, out_dir):
         topic_popularity[i]["tot_popularity"] = sum(popularity[i])
 
     table = pd.DataFrame.from_dict(topic_popularity, orient='index')
-    columns = ["title", "type", "instit", "tot_popularity"] + \
+    columns = ["title", "type", "institute_short", "tot_popularity"] + \
         [str(j+1)+". prio." for j in range(max_p)]
     
     outfile = out_dir / "popularity.csv"
     table.to_csv(outfile, sep=";", index=True,
-                 index_label="ID", columns=columns)
+                 index_label="topic_id", columns=columns)
 
 
 def advisor_table(ass_std2team, ass_team2std, problem, out_dir):
