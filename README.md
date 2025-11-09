@@ -143,12 +143,6 @@ exit
 ```
 
 ```
-pyenv versions
-pyenv install 3.12.7
-pyenv local 3.12.7
-```
-
-```
 poetry add <package>
 poetry remove <package>
 poetry update
@@ -157,12 +151,37 @@ poetry export -f requirements.txt --output requirements.txt --without-hashes
 ```
 
 
+## Psy 2025 for K04-2026 
 
-From `/Adsigno/`:
+Step one use app/adsigno to collect preferences from students. Export Excel file
+from Data in adsigno portal. It is also possible to copy the files generated
+trying to do the assignment in adsigno but not all fields are available in
+projects.csv, the advisors are missing.
+
+In ProjectAssignment_gitlab create the data files from the Excel saving each
+sheet as a CSV file.
+
+Remove students with no preferences.
+
+Use script restrictions to create restrictions.json file.
+
+Then in ProjectAssignment_github run:
+
+```
+pyenv versions
+pyenv install 3.13.3
+pyenv local 3.13.3
+```
+
 ```bash
 poetry install
 poetry shell
 
+make run
+make output
 
 exit # from poetry shell
 ```
+
+
+
