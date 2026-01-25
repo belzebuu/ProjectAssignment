@@ -46,7 +46,6 @@ def identifier(read_name):
 def program_transform(program):
     program = program.lower()
     return program
-    # this is for SDU
     if program=="naturvidenskab, biologi og datalogi":
         program="not_pharma"
     elif program=="alle studier, dog ikke farmaci": # for 2018
@@ -57,6 +56,8 @@ def program_transform(program):
         program="pharma"
     elif program=="psychology":
         program="psychology"
+    elif program=="psykologi":
+        program="psykologi"
     elif program in study_programs:
         program="not_pharma"
     elif program=="alle":
@@ -67,21 +68,23 @@ def program_transform(program):
 
 
 
-def write_students(dirname):
+def write_students(dirname, header=False):
     print("read students.csv")
+    #    grp_id;username;type;priority_list;student_id;full_name;email;timestamp
     students_file=dirname+"/students.csv";
     f = open(students_file, "r")
     lines=f.readlines();
     f.close();
-
+    if header:
+        lines=lines[1:]
     students_file=dirname+"/tmp_students.txt";
     file=open(students_file,'w');
     for line in lines:
         if line[0] == "#": continue
         line=line.strip('\n\r');
         parts=line.split(";");
-        if len(parts)>8: # name separeted from surname
-            name = parts[5]+parts[6]
+        if len(parts)>7: # name separeted from surname
+            name = parts[4]+parts[5]
         id=identifier(parts[1])
         program = program_transform(parts[2].lower())
         file.write(parts[0]+";"+id+";"+program+'\n');
@@ -92,12 +95,15 @@ def write_students(dirname):
 
 
 
-def write_projects(dirname, n_stds):
+def write_projects(dirname, n_stds, header=False):
     print("read projects.csv")
     projects_file=dirname+"/projects.csv"
+    #Topic identifier;Team identifier;Title or topic;Min capacity;Max capacity;Projet type;Project identifier;Offering institute abbreviation;Offering institute full name;Need complementary short courses;Working location
     f = open(projects_file, "r")
     lines=f.readlines();
     f.close();
+    if header:
+        lines=lines[1:]
 
     project_dict={}
     file=open(dirname+"/tmp_projects.txt",'w');
@@ -120,13 +126,15 @@ def write_projects(dirname, n_stds):
     return project_dict
 
 
-def write_priorities(dirname, prj_dict, prioritize_all=False):
+def write_priorities(dirname, prj_dict, prioritize_all=False, header=False):
     print("read students.csv")
     students_file=dirname+"/students.csv";
     f = open(students_file, "r")
     lines=f.readlines();
     f.close();
-
+    if header:
+        lines=lines[1:]
+    
     priorities_file=dirname+"/tmp_priorities.txt";
     file=open(priorities_file,'w');
     for line in lines:
@@ -141,7 +149,7 @@ def write_priorities(dirname, prj_dict, prioritize_all=False):
             j=1
 
             id=identifier(parts[1])
-            ##print priorities;
+            
             for p in priorities:
                 file.write(id+";"+str(int(p))+";"+str(j)+";"+str(2**i)+'\n');
                 j+=1
@@ -163,31 +171,37 @@ def write_priorities(dirname, prj_dict, prioritize_all=False):
 
 def main(argv):
     dirname = "."
+    prioritize_all = False
+    header=False
     try:
-        opts, args = getopt.getopt(argv, "hpd:", ["help", "dir="])
+        opts, args = getopt.getopt(argv, "hpad:", ["help", "dir=", "header="])
     except getopt.GetoptError:
         usage()
         sys.exit(2)
 
     if (len(opts)==0):
         usage();
-
+    
     for opt, arg in opts:
         if opt in ("-h", "--help"):
             usage()
             sys.exit()
-        elif opt in ("-d", "--dir"):
+        if opt in ("-d", "--dir"):
             dirname = arg
+        if opt in ("-a", "--header"):
+            header = True
+        if opt in ("-p", "--prioritize_all"):
+            prioritize_all = True
 
-    n_stds = write_students(dirname);
-    prj_dict = write_projects(dirname, n_stds);
-    write_priorities(dirname, prj_dict);
+    n_stds = write_students(dirname, header);
+    prj_dict = write_projects(dirname, n_stds, header);
+    write_priorities(dirname, prj_dict, prioritize_all, header);
 
 
 
 def usage():
     print("\nTransforms input data. Needs files in dirname \"./students.csv\" and \"./projects.csv\"");
-    print("Usage: [\"help\", \"--dir=\" \"-p\"]");
+    print("Usage: [\"help\", \"--dir=\" \"-p\" \"-a\"]");
     print("\tflag -p necessary if all project topics must be prioritized. Implies that we can assign beyond the expressed priority") 
     sys.exit(1);
 

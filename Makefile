@@ -13,6 +13,7 @@ endif
 DATADIR=/Users/march/workspace/git/TT/ProjectAssignment_git_imada/data/2024-ff501/20240304_004053
 DATADIR=/home/marco/workspace/git/EMT/ProjectAssignment_gitsdu/data
 DATADIR=/Users/march/workspace/github/EMT/ProjectAssignment_gitsdu/data/2025-psy
+DATADIR=/Users/march/workspace/github/EMT/ProjectAssignment_gitsdu/data/2026-bapsy
 #DATADIR=/home/marco/Teaching/Bachelor/aaskh20/student_alloc/media
 #CASE=2021-zhiru
 #CASE=2019-bachelor
@@ -28,9 +29,9 @@ CASE=2023-ff501
 CASE=2024-ff501
 CASE=2025-ff501
 CASE=K04-2026-prepared
+CASE=BAPSY2026
 
-SOLDIR=sln
-OUTPUTDIR=out
+
 
 PROGRAM=python3 adsigno/__main__.py
 #PROGRAM=python3 -m adsigno 
@@ -44,23 +45,29 @@ RUN_FLAGS=-e -i --Wmethod owa --groups post --min_preferences 7 --cut_off_type 1
 OUTPUT_FLAGS=--allow_unassigned --min_preferences 5
 OUTPUT_FLAGS=--allow_unassigned --prioritize_all --min_preferences 5
 OUTPUT_FLAGS=-e --min_preferences 7
-OUTPUT_FLAGS=-e -g post -w owa -i -m 7 # 2025-psy
+OUTPUT_FLAGS=-e -g post -w owa -m 7 # 2025-psy
+
+
+OUTPUTDIR=${DATADIR}/${CASE}/out
+SOLDIR=${OUTPUTDIR}/sln
 
 projects: # careful, read README.md.old before use. It should not be necessary anymore
 	python3 src/update_projects.py  ${DATADIR}/${CASE}
 
 
-$(SOLDIR):
-	mkdir -p sln	
+$(OUTPUTDIR): 
+	mkdir -p ${OUTPUTDIR}
 
-$(OUTPUTDIR):
-	mkdir -p sln	
+$(SOLDIR): | ${OUTPUTDIR}
+	mkdir -p ${SOLDIR}
 
 
 
 assignment: | $(SOLDIR)
 	${PROGRAM} ${DATADIR}/${CASE} -g post
 
+bapsy: | $(SOLDIR)
+	${PROGRAM} -e -g pre -w identity -m 5 -p -o ${OUTPUTDIR} ${DATADIR}/${CASE}  | tee ${OUTPUTDIR}/log.txt
 
 psy: | $(SOLDIR)
 	${PROGRAM} ${DATADIR}/${CASE}  | tee ${DATADIR}/${CASE}/log.txt
@@ -84,8 +91,8 @@ yrun:
 	
 
 output: | $(OUTPUTDIR)
-	yes | python3 adsigno/solution_report.py ${OUTPUT_FLAGS} -s ${DATADIR}/${CASE}/${SOLDIR}/sol_001.txt ${DATADIR}/${CASE} 
-	yes | python3 adsigno/solution_report_admin.py ${OUTPUT_FLAGS} -s ${DATADIR}/${CASE}/${SOLDIR}/sol_001.txt ${DATADIR}/${CASE}
+	yes | python3 adsigno/solution_report.py ${OUTPUT_FLAGS} -s ${SOLDIR}/sol_001.txt ${DATADIR}/${CASE}
+	yes | python3 adsigno/solution_report_admin.py ${OUTPUT_FLAGS} -s ${SOLDIR}/sol_001.txt ${DATADIR}/${CASE}
 	# Rscript scripts/make_gtables.R
 
 output2:

@@ -104,12 +104,22 @@ class Problem:
 
     def read_projects_file(self, data_dirname):
         projects_file = data_dirname / "projects.csv"
+        if not projects_file.exists():
+            projects_file = data_dirname / "Topics.csv"
+            if not projects_file.exists():
+                sys.exit(f"File {data_dirname}/projects.csv or Topics.csv missing\n")
+
         logging.info("read "+str(projects_file))
+
+        with open(projects_file, 'r', encoding='utf-8') as f:
+            first_line = f.readline()
+        
+        separator = ';' if first_line.count(';') > first_line.count(',') else ','
         # We assume header to be:
         # ID;team;title;size_min;size_max;type;prj_id;instit;institute;mini;wl;teachers;email
         # NEW: ProjektNr; Underprojek; Projekttitel; Min; Max;Projekttype; ProjektNr  i BB; Institut forkortelse; Institutnavn; Obligatorisk minikursus; Gruppeplacering
         # OLD: ProjektNr; Underprojek; Projekttitel; Min; Max;Projekttype; ProjektNr  i BB; Institut forkortelse; Obligatorisk minikursus; Gruppeplacering
-        project_table = pd.read_csv(projects_file, sep=";")
+        project_table = pd.read_csv(projects_file, sep=separator)
         logging.debug(project_table)
 
         if "team" in project_table:
@@ -138,24 +148,31 @@ class Problem:
         else:
             project_table.email = project_table.ID.apply(lambda x: str(x).lower())
 
-        if "project_name" in project_table.columns:
-            project_table.rename(columns={"project_name":"title"},inplace=True) 
-
+    
         if "min" in project_table.columns:
             project_table.rename(columns={"min":"size_min"},inplace=True) 
         if "max" in project_table.columns:
             project_table.rename(columns={"max":"size_max"},inplace=True) 
 
+        if "ID" in project_table.columns:
+            project_table.rename(columns={"ID":"topic_id"},inplace=True)
+        if "id" in project_table.columns:
+            project_table.rename(columns={"id":"topic_id"},inplace=True)
+
+        project_table.topic_id = project_table.topic_id.astype(str)     
+
+        if "project_name" in project_table.columns:
+            project_table.rename(columns={"project_name":"title"},inplace=True) 
+        else:
+            project_table["project_name"]=project_table.topic_id.astype(str)
 
 
         if "proj_id" in project_table.columns:
             project_table.rename(columns={"proj_id":"topic_id"},inplace=True)            
         if "project_number" in project_table.columns:
             project_table.rename(columns={"project_number":"topic_id"},inplace=True)            
-        if "ID" in project_table.columns:
-            project_table.rename(columns={"ID":"topic_id"},inplace=True)
 
-        project_table.topic_id = project_table.topic_id.astype(str)        
+           
         
 
         return project_table
@@ -248,15 +265,30 @@ class Problem:
 
     def read_students(self, data_dirname):
         students_file = data_dirname / "students.csv"
+        if not students_file.exists():
+            students_file = data_dirname / "Students.csv"
+            if not students_file.exists():
+                sys.exit(f"File {data_dirname}/students.csv or Students.csv missing\n")
+
         logging.debug("read " + str(students_file))
 
         # grp_id;(group);username;type;priority_list;(student_id);full_name;email;timestamp
         # group is not needed
-        student_table = pd.read_csv(
-            data_dirname / "students.csv", sep=";",  converters={"priority_list": str})
+        # Detect separator by peeking at the first line
+        with open(students_file, 'r', encoding='utf-8') as f:
+            first_line = f.readline()
+        
+        separator = ';' if first_line.count(';') > first_line.count(',') else ','
+        student_table = pd.read_csv(students_file, sep=separator, converters={"priority_list": str})
+
+        student_table["username"] = student_table["username"].fillna(pd.Series("index" + student_table.index.astype(str), index=student_table.index))
 
         student_table["username"] = student_table["username"].apply(str.lower)
         student_table.index = student_table["username"]
+
+        if "last_sub" in student_table.columns:
+            student_table.rename(columns={"last_sub":"timestamp"},inplace=True)
+
         logging.debug(student_table)
         student_details = student_table.to_dict("index", into=OrderedDict)
 
@@ -419,8 +451,10 @@ class Problem:
             restrictions = self.read_restrictions_json(data_dirname)
         elif os.path.exists(data_dirname / "restrictions.csv"):
             restrictions = self.read_restrictions_csv(data_dirname)
+        elif os.path.exists(data_dirname / "Teachers.csv"):
+            restrictions = self.read_restrictions_csv(data_dirname)
         else:
-            sys.exit(f"File {data_dirname}/restrictions.[json|csv] missing\n")
+            sys.exit(f"File {data_dirname}/[restrictions|Teachers].[json|csv] missing\n")
         for x in restrictions:
             if "teams_min" not in x:
                 x["teams_min"]=0
@@ -505,6 +539,7 @@ class Problem:
         #Team = namedtuple("Team", ("team_id", "min", "max", "type"))
         letters = "abcdefghi"
 
+        print(self.teams_per_topic)
         # copy the type of the first team
         type = self.teams_per_topic[list(self.teams_per_topic.keys())[0]][0].type
 
@@ -556,7 +591,7 @@ class Problem:
             missing_teams = n_groups - n_teams + 3
             topic_nr = max(map(lambda x : int(x), self.teams_per_topic.keys()))+1
             for _ in range(missing_teams):
-                self.add_fake_project(topic_nr)
+                self.add_fake_project() #topic_nr)
 
     def check_capacity(self, pre_grouping: bool) -> None:
         n_stds = len(self.student_details)

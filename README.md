@@ -185,3 +185,29 @@ exit # from poetry shell
 
 
 
+## BAPSY 2025 Prova
+
+In gitsdu:
+
+`transform_data.py` - converts student survey responses to the Students sheet
+`extract_pdf_to_excel.py` - extracts advisor information to the Topics and Teachers sheets
+
+Pipeline to create BAPSY2025 data files:
+```
+python3 ../scripts/transform_data.py prioritering_abridged.xlsx try.xlsx
+python3 ../scripts/extract_pdf_to_excel.py Emnekatalog_B12_F25.pdf try.xlsx
+mv try.xlsx BAPSY2025.xlsx
+python3 ../scripts/excel_to_csv.py BAPSY2025.xlsx BAPSY2025/
+python3 ../scripts/restrictions.py BAPSY2025.xlsx
+mv restrictions.json BAPSY2025/
+```
+
+After solving with `make bapsy`:
+```
+make output
+```
+and from the case directory generate Excel reports:
+```
+python3 make_xlsx.py out
+```
+produces out.xlsx with various reports.
