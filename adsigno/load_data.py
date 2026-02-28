@@ -14,6 +14,7 @@ import adsigno.utils as utils
 
 import itertools
 import random
+import string
 import numpy
 import pprint
 import adsigno.ravel_topics_1 as ravel_topics_1
@@ -38,15 +39,40 @@ class Problem:
         self.cml_options = options
         self.study_programs = set()
 
-        self.student_details, self.priorities, self.groups, self.std_type = self.read_students(
-            data_dirname)
-        self.restrictions = self.read_restrictions(data_dirname)
-        self.team_details, self.teams_per_topic, self.advisors = self.read_projects(data_dirname)
-        #print(self.advisors)
-        #print(self.restrictions)
+        excel_file = self._find_excel_file(data_dirname)
+        if excel_file is not None:
+            logging.info(f"Reading from Excel file: {excel_file}")
+            xl = pd.ExcelFile(excel_file)
+            teachers_df = xl.parse('Teachers')
+            topics_df = xl.parse('Topics')
+            students_df = xl.parse('Students', dtype={'priority_list': str})
+
+            self.restrictions = self.read_restrictions_from_excel(teachers_df, topics_df)
+            for x in self.restrictions:
+                if "teams_min" not in x:
+                    x["teams_min"] = 0
+                if "teams_max" not in x:
+                    x["teams_max"] = float("inf")
+                if "students_min" not in x:
+                    x["students_min"] = 0
+                if "students_max" not in x:
+                    x["students_max"] = float("inf")
+
+            self.student_details, self.priorities, self.groups, self.std_type = \
+                self.read_students_from_excel(students_df)
+
+            self.team_details = self._expand_topics_from_excel(topics_df, teachers_df)
+            self.teams_per_topic, self.advisors = self.arrange_teams_per_topic(self.team_details)
+        else:
+            self.student_details, self.priorities, self.groups, self.std_type = self.read_students(
+                data_dirname)
+            self.restrictions = self.read_restrictions(data_dirname)
+            self.team_details, self.teams_per_topic, self.advisors = self.read_projects(data_dirname)
+
         for k in self.restrictions:
             logging.info(k)
-            self.advisors[k["username"].lower()].update(k)
+            if k["username"].lower() in self.advisors:
+                self.advisors[k["username"].lower()].update(k)
         
         #DF = pd.DataFrame.from_dict(self.team_details,orient="index")
         #print(DF)
@@ -140,19 +166,25 @@ class Problem:
             project_table.main_advisor=project_table.main_advisor.astype(str)
         elif "advisor_main" in project_table.columns:
             project_table["main_advisor"]=project_table.advisor_main.astype(str)
+        elif "teachers" in project_table.columns:
+            project_table["main_advisor"]=project_table.teachers.apply(
+                lambda x: str(x).split(",")[0].strip() if pd.notna(x) else "")
         else:
-            raise ValueError("main_advisor or advisor_main missing in topics")
-        
+            raise ValueError("main_advisor, advisor_main, or teachers missing in topics")
+
         if "email" in project_table.columns:
             project_table.email = project_table.email.apply(lambda x: str(x).lower())
         else:
             project_table.email = project_table.ID.apply(lambda x: str(x).lower())
 
-    
+        if "min_cap" in project_table.columns:
+            project_table.rename(columns={"min_cap": "size_min"}, inplace=True)
+        if "max_cap" in project_table.columns:
+            project_table.rename(columns={"max_cap": "size_max"}, inplace=True)
         if "min" in project_table.columns:
-            project_table.rename(columns={"min":"size_min"},inplace=True) 
+            project_table.rename(columns={"min":"size_min"},inplace=True)
         if "max" in project_table.columns:
-            project_table.rename(columns={"max":"size_max"},inplace=True) 
+            project_table.rename(columns={"max":"size_max"},inplace=True)
 
         if "ID" in project_table.columns:
             project_table.rename(columns={"ID":"topic_id"},inplace=True)
@@ -259,9 +291,107 @@ class Problem:
         #raise SystemExit
         return dict(teams_per_topic), dict(sorted(advisors.items()))
 
+    # ------------------------------------------------------------------
+    # Excel reading support
+    # ------------------------------------------------------------------
 
+    def _find_excel_file(self, data_dirname):
+        """Return the single .xlsx file in data_dirname, or None."""
+        excel_files = list(data_dirname.glob("*.xlsx"))
+        if len(excel_files) == 1:
+            return excel_files[0]
+        if len(excel_files) > 1:
+            logging.warning(f"Multiple Excel files found in {data_dirname}; falling back to CSV")
+        return None
 
-        
+    def _expand_topics_from_excel(self, topics_df, teachers_df):
+        """Expand a Topics DataFrame into a team_details OrderedDict.
+
+        Each topic row with number_of_teams=N is expanded into N team rows
+        (letters a, b, c, …).  The advisor's SDU username is looked up from
+        the Teachers sheet so that the constructed e-mail address can be used
+        by arrange_teams_per_topic to key the advisors dict.
+        """
+        letters = string.ascii_lowercase
+
+        # Build full_name → username mapping from Teachers sheet
+        name_to_username = {}
+        for _, row in teachers_df.iterrows():
+            fname = row.get("full_name")
+            uname = row.get("username")
+            if pd.notna(fname) and pd.notna(uname):
+                name_to_username[str(fname)] = str(uname).lower()
+
+        team_details = OrderedDict()
+        for _, topic in topics_df.iterrows():
+            topic_id = str(int(topic["project_number"]))
+            advisor_name = str(topic.get("advisor_main", ""))
+            username = name_to_username.get(advisor_name, "")
+            email = f"{username}@sdu.dk" if username else "unknown@sdu.dk"
+
+            n_teams = int(topic.get("number_of_teams", 1))
+            for i in range(n_teams):
+                team_letter = letters[i]
+                team_key = topic_id + team_letter
+                team_details[team_key] = {
+                    "topic_id": topic_id,
+                    "team": team_letter,
+                    "title": str(topic.get("project_name", topic_id)),
+                    "size_min": int(topic["min"]),
+                    "size_max": int(topic["max"]),
+                    "type": str(topic["type"]),
+                    "prj_id": team_key,
+                    "instit": str(topic.get("institute_short", "")),
+                    "institute": str(topic.get("institute", "")),
+                    "main_advisor": advisor_name,
+                    "teachers": advisor_name,
+                    "email": email,
+                }
+
+        logging.debug(f"Expanded {len(topics_df)} topics into {len(team_details)} teams from Excel")
+        return team_details
+
+    def read_restrictions_from_excel(self, teachers_df, topics_df):
+        """Build a restrictions list from the Teachers and Topics DataFrames.
+
+        teams_max and students_max are derived from the Topics sheet
+        (sum of number_of_teams and sum of number_of_teams*max per advisor).
+        Admin rows in the Teachers sheet are excluded.
+        """
+        # Map advisor full_name → list of topic dicts
+        advisor_topics = defaultdict(list)
+        for _, topic in topics_df.iterrows():
+            advisor_name = str(topic.get("advisor_main", ""))
+            topic_id = str(int(topic["project_number"]))
+            n_teams = int(topic.get("number_of_teams", 1))
+            max_cap = int(topic["max"])
+            advisor_topics[advisor_name].append(
+                {"topic_id": topic_id, "n_teams": n_teams, "max": max_cap}
+            )
+
+        restrictions = []
+        for _, teacher in teachers_df.iterrows():
+            if teacher.get("admin", False):
+                continue
+            full_name = str(teacher["full_name"])
+            username = str(teacher["username"]).lower()
+
+            topics_data = advisor_topics.get(full_name, [])
+            if not topics_data:
+                logging.debug(f"No topics found for teacher '{full_name}' ({username}); skipping")
+                continue
+
+            restrictions.append({
+                "username": username,
+                "teams_max": sum(t["n_teams"] for t in topics_data),
+                "teams_min": 0,
+                "students_max": sum(t["n_teams"] * t["max"] for t in topics_data),
+                "students_min": 0,
+                "topics": [t["topic_id"] for t in topics_data],
+            })
+
+        logging.info(f"Built {len(restrictions)} advisor restrictions from Excel Teachers sheet")
+        return restrictions
 
     def read_students(self, data_dirname):
         students_file = data_dirname / "students.csv"
@@ -277,10 +407,25 @@ class Problem:
         # Detect separator by peeking at the first line
         with open(students_file, 'r', encoding='utf-8') as f:
             first_line = f.readline()
-        
+
         separator = ';' if first_line.count(';') > first_line.count(',') else ','
         student_table = pd.read_csv(students_file, sep=separator, converters={"priority_list": str})
+        return self._process_students_df(student_table)
 
+    def read_students_from_excel(self, students_df):
+        """Read students from an Excel Students sheet DataFrame."""
+        student_table = students_df.copy()
+        if "priority_list" in student_table.columns:
+            student_table["priority_list"] = student_table["priority_list"].fillna("").astype(str)
+        # Excel parses timestamps as pandas Timestamp; convert to ISO string for JSON serialisation
+        if "timestamp" in student_table.columns:
+            student_table["timestamp"] = student_table["timestamp"].apply(
+                lambda x: x.isoformat() if pd.notna(x) and hasattr(x, "isoformat") else str(x)
+            )
+        return self._process_students_df(student_table)
+
+    def _process_students_df(self, student_table):
+        """Process a students DataFrame into Problem data structures."""
         student_table["username"] = student_table["username"].fillna(pd.Series("index" + student_table.index.astype(str), index=student_table.index))
 
         student_table["username"] = student_table["username"].apply(str.lower)
@@ -317,7 +462,7 @@ class Problem:
 
             student_details[s]["priority_list_wties"] = student_details[s]["priority_list"]
             student_details[s]["priority_list"] = process_string(
-                student_details[s]["priority_list"].strip())
+                str(student_details[s]["priority_list"]).strip())
             prj_prioritized = len(utils.flatten_list_of_lists(student_details[s]["priority_list"]))
             if prj_prioritized < self.cml_options.min_preferences:
                 logging.warning(f" {prj_prioritized} < {self.cml_options.min_preferences} preferences for "+student_details[s]['username'])
