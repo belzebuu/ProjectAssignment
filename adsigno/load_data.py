@@ -48,15 +48,6 @@ class Problem:
             students_df = xl.parse('Students', dtype={'priority_list': str})
 
             self.restrictions = self.read_restrictions_from_excel(teachers_df, topics_df)
-            for x in self.restrictions:
-                if "teams_min" not in x:
-                    x["teams_min"] = 0
-                if "teams_max" not in x:
-                    x["teams_max"] = float("inf")
-                if "students_min" not in x:
-                    x["students_min"] = 0
-                if "students_max" not in x:
-                    x["students_max"] = float("inf")
 
             self.student_details, self.priorities, self.groups, self.std_type = \
                 self.read_students_from_excel(students_df)
@@ -88,7 +79,7 @@ class Problem:
         except utils.MissingCapacity as e:
             if options.allow_unassigned:
                 self.add_capacity(options.groups == "pre")
-                logging.warning("Missing capacity and but unssiagnments allowed: capacity added and grouping set to 'pre' prior to assignement")
+                logging.warning("Missing capacity and but unassigned students allowed: capacity added and grouping set to 'pre' prior to assignment")
             else:
                 logging.warning(e)
                 #raise SystemExit
@@ -354,8 +345,9 @@ class Problem:
     def read_restrictions_from_excel(self, teachers_df, topics_df):
         """Build a restrictions list from the Teachers and Topics DataFrames.
 
-        teams_max and students_max are derived from the Topics sheet
-        (sum of number_of_teams and sum of number_of_teams*max per advisor).
+        if teams_min/max or students_min/max not declared then:
+            teams_max and students_max are derived from the Topics sheet
+            (sum of number_of_teams and sum of number_of_teams*max per advisor).
         Admin rows in the Teachers sheet are excluded.
         """
         # Map advisor full_name → list of topic dicts
@@ -383,10 +375,10 @@ class Problem:
 
             restrictions.append({
                 "username": username,
-                "teams_max": sum(t["n_teams"] for t in topics_data),
-                "teams_min": 0,
-                "students_max": sum(t["n_teams"] * t["max"] for t in topics_data),
-                "students_min": 0,
+                "teams_max": int(teacher.get("teams_max", sum(t["n_teams"] for t in topics_data))),
+                "teams_min": int(teacher.get("teams_min", 0)),
+                "students_max": int(teacher.get("students_max", sum(t["n_teams"] * t["max"] for t in topics_data))),
+                "students_min": int(teacher.get("students_min", 0)),
                 "topics": [t["topic_id"] for t in topics_data],
             })
 
