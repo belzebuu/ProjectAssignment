@@ -1,11 +1,13 @@
 #! /usr/bin/python
 
 from adsigno.utils import *
+from adsigno import cml_parser
+from adsigno.load_data import Problem
 from adsigno.models_ip import *
 #from models_ip_scip import *
 from adsigno.models_ip_weighted import *
 from adsigno.check_sol import *
-from adsigno import cml_parser
+
 
 from subprocess import *
 
@@ -59,5 +61,5 @@ def write_solution(solutions, problem, options, time_elapsed, sln_dir):
 
 
 if __name__ == "__main__":
-    options, dirname = cml_parser.cml_parse()
-    process(dirname, options)
+    options, input_path = cml_parser.cml_parse()
+    process(input_path, options)

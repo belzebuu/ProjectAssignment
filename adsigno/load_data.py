@@ -5,8 +5,8 @@ import sys
 import os
 import csv
 import json
-import os
 import codecs
+from pathlib import Path
 import pandas as pd
 from collections import defaultdict
 from collections import OrderedDict
@@ -29,49 +29,77 @@ class Problem:
 
     def __init__(self, options=None, keep_original_priorities=False):
         if options is None and keep_original_priorities is False:
-            return 
-        if options is None and options.data_dirname is None:
+            return
+        if options is None and options.input_path is None:
             raise SystemError("Missing info to 'process'.")
-        self.options=options
-        data_dirname = options.data_dirname
-        if not os.path.exists(data_dirname):
-            raise SystemError(f"The path '{data_dirname}' does not exist.")
+        self.options = options
+        input_path = Path(options.input_path)  # Ensure it's a Path object
+
         self.cml_options = options
         self.study_programs = set()
 
-        excel_file = self._find_excel_file(data_dirname)
+        excel_file, data_dirname = None, None
+        if input_path.is_file() and input_path.suffix in [".xlsx", ".xls"]:
+            excel_file = input_path
+        elif input_path.is_dir():
+            data_dirname = input_path
+        else:
+            raise SystemError(
+                f"The path '{input_path}' does not exist or it is not an Excel file."
+            )
+
+        # excel_file = self._find_excel_file(data_dirname)
         if excel_file is not None:
             logging.info(f"Reading from Excel file: {excel_file}")
             xl = pd.ExcelFile(excel_file)
-            teachers_df = xl.parse('Teachers')
-            topics_df = xl.parse('Topics')
-            students_df = xl.parse('Students', dtype={'priority_list': str})
+            teachers_df = xl.parse("Teachers")
+            topics_df = xl.parse("Topics")
+            students_df = xl.parse("Students", dtype={"priority_list": str})
 
-            self.restrictions = self.read_restrictions_from_excel(teachers_df, topics_df)
+            self.restrictions = self.read_restrictions_from_excel(
+                teachers_df, topics_df
+            )
 
-            self.student_details, self.priorities, self.groups, self.std_type = \
+            self.student_details, self.priorities, self.groups, self.std_type = (
                 self.read_students_from_excel(students_df)
+            )
 
             self.team_details = self._expand_topics_from_excel(topics_df, teachers_df)
-            self.teams_per_topic, self.advisors = self.arrange_teams_per_topic(self.team_details)
-        else:
-            self.student_details, self.priorities, self.groups, self.std_type = self.read_students(
-                data_dirname)
+            self.teams_per_topic, self.advisors = self.arrange_teams_per_topic(
+                self.team_details
+            )
+            self.valid_prjtype = self.type_compliance(excel_file.parent)
+        elif data_dirname is not None:
+            self.student_details, self.priorities, self.groups, self.std_type = (
+                self.read_students(data_dirname)
+            )
             self.restrictions = self.read_restrictions(data_dirname)
-            self.team_details, self.teams_per_topic, self.advisors = self.read_projects(data_dirname)
+            self.team_details, self.teams_per_topic, self.advisors = self.read_projects(
+                data_dirname
+            )
+            self.valid_prjtype = self.type_compliance(data_dirname)
 
+        # Update the advisors dict with the restrictions read from the Teachers sheet (if any)
         for k in self.restrictions:
             logging.info(k)
             if k["username"].lower() in self.advisors:
+                logging.info(
+                    "Updating advisor {} with restriction {}".format(
+                        k["username"].lower(), k
+                    )
+                )
+                logging.info(
+                    "Before update: {}".format(self.advisors[k["username"].lower()])
+                )
                 self.advisors[k["username"].lower()].update(k)
-        
-        #DF = pd.DataFrame.from_dict(self.team_details,orient="index")
-        #print(DF)
-        #raise SystemError
-        self.valid_prjtype = self.type_compliance(data_dirname)
+                logging.info(
+                    "After update: {}".format(self.advisors[k["username"].lower()])
+                )
+
+        # DF = pd.DataFrame.from_dict(self.team_details,orient="index")
+        # print(DF)
 
         self.restrictions = self.tighten_restrictions()
-        
 
         # self.check_tot_capacity()
         try:
@@ -79,16 +107,19 @@ class Problem:
         except utils.MissingCapacity as e:
             if options.allow_unassigned:
                 self.add_capacity(options.groups == "pre")
-                logging.warning("Missing capacity and but unassigned students allowed: capacity added and grouping set to 'pre' prior to assignment")
+                logging.warning(
+                    "Missing capacity and but unassigned students allowed: capacity added and grouping set to 'pre' prior to assignment"
+                )
             else:
                 logging.warning(e)
-                #raise SystemExit
+                # raise SystemExit
 
-        self.std_values, self.std_ranks_av, self.std_ranks_min = self.calculate_ranks_and_values()
+        self.std_values, self.std_ranks_av, self.std_ranks_min = (
+            self.calculate_ranks_and_values()
+        )
         if not keep_original_priorities:
             self.tighten_student_priorities()
 
-        
         self.write_logs(options.output_dir)
         # self.minimax_sol = self.minimax_sol(data_dirname)
         self.minimax_sol = 0
@@ -104,20 +135,18 @@ class Problem:
         #    sys.exit("program not recognized: {}".format(program))
         return program
 
-
     def read_projects(self, data_dirname):
-        '''It must come after restrictions'''
+        """It must come after restrictions"""
         if self.cml_options.expand_topics:
             topic_details = self.read_topics(data_dirname)
-            team_details = ravel_topics_1.expand_topics(topic_details, self.restrictions)
+            team_details = ravel_topics_1.expand_topics(
+                topic_details, self.restrictions
+            )
             teams_per_topic, advisors = self.arrange_teams_per_topic(team_details)
         else:
             team_details = self.read_teams(data_dirname)
             teams_per_topic, advisors = self.arrange_teams_per_topic(team_details)
         return team_details, teams_per_topic, advisors
-
-
-
 
     def read_projects_file(self, data_dirname):
         projects_file = data_dirname / "projects.csv"
@@ -126,12 +155,12 @@ class Problem:
             if not projects_file.exists():
                 sys.exit(f"File {data_dirname}/projects.csv or Topics.csv missing\n")
 
-        logging.info("read "+str(projects_file))
+        logging.info("read " + str(projects_file))
 
-        with open(projects_file, 'r', encoding='utf-8') as f:
+        with open(projects_file, "r", encoding="utf-8") as f:
             first_line = f.readline()
-        
-        separator = ';' if first_line.count(';') > first_line.count(',') else ','
+
+        separator = ";" if first_line.count(";") > first_line.count(",") else ","
         # We assume header to be:
         # ID;team;title;size_min;size_max;type;prj_id;instit;institute;mini;wl;teachers;email
         # NEW: ProjektNr; Underprojek; Projekttitel; Min; Max;Projekttype; ProjektNr  i BB; Institut forkortelse; Institutnavn; Obligatorisk minikursus; Gruppeplacering
@@ -140,28 +169,31 @@ class Problem:
         logging.debug(project_table)
 
         if "team" in project_table:
-            project_table.team = project_table.team.fillna('')
+            project_table.team = project_table.team.fillna("")
         elif "number_of_teams" in project_table:
-            project_table.number_of_teams = project_table.number_of_teams.fillna('')
+            project_table.number_of_teams = project_table.number_of_teams.fillna("")
         else:
-            raise("team or number_of_teams missing in topics")
-        
+            raise ("team or number_of_teams missing in topics")
+
         if "instit" in project_table.columns:
-            project_table["institute_short"] = project_table.instit.fillna('')
+            project_table["institute_short"] = project_table.instit.fillna("")
         elif "institute_short" in project_table.columns:
-            project_table.institute_short = project_table.institute_short.fillna('')
+            project_table.institute_short = project_table.institute_short.fillna("")
         else:
-            raise ValueError("instit or institute_short missing in topics")   
-           
+            raise ValueError("instit or institute_short missing in topics")
+
         if "main_advisor" in project_table.columns:
-            project_table.main_advisor=project_table.main_advisor.astype(str)
+            project_table.main_advisor = project_table.main_advisor.astype(str)
         elif "advisor_main" in project_table.columns:
-            project_table["main_advisor"]=project_table.advisor_main.astype(str)
+            project_table["main_advisor"] = project_table.advisor_main.astype(str)
         elif "teachers" in project_table.columns:
-            project_table["main_advisor"]=project_table.teachers.apply(
-                lambda x: str(x).split(",")[0].strip() if pd.notna(x) else "")
+            project_table["main_advisor"] = project_table.teachers.apply(
+                lambda x: str(x).split(",")[0].strip() if pd.notna(x) else ""
+            )
         else:
-            raise ValueError("main_advisor, advisor_main, or teachers missing in topics")
+            raise ValueError(
+                "main_advisor, advisor_main, or teachers missing in topics"
+            )
 
         if "email" in project_table.columns:
             project_table.email = project_table.email.apply(lambda x: str(x).lower())
@@ -173,39 +205,40 @@ class Problem:
         if "max_cap" in project_table.columns:
             project_table.rename(columns={"max_cap": "size_max"}, inplace=True)
         if "min" in project_table.columns:
-            project_table.rename(columns={"min":"size_min"},inplace=True)
+            project_table.rename(columns={"min": "size_min"}, inplace=True)
         if "max" in project_table.columns:
-            project_table.rename(columns={"max":"size_max"},inplace=True)
+            project_table.rename(columns={"max": "size_max"}, inplace=True)
 
         if "ID" in project_table.columns:
-            project_table.rename(columns={"ID":"topic_id"},inplace=True)
+            project_table.rename(columns={"ID": "topic_id"}, inplace=True)
         if "id" in project_table.columns:
-            project_table.rename(columns={"id":"topic_id"},inplace=True)
+            project_table.rename(columns={"id": "topic_id"}, inplace=True)
 
-        project_table.topic_id = project_table.topic_id.astype(str)     
+        # Remove rows where topic_id is NaN or empty string
+        project_table = project_table[project_table['topic_id'].notna()]
+        project_table = project_table[project_table['topic_id'].astype(str).str.strip() != ""]
+
+        project_table.topic_id = project_table.topic_id.astype(str)
 
         if "project_name" in project_table.columns:
-            project_table.rename(columns={"project_name":"title"},inplace=True) 
+            project_table.rename(columns={"project_name": "title"}, inplace=True)
         else:
-            project_table["project_name"]=project_table.topic_id.astype(str)
-
+            project_table["project_name"] = project_table.topic_id.astype(str)
 
         if "proj_id" in project_table.columns:
-            project_table.rename(columns={"proj_id":"topic_id"},inplace=True)            
+            project_table.rename(columns={"proj_id": "topic_id"}, inplace=True)
         if "project_number" in project_table.columns:
-            project_table.rename(columns={"project_number":"topic_id"},inplace=True)            
-
-           
-        
+            project_table.rename(columns={"project_number": "topic_id"}, inplace=True)
 
         return project_table
 
     def read_teams(self, data_dirname):
-        '''already expanded topics'''
+        """already expanded topics"""
         project_table = self.read_projects_file(data_dirname)
 
-        project_table.index = project_table["topic_id"].astype(
-            str)+project_table["team"].astype(str)  # project_table["prj_id"]
+        project_table.index = project_table["topic_id"].astype(str) + project_table[
+            "team"
+        ].astype(str)  # project_table["prj_id"]
         team_details = project_table.to_dict("index", into=OrderedDict)
         # topics = {x: list(map(lambda p: p["team"], team_details[x])) for x in team_details}
 
@@ -229,57 +262,59 @@ class Problem:
         logging.debug(project_table.type.unique())
         return team_details
 
-
     def read_topics(self, data_dirname):
-        '''Topics to expand in teams'''
+        """Topics to expand in teams"""
         project_table = self.read_projects_file(data_dirname)
-        
-        project_table.index = project_table.topic_id.astype(str)# project_table["ID"].astype(str) #+project_table["team"].astype(str)  # project_table["prj_id"]
-        
+
+        project_table.index = project_table.topic_id.astype(
+            str
+        )  # project_table["ID"].astype(str) #+project_table["team"].astype(str)  # project_table["prj_id"]
+
         topic_details = project_table.to_dict("index", into=OrderedDict)
         # topics = {x: list(map(lambda p: p["team"], team_details[x])) for x in team_details}
         logging.debug(project_table.type.unique())
-        
-        return topic_details
 
+        return topic_details
 
     def arrange_teams_per_topic(self, team_details):
         teams_per_topic_short = defaultdict(list)
         for k, v in team_details.items():
-            label = v["team"] if len(v["team"])>0 else " "
-            teams_per_topic_short[v["topic_id"]] += list(label) 
+            label = v["team"] if v["team"] else " "
+            teams_per_topic_short[v["topic_id"]] += list(label)
             #    k: list(v) for k, v in project_table.groupby('ID')['team']}
 
         # full_details_dict = {k: v.to_dict("records") for k, v in project_table.groupby("ID")}
         # print(exam_dict)
-        #print(teams_per_topic_short)
-        
+        # print(teams_per_topic_short)
+
         teams_per_topic = defaultdict(list)
-        
+
         for topic in teams_per_topic_short.keys():
             for t in teams_per_topic_short[topic]:
-                _id = str(topic)+t.strip()
-                teams_per_topic[topic].append(utils.Team(t,
-                                                         team_details[_id]["size_min"],
-                                                         team_details[_id]["size_max"],
-                                                         team_details[_id]["type"]
-                                                         )
-                                              )
-        
-        advisors=dict()
-        for _, x in team_details.items(): # doubles should just be overwritten
+                _id = str(topic) + t.strip()
+                teams_per_topic[topic].append(
+                    utils.Team(
+                        t,
+                        team_details[_id]["size_min"],
+                        team_details[_id]["size_max"],
+                        team_details[_id]["type"],
+                    )
+                )
+
+        advisors = dict()
+        for _, x in team_details.items():  # doubles should just be overwritten
             advisor_id = x["email"].split("@")[0].strip().lower()
-            d={"teams_id": [_]}
+            d = {"teams_id": [_]}
             if "teachers" in x:
-                d.update( {"full_name": x["teachers"].split(",")[0]} )
+                d.update({"full_name": x["teachers"].split(",")[0]})
             if advisor_id not in advisors:
                 advisors[advisor_id] = d
             else:
-                advisors[advisor_id]["teams_id"]+=[_]
+                advisors[advisor_id]["teams_id"] += [_]
 
-        #print(team_details.keys())
-        #print(teams_per_topic.keys())
-        #raise SystemExit
+        # print(team_details.keys())
+        # print(teams_per_topic.keys())
+        # raise SystemExit
         return dict(teams_per_topic), dict(sorted(advisors.items()))
 
     # ------------------------------------------------------------------
@@ -292,7 +327,9 @@ class Problem:
         if len(excel_files) == 1:
             return excel_files[0]
         if len(excel_files) > 1:
-            logging.warning(f"Multiple Excel files found in {data_dirname}; falling back to CSV")
+            logging.warning(
+                f"Multiple Excel files found in {data_dirname}; falling back to CSV"
+            )
         return None
 
     def _expand_topics_from_excel(self, topics_df, teachers_df):
@@ -332,14 +369,16 @@ class Problem:
                     "size_max": int(topic["max"]),
                     "type": str(topic["type"]),
                     "prj_id": team_key,
-                    "instit": str(topic.get("institute_short", "")),
+                    "institute_short": str(topic.get("institute_short", "")),
                     "institute": str(topic.get("institute", "")),
                     "main_advisor": advisor_name,
                     "teachers": advisor_name,
                     "email": email,
                 }
 
-        logging.debug(f"Expanded {len(topics_df)} topics into {len(team_details)} teams from Excel")
+        logging.debug(
+            f"Expanded {len(topics_df)} topics into {len(team_details)} teams from Excel"
+        )
         return team_details
 
     def read_restrictions_from_excel(self, teachers_df, topics_df):
@@ -370,19 +409,32 @@ class Problem:
 
             topics_data = advisor_topics.get(full_name, [])
             if not topics_data:
-                logging.debug(f"No topics found for teacher '{full_name}' ({username}); skipping")
+                logging.debug(
+                    f"No topics found for teacher '{full_name}' ({username}); skipping"
+                )
                 continue
 
-            restrictions.append({
-                "username": username,
-                "teams_max": int(teacher.get("teams_max", sum(t["n_teams"] for t in topics_data))),
-                "teams_min": int(teacher.get("teams_min", 0)),
-                "students_max": int(teacher.get("students_max", sum(t["n_teams"] * t["max"] for t in topics_data))),
-                "students_min": int(teacher.get("students_min", 0)),
-                "topics": [t["topic_id"] for t in topics_data],
-            })
+            restrictions.append(
+                {
+                    "username": username,
+                    "teams_max": int(
+                        teacher.get("teams_max", sum(t["n_teams"] for t in topics_data))
+                    ),
+                    "teams_min": int(teacher.get("teams_min", 0)),
+                    "students_max": int(
+                        teacher.get(
+                            "students_max",
+                            sum(t["n_teams"] * t["max"] for t in topics_data),
+                        )
+                    ),
+                    "students_min": int(teacher.get("students_min", 0)),
+                    "topics": [t["topic_id"] for t in topics_data],
+                }
+            )
 
-        logging.info(f"Built {len(restrictions)} advisor restrictions from Excel Teachers sheet")
+        logging.info(
+            f"Built {len(restrictions)} advisor restrictions from Excel Teachers sheet"
+        )
         return restrictions
 
     def read_students(self, data_dirname):
@@ -397,34 +449,66 @@ class Problem:
         # grp_id;(group);username;type;priority_list;(student_id);full_name;email;timestamp
         # group is not needed
         # Detect separator by peeking at the first line
-        with open(students_file, 'r', encoding='utf-8') as f:
+        with open(students_file, "r", encoding="utf-8") as f:
             first_line = f.readline()
 
-        separator = ';' if first_line.count(';') > first_line.count(',') else ','
-        student_table = pd.read_csv(students_file, sep=separator, converters={"priority_list": str})
+        separator = ";" if first_line.count(";") > first_line.count(",") else ","
+        student_table = pd.read_csv(
+            students_file, sep=separator, converters={"priority_list": str}
+        )
         return self._process_students_df(student_table)
 
     def read_students_from_excel(self, students_df):
         """Read students from an Excel Students sheet DataFrame."""
         student_table = students_df.copy()
         if "priority_list" in student_table.columns:
-            student_table["priority_list"] = student_table["priority_list"].fillna("").astype(str)
+            student_table["priority_list"] = (
+                student_table["priority_list"].fillna("").astype(str)
+            )
         # Excel parses timestamps as pandas Timestamp; convert to ISO string for JSON serialisation
         if "timestamp" in student_table.columns:
             student_table["timestamp"] = student_table["timestamp"].apply(
-                lambda x: x.isoformat() if pd.notna(x) and hasattr(x, "isoformat") else str(x)
+                lambda x: (
+                    x.isoformat() if pd.notna(x) and hasattr(x, "isoformat") else str(x)
+                )
             )
         return self._process_students_df(student_table)
 
     def _process_students_df(self, student_table):
         """Process a students DataFrame into Problem data structures."""
-        student_table["username"] = student_table["username"].fillna(pd.Series("index" + student_table.index.astype(str), index=student_table.index))
+        student_table["username"] = student_table["username"].fillna(
+            pd.Series(
+                "index" + student_table.index.astype(str), index=student_table.index
+            )
+        )
 
         student_table["username"] = student_table["username"].apply(str.lower)
         student_table.index = student_table["username"]
+        logging.debug(student_table.dtypes)
+        if pd.api.types.is_numeric_dtype(student_table["grp_id"]):
+            try:
+                student_table["grp_id"] = (
+                    student_table["grp_id"].fillna(0).astype(int).astype(str)
+                )
+            except ValueError:
+                logging.warning(
+                    "grp_id column contains non-numeric values; treating as strings"
+                )
+                raise SystemError(
+                    "grp_id column contains non-numeric values; cannot convert to int"
+                )
+        else:
+            raise SystemError(
+                "grp_id column contains non-numeric values; cannot convert to int"
+            )
 
         if "last_sub" in student_table.columns:
-            student_table.rename(columns={"last_sub":"timestamp"},inplace=True)
+            student_table.rename(columns={"last_sub": "timestamp"}, inplace=True)
+
+        removed_students = student_table[student_table["priority_list"].isna() | (student_table["priority_list"].str.strip() == "")]
+        if not removed_students.empty:
+            logging.warning(f"Removing {len(removed_students)} students with missing or empty priority list:\n{removed_students[["full_name","email"]]}")
+        student_table = student_table[student_table["priority_list"].notna() & (student_table["priority_list"].str.strip() != "")]
 
         logging.debug(student_table)
         student_details = student_table.to_dict("index", into=OrderedDict)
@@ -440,28 +524,42 @@ class Problem:
         def process_string(instring):
             instring = instring.strip(",")
             # print(instring)
-            if len(instring) == 0:
+            if not instring:
                 return []
             pos_s = instring.find("(")
             if pos_s == -1:
                 return [[x.strip()] for x in instring.split(",")]
             else:
                 pos_e = instring.find(")")
-                return process_string(instring[0:pos_s]) + handle_tie(instring[pos_s+1:pos_e]) + process_string(instring[pos_e+1:])
+                return (
+                    process_string(instring[0:pos_s])
+                    + handle_tie(instring[pos_s + 1 : pos_e])
+                    + process_string(instring[pos_e + 1 :])
+                )
 
         # Note: we assume a well formed string
         for s in student_details:
-
-            student_details[s]["priority_list_wties"] = student_details[s]["priority_list"]
+            student_details[s]["priority_list_wties"] = student_details[s][
+                "priority_list"
+            ]
             student_details[s]["priority_list"] = process_string(
-                str(student_details[s]["priority_list"]).strip())
-            prj_prioritized = len(utils.flatten_list_of_lists(student_details[s]["priority_list"]))
+                str(student_details[s]["priority_list"]).strip()
+            )
+            prj_prioritized = len(
+                utils.flatten_list_of_lists(student_details[s]["priority_list"])
+            )
             if prj_prioritized < self.cml_options.min_preferences:
-                logging.warning(f" {prj_prioritized} < {self.cml_options.min_preferences} preferences for "+student_details[s]['username'])
-                #raise SystemExit(
+                logging.warning(
+                    f" {prj_prioritized} < {self.cml_options.min_preferences} preferences for "
+                    + student_details[s]["username"]
+                )
+                # raise SystemExit(
                 #    "Found a student who declared less priorities than requested. The case needs handling.")
 
-            if self.cml_options.cut_off_type is not None and str(student_details[s]["stype"]) == self.cml_options.cut_off_type:
+            if (
+                self.cml_options.cut_off_type is not None
+                and str(student_details[s]["stype"]) == self.cml_options.cut_off_type
+            ):
                 # We need to ensure all students have the exact same number of priorities
                 # we cut off and if a group of ties exceeds the cut off size, we select
                 # remaining at random
@@ -472,14 +570,14 @@ class Problem:
                     size += len(_)
                     if size >= self.cml_options.cut_off:
                         break
-                    #if len(_) + size <= self.cml_options.cut_off:
+                    # if len(_) + size <= self.cml_options.cut_off:
                     #    tmp += [_]
                     #    size += len(_)
-                    #elif len(_) + size > self.cml_options.cut_off:
+                    # elif len(_) + size > self.cml_options.cut_off:
                     #    tmp += [random.choices(_,
                     #                           k=self.cml_options.cut_off - size)]
                     #    break
-                    #else:
+                    # else:
                     #    break
                 # student_details[s]["priority_list"][:self.cml_options.cut_off]
                 student_details[s]["priority_list"] = tmp
@@ -487,14 +585,21 @@ class Problem:
 
         # print(json.dumps(student_details,indent=4))
 
-        priorities = {u: student_details[u]["priority_list"]
-                      for u in student_details}
+        priorities = {u: student_details[u]["priority_list"] for u in student_details}
 
-        tmp = {u: (student_details[u]["grp_id"], student_details[u]["type"])
-               for u in student_details}
+        tmp = {
+            u: (student_details[u]["grp_id"], student_details[u]["type"])
+            for u in student_details
+        }
         group_ids = {student_details[u]["grp_id"] for u in student_details}
-        groups = {g: list(
-            filter(lambda u: student_details[u]["grp_id"] == g, student_details.keys())) for g in group_ids}
+        groups = {
+            g: list(
+                filter(
+                    lambda u: student_details[u]["grp_id"] == g, student_details.keys()
+                )
+            )
+            for g in group_ids
+        }
 
         student_types = {student_details[u]["type"] for u in student_details}
         # print(student_types)
@@ -502,22 +607,44 @@ class Problem:
 
         return (student_details, priorities, groups, std_type)
 
-
-    def write_logs(self,output_dirname):
+    def write_logs(self, output_dirname):
         log = output_dirname / "log"
         os.makedirs(log, exist_ok=True)
-        with codecs.open(os.path.join(log, "projects.json"),  "w", "utf-8") as filehandle:
-            json.dump(self.team_details, fp=filehandle, sort_keys=True,
-                    indent=4, separators=(',', ': '),  ensure_ascii=False)
-        with codecs.open(os.path.join(log, "students.json"),  "w", "utf-8") as filehandle:
-            json.dump(self.student_details, fp=filehandle, sort_keys=True,
-                    indent=4, separators=(',', ': '),  ensure_ascii=False)
-        with codecs.open(os.path.join(log, "ranks.json"),  "w", "utf-8") as filehandle:
-            sorted_computed_ranks = {x: sorted(
-                self.std_ranks_av[x].items(), key=lambda item: item[1]) for x in self.std_ranks_av}
-            json.dump(sorted_computed_ranks, fp=filehandle, sort_keys=True,
-                    indent=4, separators=(',', ': '),  ensure_ascii=False)
-
+        with codecs.open(
+            os.path.join(log, "projects.json"), "w", "utf-8"
+        ) as filehandle:
+            json.dump(
+                self.team_details,
+                fp=filehandle,
+                sort_keys=True,
+                indent=4,
+                separators=(",", ": "),
+                ensure_ascii=False,
+            )
+        with codecs.open(
+            os.path.join(log, "students.json"), "w", "utf-8"
+        ) as filehandle:
+            json.dump(
+                self.student_details,
+                fp=filehandle,
+                sort_keys=True,
+                indent=4,
+                separators=(",", ": "),
+                ensure_ascii=False,
+            )
+        with codecs.open(os.path.join(log, "ranks.json"), "w", "utf-8") as filehandle:
+            sorted_computed_ranks = {
+                x: sorted(self.std_ranks_av[x].items(), key=lambda item: item[1])
+                for x in self.std_ranks_av
+            }
+            json.dump(
+                sorted_computed_ranks,
+                fp=filehandle,
+                sort_keys=True,
+                indent=4,
+                separators=(",", ": "),
+                ensure_ascii=False,
+            )
 
     def calculate_ranks_and_values(self):
         std_values = {}
@@ -536,14 +663,14 @@ class Problem:
             # print(priorities)
             for p in priorities:
                 r = len(p)
-                av_exp = sum(range(i-r+1, i+1))/r
-                av_rank = sum(range(j, j+r))/r
+                av_exp = sum(range(i - r + 1, i + 1)) / r
+                av_rank = sum(range(j, j + r)) / r
                 for t in p:
                     values[t] = 2**av_exp
                     ranks_av[t] = av_rank
                     ranks_min[t] = j
-                j = j+r
-                i = max(0, i-r)
+                j = j + r
+                i = max(0, i - r)
 
             # we handle here also cases of students who did not input a preference list
             # we assign to them a value that is the average value among all available values
@@ -551,9 +678,12 @@ class Problem:
 
             if self.cml_options.prioritize_all or len(priorities) == 0:
                 prj_set = set(self.teams_per_topic.keys()).difference(
-                    set(utils.flatten_list_of_lists(priorities)))
+                    set(utils.flatten_list_of_lists(priorities))
+                )
                 prj_set = list(prj_set)
-                if False:  # old way decide a random order but it may lead to suboptimal sol
+                if (
+                    False
+                ):  # old way decide a random order but it may lead to suboptimal sol
                     prj_list = random.sample(prj_set, k=len(prj_set))
                     for p in prj_list:
                         values[p] = 2**i
@@ -575,15 +705,17 @@ class Problem:
 
         # print(std_ranks_av,std_values)
         # pprint.pprint()
-        #raise SystemError
+        # raise SystemError
         return std_values, std_ranks_av, std_ranks_min
 
     def recalculate_ranks_values(self) -> None:
-        self.std_values, self.std_ranks_av, self.std_ranks_min = self.calculate_ranks_and_values()
+        self.std_values, self.std_ranks_av, self.std_ranks_min = (
+            self.calculate_ranks_and_values()
+        )
 
     def read_restrictions(self, data_dirname):
-        """ reads restrictions """
-        restrictions=dict()
+        """reads restrictions"""
+        restrictions = dict()
         if os.path.exists(data_dirname / "restrictions.json"):
             restrictions = self.read_restrictions_json(data_dirname)
         elif os.path.exists(data_dirname / "restrictions.csv"):
@@ -591,117 +723,153 @@ class Problem:
         elif os.path.exists(data_dirname / "Teachers.csv"):
             restrictions = self.read_restrictions_csv(data_dirname)
         else:
-            sys.exit(f"File {data_dirname}/[restrictions|Teachers].[json|csv] missing\n")
+            sys.exit(
+                f"File {data_dirname}/[restrictions|Teachers].[json|csv] missing\n"
+            )
         for x in restrictions:
             if "teams_min" not in x:
-                x["teams_min"]=0
+                x["teams_min"] = 0
             if "teams_max" not in x:
-                x["teams_max"]=float("inf")
+                x["teams_max"] = float("inf")
             if "students_min" not in x:
-                x["students_min"]=0  
+                x["students_min"] = 0
             if "students_max" not in x:
-                x["students_max"]=float("inf")     
+                x["students_max"] = float("inf")
         return restrictions
 
     def read_restrictions_json(self, data_dirname):
-        """ reads restrictions """
+        """reads restrictions"""
         with open(data_dirname / "restrictions.json", "r") as jsonfile:
             restrictions = json.load(jsonfile)
         for r in restrictions["nteams"]:
             r["username"] = r["username"].lower()
-        #print({x["username"]: x["teams_max"] for x in restrictions["nteams"]})        
-        return restrictions["nteams"] 
+        # print({x["username"]: x["teams_max"] for x in restrictions["nteams"]})
+        return restrictions["nteams"]
 
     def tighten_restrictions(self):
         # Adjust for topics not available
         processed = []
-        for (i, r) in enumerate(self.restrictions):
-            topics = [t for t in r["topics"]
-                      if t in self.teams_per_topic.keys()]
+        for i, r in enumerate(self.restrictions):
+            topics = [t for t in r["topics"] if t in self.teams_per_topic.keys()]
             if len(topics) != 0:
                 r["topics"] = topics
                 processed += [r]
         return processed
 
     def read_restrictions_csv(self, data_dirname):
-        """ reads restrictions """
-        reader = csv.reader(
-            open(data_dirname / "restrictions.csv", "r"), delimiter=";")
+        """reads restrictions"""
+        reader = csv.reader(open(data_dirname / "restrictions.csv", "r"), delimiter=";")
         restrictions = []
         try:
             for row in reader:
-                restrictions += [{"cum": int(row[0]),
-                                  "topics": [int(row[t]) for t in range(1, len(row))]}]
+                restrictions += [
+                    {
+                        "cum": int(row[0]),
+                        "topics": [int(row[t]) for t in range(1, len(row))],
+                    }
+                ]
 
         except csv.Error as e:
-            sys.exit('file %s, line %d: %s' %
-                     ("/restrictions.csv", reader.line_num, e))
-        
+            sys.exit("file %s, line %d: %s" % ("/restrictions.csv", reader.line_num, e))
+
         return restrictions
 
     def type_compliance(self, data_dirname):
-        """ reads types """
+        """reads types"""
         reader = csv.reader(open(data_dirname / "types.csv", "r"), delimiter=";")
         valid_prjtypes = {}
         try:
             for row in reader:
                 valid_prjtypes[row[0]] = [row[t] for t in range(1, len(row))]
         except csv.Error as e:
-            sys.exit('file %s, line %d: %s' %
-                     ("/types.csv", reader.line_num, e))
+            sys.exit("file %s, line %d: %s" % ("/types.csv", reader.line_num, e))
             # return {'biologi': ["alle", "natbidat"],"farmaci": ["alle","farmaci"],"natbidat": ["alle","natbidat"]}
-        logging.debug("In students:" + str({x for _,x in self.std_type.items()}))
-        logging.debug("In projects:" + str({x["type"] for _,x in self.team_details.items()}))
+        logging.debug("In students:" + str({x for _, x in self.std_type.items()}))
+        logging.debug(
+            "In projects:" + str({x["type"] for _, x in self.team_details.items()})
+        )
         logging.debug("In types: " + str(valid_prjtypes))
 
         # check
         for s in self.std_type:
             t = self.std_type[s]
 
-            valid_prjs = [x for x, item in self.teams_per_topic.items() if item[0].type in valid_prjtypes[t]]
-            filtered = list(filter(lambda x: x in utils.flatten_list_of_lists(self.priorities[s]),  valid_prjs))
-            if (len(filtered) < 1):
-                # prob.std_ranks_av[prob.groups[g][0]])                
-                logging.debug(s, self.std_type[s],  valid_prjtypes[t])
-                logging.debug(sorted(utils.flatten_list_of_lists(self.priorities[s])), sorted(valid_prjs), filtered) #, self.priorities)
-                logging.debug([item[0].type for x, item in self.teams_per_topic.items()])
+            valid_prjs = [
+                x
+                for x, item in self.teams_per_topic.items()
+                if item[0].type in valid_prjtypes[t]
+            ]
+            filtered = list(
+                filter(
+                    lambda x: x in utils.flatten_list_of_lists(self.priorities[s]),
+                    valid_prjs,
+                )
+            )
+            if len(filtered) < 1:
+                # prob.std_ranks_av[prob.groups[g][0]])
+                logging.debug(f"{s} {self.std_type[s]} {valid_prjtypes[t]}")
+                logging.debug(
+                    f"{sorted(utils.flatten_list_of_lists(self.priorities[s]))} {sorted(valid_prjs)} {filtered}"
+                )  # , self.priorities)
+                logging.debug(
+                    [item[0].type for x, item in self.teams_per_topic.items()]
+                )
                 logging.debug(self.teams_per_topic.keys())
-                #raise utils.TypeComplianceError("Type compliance error: priority list empty after type filtering\n%s" % s)
+                # raise utils.TypeComplianceError("Type compliance error: priority list empty after type filtering\n%s" % s)
 
         return valid_prjtypes
 
     def add_fake_project(self) -> None:
         """Must occurr before calculating ranks and values"""
-        new_id="Unassigned"
-        #Team = namedtuple("Team", ("team_id", "min", "max", "type"))
+        new_id = "Unassigned"
+        # Team = namedtuple("Team", ("team_id", "min", "max", "type"))
         letters = "abcdefghi"
 
         print(self.teams_per_topic)
         # copy the type of the first team
         type = self.teams_per_topic[list(self.teams_per_topic.keys())[0]][0].type
 
-        n=0
+        n = 0
         if new_id not in self.teams_per_topic:
-            self.teams_per_topic[new_id]=[utils.Team(letters[n], 0, 5, type)]
+            self.teams_per_topic[new_id] = [utils.Team(letters[n], 0, 5, type)]
         else:
-            n = len(self.teams_per_topic[new_id]) 
+            n = len(self.teams_per_topic[new_id])
             self.teams_per_topic[new_id].append(utils.Team(letters[n], 0, 5, type))
 
-        _id = str(new_id)+letters[n]
-        self.team_details[_id] = {'ID': new_id, 'team': letters[n],
-                                  'title': 'Unassigned', 'size_min': 0, 'size_max': 5, 'type': type,
-                                  'prj_id': _id, 'instit': 'IMADA', 'institute': 'IMADA', 'mini': numpy.nan, 'wl': numpy.nan,
-                                  'teachers': 'Nobody', 'email': 'nobody@sdu.dk'}
+        _id = str(new_id) + letters[n]
+        self.team_details[_id] = {
+            "ID": new_id,
+            "team": letters[n],
+            "title": "Unassigned",
+            "size_min": 0,
+            "size_max": 5,
+            "type": type,
+            "prj_id": _id,
+            "instit": "IMADA",
+            "institute": "IMADA",
+            "mini": numpy.nan,
+            "wl": numpy.nan,
+            "teachers": "Nobody",
+            "email": "nobody@sdu.dk",
+        }
 
         for s in self.priorities:
-            if self.cml_options.cut_off_type is not None and str(self.student_details[s]["stype"]) == self.cml_options.cut_off_type:
+            if (
+                self.cml_options.cut_off_type is not None
+                and str(self.student_details[s]["stype"])
+                == self.cml_options.cut_off_type
+            ):
                 continue
             if not any([new_id in x for x in self.priorities[s]]):
                 self.priorities[s] += [[new_id]]
-        #print(json.dumps(self.priorities,indent=4))
-        
+        # print(json.dumps(self.priorities,indent=4))
+
         for s in self.student_details:
-            if self.cml_options.cut_off_type is not None and str(self.student_details[s]["stype"]) == self.cml_options.cut_off_type:
+            if (
+                self.cml_options.cut_off_type is not None
+                and str(self.student_details[s]["stype"])
+                == self.cml_options.cut_off_type
+            ):
                 continue
             if not any([new_id in x for x in self.student_details[s]["priority_list"]]):
                 self.student_details[s]["priority_list"] += [[new_id]]
@@ -718,17 +886,17 @@ class Problem:
         n_places = 0
         for x in self.restrictions:
             n_places += x["students_max"]
-        
+
         if n_stds > n_places:
             missing_places = n_stds - n_places
-            topic_nr = max(map(lambda x : int(x), self.teams_per_topic.keys()))+1
+            topic_nr = max(map(lambda x: int(x), self.teams_per_topic.keys())) + 1
             for _ in range(missing_places):
                 self.add_fake_project(topic_nr)
         if n_groups > n_teams and pre_grouping:
             missing_teams = n_groups - n_teams + 3
-            topic_nr = max(map(lambda x : int(x), self.teams_per_topic.keys()))+1
+            topic_nr = max(map(lambda x: int(x), self.teams_per_topic.keys())) + 1
             for _ in range(missing_teams):
-                self.add_fake_project() #topic_nr)
+                self.add_fake_project()  # topic_nr)
 
     def check_capacity(self, pre_grouping: bool) -> None:
         n_stds = len(self.student_details)
@@ -737,46 +905,61 @@ class Problem:
         for x in self.restrictions:  # self.teams_per_topic.keys():
             n_teams += x["teams_max"]  # len(self.teams_per_topic[p])
         n_places = 0
-        ignore_capacity=False
+        ignore_capacity = False
         for x in self.restrictions:
             if "students_max" in x:
-                n_places += x["students_max"] 
+                n_places += x["students_max"]
             else:
-                ignore_capacity=True
-        
-        logging.info(f"Number of students: {n_stds} on number of places available: {n_places}")
-        logging.info(f"Number of student groups: {n_groups} on number of teams available: {n_teams}")
-        
+                ignore_capacity = True
+
+        logging.info(
+            f"Number of students: {n_stds} on number of places available: {n_places}"
+        )
+        logging.info(
+            f"Number of student groups: {n_groups} on number of teams available: {n_teams}"
+        )
+
         if n_stds > n_places and not ignore_capacity:
-            raise utils.MissingCapacity("After restrictions, potential places not enough for all students. Ignore if restictions not globally set.")
+            raise utils.MissingCapacity(
+                "After restrictions, potential places not enough for all students. Ignore if restictions not globally set."
+            )
         elif n_groups > n_teams and pre_grouping:
-            raise utils.MissingCapacity("After restrictions, no teams enough to cover all groups. Ignore if restrictions not globally set.")
+            raise utils.MissingCapacity(
+                "After restrictions, no teams enough to cover all groups. Ignore if restrictions not globally set."
+            )
 
     def check_tot_capacity(self) -> None:
-        capacity = sum([self.team_details[k]["size_max"]
-                       for k in self.team_details])
+        capacity = sum([self.team_details[k]["size_max"] for k in self.team_details])
         n_stds = len(self.student_details)
-        if (capacity < n_stds):
-            raise utils.MissingCapacity("Not enough capacity from all projects. A possible workaround could be to include a placeholder project with the needed capacity.")
+        if capacity < n_stds:
+            raise utils.MissingCapacity(
+                "Not enough capacity from all projects. A possible workaround could be to include a placeholder project with the needed capacity."
+            )
             # file.write(str(len(project_dict)+1)+";;1;"+str(n_stds-capacity)+";"+program+"\n")
-            #project_dict[len(project_dict)+1] = n_stds-capacity
+            # project_dict[len(project_dict)+1] = n_stds-capacity
 
     def tighten_student_priorities(self) -> None:
-        
+
         def remove_absent_prj(plist: list):
-            for sub_list in plist: #self.student_details[s]["priority_list"]:
+            for sub_list in plist:  # self.student_details[s]["priority_list"]:
                 for p in sub_list:
                     if p not in self.teams_per_topic.keys():
-                        msg = "WARNING: " + s + " expressed a preference for a project " + str(p)+" which is not available\n<br/>"
+                        msg = (
+                            "WARNING: "
+                            + s
+                            + " expressed a preference for a project "
+                            + str(p)
+                            + " which is not available\n<br/>"
+                        )
                         msg += str(self.student_details[s]["priority_list"])
-                        utils.data_issue_continue(msg, self.options.execution_mode)                        
+                        utils.data_issue_continue(msg, self.options.execution_mode)
                         logging.warning(self.student_details[s]["priority_list"])
                         sub_list.remove(p)
-                        if len(sub_list)==0:
-                            self.student_details[s]["priority_list"].remove(sub_list)                        
-                        return True                    
+                        if len(sub_list) == 0:
+                            self.student_details[s]["priority_list"].remove(sub_list)
+                        return True
             return False
 
-        for s in self.student_details.keys():            
+        for s in self.student_details.keys():
             while remove_absent_prj(self.student_details[s]["priority_list"]):
                 pass

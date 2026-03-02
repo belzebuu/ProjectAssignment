@@ -6,6 +6,7 @@
 # model.tbl
 # sol.txt
 # projects-quoted.txt
+import logging
 import sys
 import getopt
 import os
@@ -429,8 +430,8 @@ def institute_wise(prob):
                               ["Institut"] == i] for i in institutes}
     topics_per_institute = {i: [x for x in sorted(prob.teams_per_topic.keys()) if prob.team_details[str(
         x)+prob.teams_per_topic[x][0]]["Institut"] == i] for i in institutes}
-    print(pIDs_per_institute)
-    print(topics_per_institute)
+    #print(pIDs_per_institute)
+    #print(topics_per_institute)
 
     for i in sorted(institutes):
         tot_per_institute = 0
@@ -465,7 +466,7 @@ def institute_wise(prob):
     #topics_per_institute['IMADA Dat'] = [15, 78, 95, 1, 81, 26, 40, 12, 17, 14, 77, 60]
     fields = set([prob.student_details[s]["Studieretning"] for s in prob.student_details])
     # fields=topics_per_institute.keys()
-    print(topics_per_institute)
+    logging.debug(f"topics_per_institute: {topics_per_institute}")
     shorten = {"Biologisk Institut": "Biologi",
                "IMADA Dat": "IMADA-Dat",
                "IMADA Mat": "IMADA-Mat",
@@ -494,7 +495,7 @@ def institute_wise(prob):
             matrix[std_retning][k] = matrix[std_retning][k]+lshared[k]
         students_per_institute.update({std_retning: {s: lshared}})
     # print students_per_institute
-    print(matrix)
+    logging.debug(f"matrix: {matrix}")
     # print map(lambda k: ', '.join(map(lambda x : str(matrix[k][x]), matrix.keys())) ,  matrix.keys())
     f = open("www/data/pref.csv", "w")
     f.write("From,To,count\n")
@@ -506,7 +507,7 @@ def institute_wise(prob):
 
     stds_per_retning = {
         f: len([s for s in prob.student_details if prob.student_details[s]["Studieretning"] == f]) for f in fields}
-    print(stds_per_retning)
+    logging.debug(f"stds_per_retning: {stds_per_retning}")
 
 
 def solution_report_4_admin(options):    

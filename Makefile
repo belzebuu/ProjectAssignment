@@ -82,6 +82,17 @@ ff501: $(SOLDIR)
 	${PROGRAM} -g post -w owa -i -m 7 ${DATADIR}/${CASE} | tee ${DATADIR}/${CASE}/log.txt
 
 
+ff5012026:
+	$(eval DATADIR = /Users/march/workspace/github/EMT/ProjectAssignment_gitsdu/data)
+	$(eval CASE = 2026-ff501)
+	$(eval EXCEL_FILE = FF501-2026-data.xlsx)
+	$(eval SOLDIR = ${DATADIR}/${CASE}/sln)
+	$(eval FLAGS = -g post -w owa -i -m 7)
+	${PROGRAM} ${FLAGS} ${DATADIR}/${CASE}/${EXCEL_FILE} | tee ${DATADIR}/${CASE}/log.txt
+	yes | python3 adsigno/solution_report.py ${FLAGS} -s ${SOLDIR}/sol_001.txt ${DATADIR}/${CASE}/${EXCEL_FILE}
+	yes | python3 adsigno/solution_report_admin.py ${FLAGS} -s ${SOLDIR}/sol_001.txt ${DATADIR}/${CASE}/${EXCEL_FILE}
+
+
 run:
 	${PROGRAM} ${RUN_FLAGS} ${DATADIR}/${CASE}  | tee ${DATADIR}/${CASE}/log.txt
 

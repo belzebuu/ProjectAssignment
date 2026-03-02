@@ -8,15 +8,15 @@ import codecs
 import string
 import csv
 import json
+from pathlib import Path
 import pandas as pd
 from collections import defaultdict
 from collections import OrderedDict
 from adsigno.load_data import Problem
-import functools
-import adsigno.cml_parser as cml_parser
-import adsigno.utils as utils
+from adsigno import cml_parser
+from adsigno import utils as utils
 import subprocess
-from pathlib import Path
+import logging
 
 def read_solution(solfile):
     ass_std2team = {}
@@ -29,7 +29,8 @@ def read_solution(solfile):
         ass_std2team[parts[0]] = (str(parts[1].strip()), parts[2].strip())
         ass_team2std[(str(parts[1])+parts[2]).strip()].add(parts[0])
 
-    print(ass_std2team, ass_team2std)
+    logging.debug(f"ass_std2team: {ass_std2team}")
+    logging.debug(f"ass_team2std: {ass_team2std}")
     return ass_std2team, ass_team2std
 
 
@@ -90,7 +91,7 @@ def project_table(ass_std2team, ass_team2std, popularity, max_p, prob, out_dir):
 
             team_details[pID]["assigned"] = []
             if (std_assigned > 0):
-                print(team_details[pID])
+                #print(team_details[pID])
                 if "teachers" in team_details[pID]:
                     filehandle.write("%s: %s (advisors: %s; contact: %s) \n" %
                                      (  # pID,
@@ -258,6 +259,7 @@ def write_popularity(popularity, max_p, prob, out_dir):
     columns = ["title", "type", "institute_short", "tot_popularity"] + \
         [str(j+1)+". prio." for j in range(max_p)]
     
+    logging.debug(table)
     outfile = out_dir / "popularity.csv"
     table.to_csv(outfile, sep=";", index=True,
                  index_label="topic_id", columns=columns)
@@ -265,8 +267,8 @@ def write_popularity(popularity, max_p, prob, out_dir):
 
 def advisor_table(ass_std2team, ass_team2std, problem, out_dir):
     outfile = out_dir / "advisors.csv"
-    print(ass_std2team)
-    print(ass_team2std)
+    #print(ass_std2team)
+    #print(ass_team2std)
 
     for _, rest in problem.advisors.items():
         groups = 0
@@ -286,7 +288,7 @@ def advisor_table(ass_std2team, ass_team2std, problem, out_dir):
 
     advisors_dict = {k: problem.advisors[k] for k in problem.advisors}
     table = pd.DataFrame.from_dict(advisors_dict, orient='index')
-    print(table)
+    logging.debug(f"advisors table: {table}")
     columns = ["full_name", "teams_min", "teams_max", "assigned_groups", "capacity_left_grps",
                "students_min", "students_max", "assigned_stds", "capacity_left_stds"]
     table[columns].to_csv(outfile, sep=";", index=True,

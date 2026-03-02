@@ -30,13 +30,13 @@ def cml_parse() -> dict:
     parser.add_argument("-l", "--logging_file", dest="logging_file", metavar="PATH", default=None, type=Path, help="The file where the logging is sent [default: stderr]")
     parser.add_argument("-s", "--solution_file", dest="solution_file", metavar="PATH", default=None, type=Path, help="The file where the solution is stored [default: %(default)s]")
     parser.add_argument("-o", "--output_dir", dest="output_dir", metavar="PATH", default=None, type=Path, help="The directory where the output directories are stored ('log/' 'sln/' 'out/'). If 'None', then same as input direcotry. [default: %(default)s]")
-    parser.add_argument("data_dirname",nargs=1,type=Path)
+    parser.add_argument("input_path",nargs=1,type=Path)
 
     options = parser.parse_args()  # by default it uses sys.argv[1:]
         
-    options.data_dirname = options.data_dirname[0]   
+    options.input_path = options.input_path[0]   
     if options.output_dir is None:
-        options.output_dir = options.data_dirname
+        options.output_dir = options.input_path.parent
     else:
         options.output_dir=Path(options.output_dir)
 
