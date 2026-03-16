@@ -6,8 +6,10 @@ HOST=$(shell hostname)
 
 ifeq (${HOST},ADM-131257-Mac)
 	DATADIR=/Users/march/workspace/git/flask/Assignment/Assign/data/
+	SYSTEMDIR=/Users/march/workspace
 else
 	DATADIR=/home/marco/workspace/git/flask/Assignment/Assign/data/
+	SYSTEMDIR=/home/marco/workspace
 endif
 
 DATADIR=/Users/march/workspace/git/TT/ProjectAssignment_git_imada/data/2024-ff501/20240304_004053
@@ -83,11 +85,22 @@ ff501: $(SOLDIR)
 
 
 ff5012026:
-	$(eval DATADIR = /Users/march/workspace/github/EMT/ProjectAssignment_gitsdu/data)
+	$(eval DATADIR = ${SYSTEMDIR}/github/EMT/ProjectAssignment_gitsdu/data)
 	$(eval CASE = 2026-ff501)
 	$(eval EXCEL_FILE = FF501-2026-data.xlsx)
 	$(eval SOLDIR = ${DATADIR}/${CASE}/sln)
 	$(eval FLAGS = -g post -w owa -i -m 7)
+	${PROGRAM} ${FLAGS} ${DATADIR}/${CASE}/${EXCEL_FILE} | tee ${DATADIR}/${CASE}/log.txt
+	yes | python3 adsigno/solution_report.py ${FLAGS} -s ${SOLDIR}/sol_001.txt ${DATADIR}/${CASE}/${EXCEL_FILE}
+	yes | python3 adsigno/solution_report_admin.py ${FLAGS} -s ${SOLDIR}/sol_001.txt ${DATADIR}/${CASE}/${EXCEL_FILE}
+
+
+bapsy2026:
+	$(eval DATADIR = ${SYSTEMDIR}/github/EMT/ProjectAssignment_gitsdu/data)
+	$(eval CASE = 2026-bapsy)
+	$(eval EXCEL_FILE = BAPSY2026.xlsx)
+	$(eval SOLDIR = ${DATADIR}/${CASE}/sln)
+	$(eval FLAGS = -x continue -e -g pre -w owa -m 5 -c 1 -t 1)
 	${PROGRAM} ${FLAGS} ${DATADIR}/${CASE}/${EXCEL_FILE} | tee ${DATADIR}/${CASE}/log.txt
 	yes | python3 adsigno/solution_report.py ${FLAGS} -s ${SOLDIR}/sol_001.txt ${DATADIR}/${CASE}/${EXCEL_FILE}
 	yes | python3 adsigno/solution_report_admin.py ${FLAGS} -s ${SOLDIR}/sol_001.txt ${DATADIR}/${CASE}/${EXCEL_FILE}

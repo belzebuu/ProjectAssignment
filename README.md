@@ -101,7 +101,7 @@ $ python3 adsigno/solution_report_admin.py -m 7 -s /home/marco/workspace/git/EMT
 
 
 ```
-make ff501
+make ff5012026
 ```
 
 The rest below is outdated.
@@ -174,6 +174,9 @@ pyenv local 3.13.3
 ```
 
 ```bash
+poetry env info
+poetry env activate
+# exec command
 poetry install
 poetry shell
 
