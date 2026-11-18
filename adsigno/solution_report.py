@@ -156,10 +156,10 @@ def student_table(ass_std2team, ass_team2std, prob, out_dir):
 
     table = pd.DataFrame.from_dict(student_details, orient='index')
     if "stype" in table.columns:
-        cols = ["username", "type", "stype", "grp_id", "topic_assigned",
+        cols = ["username", "full_name", "type", "stype", "grp_id", "topic_assigned",
                 "team_assigned", "priority_assigned", "priority_list_wties"]
     else:
-        cols = ["username", "type", "grp_id", "topic_assigned",
+        cols = ["username", "full_name", "type", "grp_id", "topic_assigned",
                 "team_assigned", "priority_assigned", "priority_list_wties"]
     table.to_csv(outfile, sep=";", index=False, columns=cols)
 
@@ -273,6 +273,7 @@ def advisor_table(ass_std2team, ass_team2std, problem, out_dir):
     for _, rest in problem.advisors.items():
         groups = 0
         stds = 0
+        print(_)
         for topic in rest["topics"]:
             if topic in problem.teams_per_topic:
                 for team in problem.teams_per_topic[topic]:

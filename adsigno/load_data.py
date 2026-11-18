@@ -117,10 +117,12 @@ class Problem:
         self.std_values, self.std_ranks_av, self.std_ranks_min = (
             self.calculate_ranks_and_values()
         )
+
         if not keep_original_priorities:
             self.tighten_student_priorities()
+        
+        self.write_logs(options.output_dir)        
 
-        self.write_logs(options.output_dir)
         # self.minimax_sol = self.minimax_sol(data_dirname)
         self.minimax_sol = 0
 
@@ -353,7 +355,7 @@ class Problem:
         team_details = OrderedDict()
         for _, topic in topics_df.iterrows():
             topic_id = str(int(topic["project_number"]))
-            advisor_name = str(topic.get("advisor_main", ""))
+            advisor_name = str(topic.get("main_advisor", ""))
             username = name_to_username.get(advisor_name, "")
             email = f"{username}@sdu.dk" if username else "unknown@sdu.dk"
 
@@ -392,20 +394,21 @@ class Problem:
         # Map advisor full_name → list of topic dicts
         advisor_topics = defaultdict(list)
         for _, topic in topics_df.iterrows():
-            advisor_name = str(topic.get("advisor_main", ""))
-            topic_id = str(int(topic["project_number"]))
+            advisor_name = str(topic.get("main_advisor", "")).strip()
+            topic_id = str(int(topic["project_number"])).strip()
             n_teams = int(topic.get("number_of_teams", 1))
             max_cap = int(topic["max"])
             advisor_topics[advisor_name].append(
                 {"topic_id": topic_id, "n_teams": n_teams, "max": max_cap}
             )
-
+        #print(advisor_topics)
+        #print(topics_df.columns)
         restrictions = []
         for _, teacher in teachers_df.iterrows():
             if teacher.get("admin", False):
                 continue
-            full_name = str(teacher["full_name"])
-            username = str(teacher["username"]).lower()
+            full_name = str(teacher["full_name"]).strip()
+            username = str(teacher["username"]).strip().lower()
 
             topics_data = advisor_topics.get(full_name, [])
             if not topics_data:
@@ -622,6 +625,28 @@ class Problem:
                 ensure_ascii=False,
             )
         with codecs.open(
+            os.path.join(log, "restrictions.json"), "w", "utf-8"
+        ) as filehandle:
+            json.dump(
+                self.restrictions,
+                fp=filehandle,
+                sort_keys=True,
+                indent=4,
+                separators=(",", ": "),
+                ensure_ascii=False,
+            )
+        with codecs.open(
+            os.path.join(log, "advisors.json"), "w", "utf-8"
+        ) as filehandle:
+            json.dump(
+                self.advisors,
+                fp=filehandle,
+                sort_keys=True,
+                indent=4,
+                separators=(",", ": "),
+                ensure_ascii=False,
+            )
+        with codecs.open(
             os.path.join(log, "students.json"), "w", "utf-8"
         ) as filehandle:
             json.dump(
@@ -823,9 +848,10 @@ class Problem:
         """Must occurr before calculating ranks and values"""
         new_id = "Unassigned"
         # Team = namedtuple("Team", ("team_id", "min", "max", "type"))
-        letters = "abcdefghi"
+        letters = list(map(chr, range(ord('a'), ord('z')+1)))
+        #letters += list(map(chr, range(ord('A'), ord('Z')+1)))
 
-        print(self.teams_per_topic)
+        #print(self.teams_per_topic)
         # copy the type of the first team
         type = self.teams_per_topic[list(self.teams_per_topic.keys())[0]][0].type
 
@@ -891,12 +917,12 @@ class Problem:
             missing_places = n_stds - n_places
             topic_nr = max(map(lambda x: int(x), self.teams_per_topic.keys())) + 1
             for _ in range(missing_places):
-                self.add_fake_project(topic_nr)
+                self.add_fake_project() #topic_nr)
         if n_groups > n_teams and pre_grouping:
             missing_teams = n_groups - n_teams + 3
             topic_nr = max(map(lambda x: int(x), self.teams_per_topic.keys())) + 1
             for _ in range(missing_teams):
-                self.add_fake_project()  # topic_nr)
+                self.add_fake_project()
 
     def check_capacity(self, pre_grouping: bool) -> None:
         n_stds = len(self.student_details)

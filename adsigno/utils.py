@@ -99,7 +99,7 @@ def data_issue_continue(msg: str, execution_mode: str) -> None:
 				sys.exit("You decided to stop")
 		case "except":
 			raise DataIssueStop(msg) 
-		case "yes":
+		case "continue":
 			pass
 		case _:
 			raise SystemError("Option " + execution_mode+" not recognized")
