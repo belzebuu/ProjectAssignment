@@ -216,6 +216,12 @@ class Problem:
         if "id" in project_table.columns:
             project_table.rename(columns={"id": "topic_id"}, inplace=True)
 
+      
+        if "proj_id" in project_table.columns:
+            project_table.rename(columns={"proj_id": "topic_id"}, inplace=True)
+        if "project_number" in project_table.columns:
+            project_table.rename(columns={"project_number": "topic_id"}, inplace=True)
+
         # Remove rows where topic_id is NaN or empty string
         project_table = project_table[project_table['topic_id'].notna()]
         project_table = project_table[project_table['topic_id'].astype(str).str.strip() != ""]
@@ -227,11 +233,7 @@ class Problem:
         else:
             project_table["project_name"] = project_table.topic_id.astype(str)
 
-        if "proj_id" in project_table.columns:
-            project_table.rename(columns={"proj_id": "topic_id"}, inplace=True)
-        if "project_number" in project_table.columns:
-            project_table.rename(columns={"project_number": "topic_id"}, inplace=True)
-
+      
         return project_table
 
     def read_teams(self, data_dirname):
