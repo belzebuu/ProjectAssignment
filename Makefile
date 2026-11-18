@@ -43,7 +43,7 @@ RUN_FLAGS=-i --Wmethod owa --groups post --min_preferences 7 --cut_off_type styp
 RUN_FLAGS=--Wmethod owa --groups pre --min_preferences 6 # 2022-BADM500
 RUN_FLAGS=-e --Wmethod owa --groups pre --min_preferences 5 # 2023-BADM500
 RUN_FLAGS=-i --groups post --min_preferences 7 # 2022-
-RUN_FLAGS=-e -i --Wmethod owa --groups post --min_preferences 7 --cut_off_type 1 --cut_off 3 # 2025-psy
+RUN_FLAGS=-e -i --Wmethod owa --groups post --min_preferences 7 --cut_off_type 1 --cut_off 2 -p # 2025-psy
 
 OUTPUT_FLAGS=--allow_unassigned --min_preferences 5
 OUTPUT_FLAGS=--allow_unassigned --prioritize_all --min_preferences 5
