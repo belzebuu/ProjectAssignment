@@ -69,7 +69,7 @@ python3 src/adsigno/__main__.py -i --groups post --min_preferences 7 -x except /
 
 This writes in the directory `tmp` the directories `sln` and `log` containing the solutions and the log files.
 
-To generate the various kind of reports in `tmp/out`:  
+To generate the various kinds of reports in `tmp/out`:  
 ```
 python3 src/adsigno/solution_report.py -m 3 -s tmp/sln/sol_001.txt -o tmp data/2021-example
 ```
@@ -151,7 +151,7 @@ poetry export -f requirements.txt --output requirements.txt --without-hashes
 ```
 
 
-## Psy 2025 for K04-2026 
+## Psy 2025 for K04-2026 / 2027
 
 Step one use app/adsigno to collect preferences from students. Export Excel file
 from Data in adsigno portal. It is also possible to copy the files generated
@@ -160,6 +160,12 @@ projects.csv, the advisors are missing.
 
 In ProjectAssignment_gitlab create the data files from the Excel saving each
 sheet as a CSV file.
+
+```
+python3 data/scripts/excel_to_csv.py  data/2026-psy/K04-2027-data.xlsx K04-2027-prepared
+cp ../2025-psy/K04-2026-prepared/types.csv K04-2027-prepared
+python3 ../scripts/restrictions.py K04-2027-data.xlsx
+```
 
 Remove students with no preferences.
 

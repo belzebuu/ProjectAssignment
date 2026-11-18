@@ -14,6 +14,7 @@ DATADIR=/Users/march/workspace/git/TT/ProjectAssignment_git_imada/data/2024-ff50
 DATADIR=/home/marco/workspace/git/EMT/ProjectAssignment_gitsdu/data
 DATADIR=/Users/march/workspace/github/EMT/ProjectAssignment_gitsdu/data/2025-psy
 DATADIR=/Users/march/workspace/github/EMT/ProjectAssignment_gitsdu/data/2026-bapsy
+DATADIR=/Users/march/workspace/github/EMT/ProjectAssignment_gitsdu/data/2026-psy
 #DATADIR=/home/marco/Teaching/Bachelor/aaskh20/student_alloc/media
 #CASE=2021-zhiru
 #CASE=2019-bachelor
@@ -30,7 +31,7 @@ CASE=2024-ff501
 CASE=2025-ff501
 CASE=K04-2026-prepared
 CASE=BAPSY2026
-
+CASE=K04-2027-prepared
 
 
 PROGRAM=python3 adsigno/__main__.py
