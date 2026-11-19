@@ -51,8 +51,9 @@ OUTPUT_FLAGS=-e --min_preferences 7
 OUTPUT_FLAGS=-e -g post -w owa -m 7 # 2025-psy
 
 
-OUTPUTDIR=${DATADIR}/${CASE}/out
-SOLDIR=${OUTPUTDIR}/sln
+
+OUTPUTDIR=${DATADIR}/${CASE}/res
+
 
 projects: # careful, read README.md.old before use. It should not be necessary anymore
 	python3 src/update_projects.py  ${DATADIR}/${CASE}
@@ -108,22 +109,18 @@ bapsy2026:
 
 
 run:
-	${PROGRAM} ${RUN_FLAGS} ${DATADIR}/${CASE}  | tee ${DATADIR}/${CASE}/log.txt
+	${PROGRAM} ${RUN_FLAGS} -o ${OUTPUTDIR} ${DATADIR}/${CASE}  | tee ${DATADIR}/${CASE}/log.txt
 
 
 yrun:
-	yes | ${PROGRAM} ${RUN_FLAGS} ${DATADIR}/${CASE}  | tee ${DATADIR}/${CASE}/log.txt
+	yes | ${PROGRAM} ${RUN_FLAGS} -o ${OUTPUTDIR} ${DATADIR}/${CASE}  | tee ${DATADIR}/${CASE}/log.txt
 	
 
 output: | $(OUTPUTDIR)
-	yes | python3 adsigno/solution_report.py ${OUTPUT_FLAGS} -s ${SOLDIR}/sol_001.txt ${DATADIR}/${CASE}
-	yes | python3 adsigno/solution_report_admin.py ${OUTPUT_FLAGS} -s ${SOLDIR}/sol_001.txt ${DATADIR}/${CASE}
+	yes | python3 adsigno/solution_report.py ${OUTPUT_FLAGS} -s ${OUTPUTDIR}/sln/sol_001.txt -o ${OUTPUTDIR} ${DATADIR}/${CASE} 
+	yes | python3 adsigno/solution_report_admin.py ${OUTPUT_FLAGS} -s ${OUTPUTDIR}/sln/sol_001.txt -o ${OUTPUTDIR} ${DATADIR}/${CASE} 
 	# Rscript scripts/make_gtables.R
 
-output2:
-	yes | python3 src/adsigno/solution_report.py ${OUTPUT_FLAGS} -s ${DATADIR}/${SOLDIR}/sol_001.txt -o ${DATADIR} ${DATADIR}
-	yes | python3 src/adsigno/solution_report_admin.py ${OUTPUT_FLAGS} -s ${DATADIR}/${SOLDIR}/sol_001.txt -o ${DATADIR} ${DATADIR}
-	# Rscript scripts/make_gtables.R
 
 publish: 
 	#/bin/rm -rf /home/marco/public_html/out/
